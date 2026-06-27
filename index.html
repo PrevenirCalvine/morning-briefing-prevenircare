@@ -104,6 +104,29 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
 .co{padding:6px 11px;border-radius:99px;border:0.5px solid var(--bd);cursor:pointer;font-size:11px;font-family:'Exo 2',sans-serif;font-weight:600;transition:all .15s;}
 .co:hover{border-color:var(--pc-teal);}
 .co.sel{border-color:var(--pc-teal);background:var(--pc-teal-bg);color:var(--pc-teal-dark);}
+.btn-copilot{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-family:'Exo 2',sans-serif;font-weight:600;padding:10px 18px;border-radius:10px;border:1.5px solid var(--pc-violet);background:var(--pc-violet-bg);color:var(--pc-violet-dark);cursor:pointer;transition:all .15s;}
+.btn-copilot:hover{background:var(--pc-violet);color:#fff;}
+.btn-copilot i{font-size:16px;}
+.copilot-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:200;}
+.copilot-overlay.show{display:block;}
+.copilot-panel{position:fixed;top:0;right:-520px;width:480px;max-width:95vw;height:100vh;background:#fff;box-shadow:-4px 0 32px rgba(0,0,0,.12);z-index:201;transition:right .3s ease;display:flex;flex-direction:column;}
+.copilot-panel.show{right:0;}
+.copilot-hdr{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:0.5px solid var(--bd);flex-shrink:0;}
+.copilot-title{font-family:'STIX Two Text',Georgia,serif;font-size:17px;font-weight:700;color:var(--pc-dark);}
+.copilot-title span{color:var(--pc-violet);}
+.copilot-subtitle{font-size:11px;color:var(--tm);font-family:'Exo 2',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.07em;margin-top:2px;}
+.copilot-close{width:32px;height:32px;border-radius:50%;border:0.5px solid var(--bd);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--tm);font-size:16px;}
+.copilot-close:hover{background:var(--s1);}
+.copilot-body{flex:1;overflow-y:auto;padding:24px;}
+.copilot-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;gap:12px;}
+.copilot-spin{width:28px;height:28px;border:2.5px solid var(--bd);border-top-color:var(--pc-violet);border-radius:50%;animation:sp .8s linear infinite;}
+.copilot-loading-txt{font-size:13px;color:var(--tm);}
+.copilot-section{margin-bottom:20px;}
+.copilot-sec-lbl{font-family:'Exo 2',sans-serif;font-size:9px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.09em;margin-bottom:8px;}
+.copilot-data{background:var(--s1);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--ts);line-height:1.65;}
+.copilot-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-family:'Exo 2',sans-serif;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--pc-violet-bg);color:var(--pc-violet-dark);margin-bottom:10px;}
+.copilot-placeholder i{font-size:32px;color:var(--pc-violet);opacity:.4;display:block;margin:0 auto 8px;}
+.copilot-placeholder p{font-size:13px;color:var(--tm);line-height:1.6;text-align:center;}
 .spin-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;gap:12px;background:#fff;border-radius:12px;border:0.5px solid var(--bd);}
 .spin{width:28px;height:28px;border:2.5px solid var(--bd);border-top-color:var(--pc-teal);border-radius:50%;animation:sp .8s linear infinite;}
 @keyframes sp{to{transform:rotate(360deg);}}
@@ -212,6 +235,24 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
   </div>
 </div>
 
+<!-- PANNEAU LATERAL SALES COPILOT -->
+<div class="copilot-overlay" id="copilot-overlay" onclick="closeCopilot()"></div>
+<div class="copilot-panel" id="copilot-panel">
+  <div class="copilot-hdr">
+    <div>
+      <div class="copilot-title">PrévenirCare <span>Sales Copilot</span></div>
+      <div class="copilot-subtitle">Analyse commerciale</div>
+    </div>
+    <button class="copilot-close" onclick="closeCopilot()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="copilot-body" id="copilot-body">
+    <div class="copilot-placeholder">
+      <i class="ti ti-brain"></i>
+      <p>Sélectionnez une entreprise et cliquez sur<br><strong>"Préparer le prochain échange"</strong><br>pour démarrer l'analyse.</p>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -220,6 +261,7 @@ const BASE='appRusV4qJw9fxGKF';
 const TC='tblSgCiw3GO0oa9dp';
 const TE='tblPz7bhmL1eNogQS';
 const TI='tblxqjgr9IRrLevZw';
+const TO='tblSWdbKWnujbAi0b';
 const NOW=new Date();
 document.getElementById('dchip').textContent=NOW.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
 
@@ -329,6 +371,11 @@ function cardHTML(comp,idx,cc){
     <div class="sec-lbl">Contacts (${cc.length})</div>
     <div class="contact-list">${ctHTML}</div>
     ${pri?`<div class="dl2">Brouillon — ${pri['Nom du contact']||''}</div><div class="ew"><div class="esubj">Objet : <strong>${em.s}</strong></div><div class="ebody">${em.b}</div><div class="esig"><div class="sname">Calvine TONGA</div><div class="ssub">Fondatrice – Présidente · PrévenirCare · prevenir.care</div></div></div>`:''}
+    <div style="margin-top:16px;padding-top:14px;border-top:0.5px solid var(--bd);">
+      <button class="btn-copilot" onclick="event.stopPropagation();prepareNextAction('${comp._recordId||''}','${name.replace(/'/g,"\\'")}')">
+        <i class="ti ti-brain"></i> Préparer le prochain échange
+      </button>
+    </div>
   </div>
 </div>`;
 }
@@ -451,6 +498,149 @@ async function fetchAll(table){
   }while(offset);
   return recs;
 }
+
+// ─── SPRINT 1 — SALES COPILOT ARCHITECTURE ───────────────────────────────────
+
+function openCopilot(){
+  document.getElementById('copilot-overlay').classList.add('show');
+  document.getElementById('copilot-panel').classList.add('show');
+}
+
+function closeCopilot(){
+  document.getElementById('copilot-overlay').classList.remove('show');
+  document.getElementById('copilot-panel').classList.remove('show');
+}
+
+async function prepareNextAction(companyId, companyName){
+  // Ouvrir le panneau et afficher l'état de chargement
+  openCopilot();
+  document.getElementById('copilot-body').innerHTML=`
+    <div class="copilot-loading">
+      <div class="copilot-spin"></div>
+      <div class="copilot-loading-txt">Préparation de l'analyse…</div>
+    </div>`;
+
+  try {
+    // 1. Récupérer l'entreprise
+    const comp = companies.find(c => c._recordId === companyId) || {};
+
+    // 2. Récupérer les contacts liés
+    const compContacts = contacts.filter(c => {
+      const l = c['Entreprise liée'];
+      return Array.isArray(l) && l.includes(companyId);
+    });
+
+    // 3. Récupérer les interactions liées aux contacts
+    const contactIds = compContacts.map(c => c._recordId).filter(Boolean);
+    let compInteractions = [];
+    if(contactIds.length > 0){
+      const interRes = await fetchAll(TI);
+      compInteractions = interRes.filter(i => {
+        const linked = i['Contact lié'];
+        return Array.isArray(linked) && linked.some(id => contactIds.includes(id));
+      });
+    }
+
+    // 4. Récupérer les opportunités
+    const oppRes = await fetchAll(TO);
+    const compOpps = oppRes.filter(o => {
+      const linked = o['Contacts liés'] || o['Contact lié'] || [];
+      return Array.isArray(linked) && linked.some(id => contactIds.includes(id));
+    });
+
+    // 5. Niveau Kestio de l'entreprise
+    const mat = cMat(compContacts);
+    const kestioLevel = `N${mat}`;
+
+    // 6. Construire l'objet contexte
+    const context = {
+      company: {
+        id: companyId,
+        name: companyName,
+        secteur: typeof comp['Secteur']==='object' ? comp['Secteur']?.name : (comp['Secteur']||''),
+        taille: typeof comp['Taille']==='object' ? comp['Taille']?.name : (comp['Taille']||''),
+      },
+      contacts: compContacts.map(c => ({
+        id: c._recordId,
+        nom: c['Nom du contact'] || '',
+        role: c['Rôle / Fonction'] || c['Rôle'] || '',
+        email: c['Email'] || '',
+        statut: c['Statut réponse'] || '',
+        niveau_maturite: c['Niveau maturité'] || '1',
+        dernierEmail: c['Date dernier email'] || '',
+        notes: c['Notes sur le contact'] || '',
+        prochaine_action: c['Prochaine action'] || '',
+        date_prochaine_action: c['Date prochaine action'] || '',
+      })),
+      interactions: compInteractions.map(i => ({
+        type: i['Type d\'interaction'] || '',
+        date: i['Date d\'interaction'] || '',
+        notes: i['Notes'] || '',
+      })),
+      opportunities: compOpps.map(o => ({
+        nom: o['Nom de l\'opportunité'] || '',
+        stade: typeof o['Stade']==='object' ? o['Stade']?.name : (o['Stade']||''),
+        score: o['Score'] || 0,
+        valeur: o['Valeur (EUR)'] || 0,
+        prochaine_action: o['Prochaine action'] || '',
+      })),
+      kestioLevel,
+      kestioObjectif: MC[mat]?.obj || '',
+      kestioAction: MC[mat]?.act || '',
+      generatedAt: new Date().toISOString(),
+    };
+
+    // 7. Afficher dans la console (critère de réussite du sprint)
+    console.log('🧠 PrévenirCare Sales Copilot — Contexte:', JSON.stringify(context, null, 2));
+
+    // 8. Afficher le résumé dans le panneau
+    const lastInter = context.interactions.sort((a,b) => new Date(b.date)-new Date(a.date))[0];
+    const priorityContact = context.contacts.find(c => c.prochaine_action) || context.contacts[0];
+
+    document.getElementById('copilot-body').innerHTML=`
+      <div class="copilot-badge"><i class="ti ti-building"></i> ${companyName}</div>
+      <div class="copilot-section">
+        <div class="copilot-sec-lbl">Niveau de maturité</div>
+        <div class="copilot-data">${mb(mat)} <span style="margin-left:8px;font-size:12px;color:var(--ts);">${context.kestioObjectif}</span></div>
+      </div>
+      <div class="copilot-section">
+        <div class="copilot-sec-lbl">Contacts (${context.contacts.length})</div>
+        <div class="copilot-data">${context.contacts.map(c=>`<div style="margin-bottom:6px;"><strong>${c.nom}</strong> · ${c.role||'–'}<br><span style="color:var(--tm);font-size:11px;">${c.statut||'Non contacté'}${c.dernierEmail?' · dernier email '+new Date(c.dernierEmail).toLocaleDateString('fr-FR'):''}</span></div>`).join('')}</div>
+      </div>
+      ${context.interactions.length>0?`<div class="copilot-section">
+        <div class="copilot-sec-lbl">Dernière interaction</div>
+        <div class="copilot-data">${lastInter?`${lastInter.type} · ${lastInter.date?new Date(lastInter.date).toLocaleDateString('fr-FR'):''}<br><span style="color:var(--tm);font-size:11px;">${lastInter.notes||''}</span>`:'Aucune'}</div>
+      </div>`:''}
+      ${priorityContact?.prochaine_action?`<div class="copilot-section">
+        <div class="copilot-sec-lbl">Prochaine action prévue</div>
+        <div class="copilot-data">${priorityContact.prochaine_action}${priorityContact.date_prochaine_action?' · <strong>'+new Date(priorityContact.date_prochaine_action).toLocaleDateString('fr-FR')+'</strong>':''}</div>
+      </div>`:''}
+      <div class="copilot-section">
+        <div class="copilot-sec-lbl">Action recommandée</div>
+        <div class="copilot-data" style="color:var(--pc-violet-dark);border-left:2px solid var(--pc-violet);">${context.kestioAction}</div>
+      </div>
+      <div style="margin-top:24px;padding-top:16px;border-top:0.5px solid var(--bd);font-size:11px;color:var(--tm);text-align:center;">
+        <i class="ti ti-code" style="display:block;margin-bottom:4px;"></i>
+        Contexte complet disponible en console (F12)<br>
+        <span style="font-family:'Exo 2',sans-serif;font-weight:600;color:var(--pc-violet-dark);">Sprint 2 — Génération IA à venir</span>
+      </div>`;
+
+    // Prépare le contexte pour le sprint 2 (fonction future)
+    // generateCommercialRecommendation(context); // Sprint 2
+
+  } catch(e) {
+    console.error('Copilot error:', e);
+    document.getElementById('copilot-body').innerHTML=`
+      <div style="background:var(--pc-terra-bg);border-radius:8px;padding:14px;font-size:13px;color:var(--pc-terra-dark);">
+        <strong>Erreur lors de l'analyse.</strong><br>${e.message}
+      </div>`;
+  }
+}
+
+// Stub Sprint 2 — sera implémenté au prochain sprint
+// async function generateCommercialRecommendation(context){ ... }
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 async function boot(){
   document.getElementById('rbtn').disabled=true;
