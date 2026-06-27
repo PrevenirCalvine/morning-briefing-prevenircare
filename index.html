@@ -7,143 +7,119 @@
 <link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:wght@700&family=Exo+2:wght@600;700&family=Poppins:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/tabler-icons.min.css">
 <style>
-  *{box-sizing:border-box;margin:0;padding:0;}
-  :root{
-    --pc-teal:#69BAA5;--pc-teal-bg:#EAF6F2;--pc-teal-dark:#3d7a6b;
-    --pc-violet:#8176AA;--pc-violet-bg:#EEEDFA;--pc-violet-dark:#534B7A;
-    --pc-terra:#C45A2C;--pc-terra-bg:#FAEAE2;--pc-terra-dark:#8C3E1A;
-    --pc-dark:#303030;
-    --surface-0:#ffffff;--surface-1:#F7F7F7;--surface-2:#ffffff;
-    --border:#E5E5E5;--border-strong:#CFCFCF;
-    --text-primary:#1A1A1A;--text-secondary:#444;--text-muted:#888;
-    --radius:8px;
-  }
-  body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:var(--text-primary);min-height:100vh;}
-  .page{max-width:860px;margin:0 auto;padding:2rem 1.5rem 4rem;}
-
-  /* HEADER */
-  .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;background:#fff;border-radius:12px;padding:16px 20px;border:0.5px solid var(--border);}
-  .brand{display:flex;align-items:center;gap:12px;}
-  .brand-name{font-family:'STIX Two Text',Georgia,serif;font-size:20px;font-weight:700;color:var(--pc-dark);}
-  .brand-name span{color:var(--pc-teal);}
-  .brand-sub{font-family:'Exo 2',sans-serif;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--text-muted);margin-top:2px;}
-  .header-right{display:flex;align-items:center;gap:10px;}
-  .date-chip{font-size:12px;color:var(--text-secondary);background:var(--surface-1);border:0.5px solid var(--border);border-radius:var(--radius);padding:5px 12px;}
-  .btn-refresh{display:flex;align-items:center;gap:6px;font-size:12px;font-family:'Poppins',sans-serif;padding:6px 14px;border-radius:var(--radius);border:0.5px solid var(--border-strong);background:#fff;color:var(--text-secondary);cursor:pointer;transition:background .15s;}
-  .btn-refresh:hover{background:var(--surface-1);}
-  .btn-refresh:disabled{opacity:.5;cursor:default;}
-
-  /* KPI */
-  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.5rem;}
-  .kpi{background:#fff;border-radius:12px;padding:14px 16px;border:0.5px solid var(--border);}
-  .kpi-n{font-family:'Exo 2',sans-serif;font-size:28px;font-weight:700;line-height:1;color:var(--text-primary);}
-  .kpi-n.t{color:var(--pc-teal-dark);}.kpi-n.v{color:var(--pc-violet-dark);}.kpi-n.o{color:var(--pc-terra-dark);}
-  .kpi-l{font-size:11px;color:var(--text-muted);margin-top:5px;line-height:1.3;}
-
-  /* TABS */
-  .tabs{display:flex;gap:4px;background:#fff;border-radius:10px;padding:4px;margin-bottom:1.25rem;border:0.5px solid var(--border);}
-  .tab{flex:1;font-size:12px;font-family:'Exo 2',sans-serif;font-weight:600;padding:7px;border-radius:7px;border:none;background:transparent;color:var(--text-muted);cursor:pointer;letter-spacing:.02em;}
-  .tab.on{background:var(--pc-teal);color:#fff;}
-
-  /* SECTION LABEL */
-  .sec-lbl{font-family:'Exo 2',sans-serif;font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:10px;}
-
-  /* CARDS */
-  .cards{display:flex;flex-direction:column;gap:10px;}
-  .card{background:#fff;border:0.5px solid var(--border);border-radius:12px;padding:16px 18px;cursor:pointer;transition:border-color .15s,box-shadow .15s;}
-  .card:hover{border-color:var(--pc-teal);box-shadow:0 2px 12px rgba(105,186,165,.12);}
-  .card.open{border-left:3px solid var(--pc-teal);padding-left:16px;}
-  .card-static{cursor:default;}
-  .card-static:hover{border-color:var(--border);box-shadow:none;}
-
-  /* CARD HEADER */
-  .ch{display:flex;align-items:center;gap:12px;}
-  .av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Exo 2',sans-serif;font-size:13px;font-weight:700;flex-shrink:0;}
-  .av0{background:var(--pc-teal-bg);color:var(--pc-teal-dark);}
-  .av1{background:var(--pc-violet-bg);color:var(--pc-violet-dark);}
-  .av2{background:var(--pc-terra-bg);color:var(--pc-terra-dark);}
-  .av3{background:var(--surface-1);color:var(--text-secondary);border:0.5px solid var(--border);}
-  .cm{flex:1;min-width:0;}
-  .cn{font-family:'Exo 2',sans-serif;font-size:14px;font-weight:600;color:var(--text-primary);}
-  .cr{font-size:12px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px;}
-  .cr2{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
-  .badge{font-size:10px;padding:3px 9px;border-radius:99px;font-weight:600;font-family:'Exo 2',sans-serif;}
-  .bu{background:var(--pc-terra-bg);color:var(--pc-terra-dark);}
-  .bh{background:#FFF3E0;color:#8C5A00;}
-  .bm{background:var(--pc-teal-bg);color:var(--pc-teal-dark);}
-  .bn{background:var(--surface-1);color:var(--text-muted);}
-  .bv{background:var(--pc-violet-bg);color:var(--pc-violet-dark);}
-  .dl{font-size:10px;color:var(--text-muted);}
-  .chevron{color:var(--text-muted);font-size:15px;transition:transform .15s;flex-shrink:0;}
-  .open .chevron{transform:rotate(180deg);}
-
-  /* STATUT EMAIL */
-  .statut-row{display:flex;align-items:center;gap:8px;margin-top:6px;padding-top:6px;border-top:0.5px solid var(--border);}
-  .statut-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-  .s-attente{background:#F5A623;}.s-reponse{background:#4CAF50;}.s-rdv{background:var(--pc-teal);}.s-relance{background:var(--pc-terra);}.s-init{background:#ccc;}.s-suite{background:#aaa;}
-  .statut-txt{font-size:11px;color:var(--text-secondary);}
-  .days-since{font-size:11px;color:var(--text-muted);}
-
-  /* DETAIL */
-  .detail{display:none;border-top:0.5px solid var(--border);margin-top:14px;padding-top:14px;}
-  .open .detail{display:block;}
-  .dsec{margin-bottom:16px;}
-  .dl2{font-family:'Exo 2',sans-serif;font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:6px;}
-  .dv{font-size:13px;color:var(--text-secondary);line-height:1.7;}
-  .angle-tag{display:inline-flex;align-items:center;gap:6px;background:var(--pc-teal-bg);color:var(--pc-teal-dark);font-size:11px;padding:5px 12px;border-radius:99px;margin-bottom:8px;font-family:'Exo 2',sans-serif;font-weight:600;}
-
-  /* RELANCE RECOMMENDATION */
-  .relance-box{background:var(--pc-terra-bg);border:0.5px solid #f0b99e;border-radius:8px;padding:12px 14px;font-size:12px;color:var(--pc-terra-dark);line-height:1.6;margin-bottom:14px;}
-  .relance-box strong{font-family:'Exo 2',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;}
-
-  /* EMAIL DRAFT */
-  .email-wrap{background:var(--surface-1);border:0.5px solid var(--border);border-left:2px solid var(--pc-teal);border-radius:8px;padding:16px 18px;}
-  .email-subj{font-size:11px;color:var(--text-muted);margin-bottom:10px;font-family:'Exo 2',sans-serif;}
-  .email-subj strong{color:var(--text-secondary);font-weight:600;}
-  .email-body{font-size:13px;color:var(--text-secondary);line-height:1.8;white-space:pre-wrap;}
-  .email-sig{margin-top:12px;padding-top:12px;border-top:0.5px solid var(--border);}
-  .sig-name{font-family:'STIX Two Text',Georgia,serif;font-size:14px;font-weight:700;color:var(--pc-dark);}
-  .sig-role{font-size:11px;color:var(--text-muted);margin-top:1px;}
-  .sig-brand{font-size:11px;color:var(--pc-teal-dark);font-family:'Exo 2',sans-serif;font-weight:600;margin-top:2px;}
-
-  /* ACTIONS */
-  .actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
-  .btn{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-family:'Poppins',sans-serif;padding:6px 13px;border-radius:var(--radius);border:0.5px solid var(--border-strong);background:#fff;color:var(--text-secondary);cursor:pointer;transition:background .15s;}
-  .btn:hover{background:var(--surface-1);}
-  .btn-teal{background:var(--pc-teal);color:#fff;border-color:var(--pc-teal);}
-  .btn-teal:hover{background:var(--pc-teal-dark);}
-  .btn-violet{background:var(--pc-violet-bg);color:var(--pc-violet-dark);border-color:var(--pc-violet-bg);}
-  .btn-terra{background:var(--pc-terra-bg);color:var(--pc-terra-dark);border-color:var(--pc-terra-bg);}
-
-  /* OPP */
-  .score-pill{font-size:10px;padding:3px 9px;border-radius:99px;background:var(--pc-violet-bg);color:var(--pc-violet-dark);font-family:'Exo 2',sans-serif;font-weight:700;}
-  .stade-pill{font-size:10px;padding:3px 9px;border-radius:99px;background:var(--surface-1);border:0.5px solid var(--border);color:var(--text-secondary);font-family:'Exo 2',sans-serif;}
-  .next-action{margin-top:10px;padding-top:10px;border-top:0.5px solid var(--border);font-size:13px;color:var(--text-secondary);display:flex;align-items:baseline;gap:8px;}
-
-  /* LOADING / EMPTY / ERROR */
-  .spin-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;gap:12px;background:#fff;border-radius:12px;border:0.5px solid var(--border);}
-  .spin{width:28px;height:28px;border:2.5px solid var(--border);border-top-color:var(--pc-teal);border-radius:50%;animation:sp .8s linear infinite;}
-  @keyframes sp{to{transform:rotate(360deg);}}
-  .spin-txt{font-size:13px;color:var(--text-muted);}
-  .empty{text-align:center;padding:3rem 0;font-size:13px;color:var(--text-muted);background:#fff;border-radius:12px;border:0.5px solid var(--border);}
-  .err{background:var(--pc-terra-bg);border:0.5px solid #f0b99e;border-radius:12px;padding:16px 18px;font-size:13px;color:var(--pc-terra-dark);line-height:1.7;}
-
-  /* NOTICE */
-  .notice{background:var(--pc-teal-bg);border:0.5px solid #9FE1CB;border-radius:10px;padding:12px 16px;font-size:12px;color:var(--pc-teal-dark);margin-bottom:1.25rem;display:flex;align-items:flex-start;gap:10px;line-height:1.6;}
-  .notice i{font-size:16px;flex-shrink:0;margin-top:1px;}
-
-  @media(max-width:600px){
-    .kpi-row{grid-template-columns:repeat(2,1fr);}
-    .header{flex-direction:column;align-items:flex-start;gap:10px;}
-  }
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --pc-teal:#69BAA5;--pc-teal-bg:#EAF6F2;--pc-teal-dark:#3d7a6b;
+  --pc-violet:#8176AA;--pc-violet-bg:#EEEDFA;--pc-violet-dark:#534B7A;
+  --pc-terra:#C45A2C;--pc-terra-bg:#FAEAE2;--pc-terra-dark:#8C3E1A;
+  --pc-dark:#303030;
+  --s1:#F7F7F7;--bd:#E5E5E5;--bds:#CFCFCF;
+  --tp:#1A1A1A;--ts:#444;--tm:#888;--r:8px;
+}
+body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:var(--tp);min-height:100vh;}
+.page{max-width:900px;margin:0 auto;padding:2rem 1.5rem 4rem;}
+.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;background:#fff;border-radius:12px;padding:16px 20px;border:0.5px solid var(--bd);flex-wrap:wrap;gap:10px;}
+.brand{display:flex;align-items:center;gap:12px;}
+.bn{font-family:'STIX Two Text',Georgia,serif;font-size:20px;font-weight:700;color:var(--pc-dark);}
+.bn span{color:var(--pc-teal);}
+.bs{font-family:'Exo 2',sans-serif;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--tm);margin-top:2px;}
+.hdr-r{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.btn{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-family:'Poppins',sans-serif;padding:6px 13px;border-radius:var(--r);border:0.5px solid var(--bds);background:#fff;color:var(--ts);cursor:pointer;transition:background .15s;}
+.btn:hover{background:var(--s1);}
+.btn:disabled{opacity:.5;cursor:default;}
+.btn-teal{background:var(--pc-teal);color:#fff;border-color:var(--pc-teal);}
+.btn-teal:hover{background:var(--pc-teal-dark);}
+.btn-sm{font-size:11px;padding:4px 9px;}
+.date-chip{font-size:12px;color:var(--ts);background:var(--s1);border:0.5px solid var(--bd);border-radius:var(--r);padding:5px 12px;}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.5rem;}
+.kpi{background:#fff;border-radius:12px;padding:14px 16px;border:0.5px solid var(--bd);}
+.kpi-n{font-family:'Exo 2',sans-serif;font-size:28px;font-weight:700;line-height:1;}
+.kpi-n.t{color:var(--pc-teal-dark);}.kpi-n.v{color:var(--pc-violet-dark);}.kpi-n.o{color:var(--pc-terra-dark);}.kpi-n.g{color:#2a7a2a;}
+.kpi-l{font-size:11px;color:var(--tm);margin-top:5px;line-height:1.3;}
+.tabs{display:flex;gap:4px;background:#fff;border-radius:10px;padding:4px;margin-bottom:1.25rem;border:0.5px solid var(--bd);}
+.tab{flex:1;font-size:12px;font-family:'Exo 2',sans-serif;font-weight:600;padding:7px;border-radius:7px;border:none;background:transparent;color:var(--tm);cursor:pointer;}
+.tab.on{background:var(--pc-teal);color:#fff;}
+.sec-lbl{font-family:'Exo 2',sans-serif;font-size:10px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.09em;margin-bottom:10px;}
+.mat{display:inline-flex;align-items:center;font-size:10px;font-family:'Exo 2',sans-serif;font-weight:700;padding:3px 9px;border-radius:99px;}
+.mat1{background:#F0F0F0;color:#555;}.mat2{background:#FFF3E0;color:#8C5A00;}.mat3{background:var(--pc-teal-bg);color:var(--pc-teal-dark);}.mat4{background:var(--pc-violet-bg);color:var(--pc-violet-dark);}
+.cards{display:flex;flex-direction:column;gap:12px;}
+.ccard{background:#fff;border:0.5px solid var(--bd);border-radius:14px;overflow:hidden;}
+.ccard.open{border-left:3px solid var(--pc-teal);}
+.ccard-hdr{display:flex;align-items:center;gap:12px;padding:16px 18px;cursor:pointer;}
+.ccard-hdr:hover{background:var(--s1);}
+.cav{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Exo 2',sans-serif;font-size:13px;font-weight:700;flex-shrink:0;}
+.cav0{background:var(--pc-teal-bg);color:var(--pc-teal-dark);}.cav1{background:var(--pc-violet-bg);color:var(--pc-violet-dark);}.cav2{background:var(--pc-terra-bg);color:var(--pc-terra-dark);}.cav3{background:#F0F0F0;color:#555;}
+.cm{flex:1;min-width:0;}
+.cname{font-family:'Exo 2',sans-serif;font-size:15px;font-weight:700;color:var(--tp);}
+.cmeta{font-size:12px;color:var(--tm);margin-top:2px;display:flex;gap:6px;flex-wrap:wrap;}
+.cr2{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;}
+.chevron{color:var(--tm);font-size:15px;transition:transform .15s;flex-shrink:0;}
+.open .chevron{transform:rotate(180deg);}
+.action-today{background:var(--pc-teal-bg);border-top:0.5px solid #c5e8de;padding:12px 18px;display:flex;gap:10px;}
+.action-today i{color:var(--pc-teal-dark);font-size:16px;flex-shrink:0;margin-top:2px;}
+.action-today-txt{font-size:12px;color:var(--pc-teal-dark);line-height:1.65;}
+.action-today-txt strong{font-family:'Exo 2',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:2px;}
+.cdetail{display:none;border-top:0.5px solid var(--bd);padding:16px 18px;}
+.open .cdetail{display:block;}
+.mat-progress{display:flex;gap:4px;margin-bottom:4px;}
+.mat-step{flex:1;height:4px;border-radius:99px;background:#E5E5E5;}
+.mat-step.active{background:var(--pc-teal);}.mat-step.done{background:var(--pc-teal-dark);}
+.mat-labels{display:flex;margin-bottom:10px;}
+.mat-label{font-size:9px;font-family:'Exo 2',sans-serif;font-weight:600;color:var(--tm);text-align:center;flex:1;text-transform:uppercase;letter-spacing:.04em;}
+.mat-label.cur{color:var(--pc-teal-dark);}
+.contact-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+.contact-row{background:var(--s1);border-radius:10px;padding:12px 14px;}
+.crh{display:flex;align-items:center;gap:10px;}
+.cav-sm{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Exo 2',sans-serif;font-size:11px;font-weight:700;flex-shrink:0;}
+.cav-sm0{background:var(--pc-teal-bg);color:var(--pc-teal-dark);}.cav-sm1{background:var(--pc-violet-bg);color:var(--pc-violet-dark);}.cav-sm2{background:var(--pc-terra-bg);color:var(--pc-terra-dark);}
+.cnm{font-family:'Exo 2',sans-serif;font-size:13px;font-weight:600;color:var(--tp);}
+.crl{font-size:11px;color:var(--tm);}
+.sd{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.si{background:#ccc;}.sa{background:#F5A623;}.sr{background:#4CAF50;}.srdv{background:var(--pc-teal);}.srl{background:var(--pc-terra);}
+.ibtns{display:flex;gap:5px;flex-wrap:wrap;padding-left:40px;margin-top:8px;}
+.dl2{font-family:'Exo 2',sans-serif;font-size:9px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.09em;margin-bottom:6px;margin-top:14px;}
+.ew{background:var(--s1);border:0.5px solid var(--bd);border-left:2px solid var(--pc-teal);border-radius:8px;padding:14px 16px;}
+.esubj{font-size:11px;color:var(--tm);margin-bottom:8px;font-family:'Exo 2',sans-serif;}
+.esubj strong{color:var(--ts);font-weight:600;}
+.ebody{font-size:12px;color:var(--ts);line-height:1.8;white-space:pre-wrap;}
+.esig{margin-top:10px;padding-top:10px;border-top:0.5px solid var(--bd);}
+.sname{font-family:'STIX Two Text',Georgia,serif;font-size:13px;font-weight:700;color:var(--pc-dark);}
+.ssub{font-size:10px;color:var(--tm);}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center;}
+.modal-overlay.show{display:flex;}
+.modal{background:#fff;border-radius:16px;padding:24px;width:92%;max-width:520px;max-height:90vh;overflow-y:auto;}
+.modal-title{font-family:'STIX Two Text',Georgia,serif;font-size:18px;font-weight:700;color:var(--pc-dark);margin-bottom:16px;}
+.fg{margin-bottom:14px;}
+.fl{font-family:'Exo 2',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tm);margin-bottom:5px;display:block;}
+.fi{width:100%;padding:8px 12px;border:0.5px solid var(--bds);border-radius:var(--r);font-family:'Poppins',sans-serif;font-size:13px;color:var(--tp);background:#fff;outline:none;}
+.fi:focus{border-color:var(--pc-teal);}
+.fta{width:100%;padding:8px 12px;border:0.5px solid var(--bds);border-radius:var(--r);font-family:'Poppins',sans-serif;font-size:13px;color:var(--tp);resize:vertical;min-height:80px;outline:none;}
+.fta:focus{border-color:var(--pc-teal);}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;}
+.mat-sel{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:4px;}
+.mo{padding:8px 10px;border-radius:8px;border:0.5px solid var(--bd);cursor:pointer;font-size:11px;font-family:'Exo 2',sans-serif;font-weight:600;text-align:center;transition:all .15s;}
+.mo:hover{border-color:var(--pc-teal);}
+.mo.sel{border-color:var(--pc-teal);background:var(--pc-teal-bg);color:var(--pc-teal-dark);}
+.canal-sel{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
+.co{padding:6px 11px;border-radius:99px;border:0.5px solid var(--bd);cursor:pointer;font-size:11px;font-family:'Exo 2',sans-serif;font-weight:600;transition:all .15s;}
+.co:hover{border-color:var(--pc-teal);}
+.co.sel{border-color:var(--pc-teal);background:var(--pc-teal-bg);color:var(--pc-teal-dark);}
+.spin-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;gap:12px;background:#fff;border-radius:12px;border:0.5px solid var(--bd);}
+.spin{width:28px;height:28px;border:2.5px solid var(--bd);border-top-color:var(--pc-teal);border-radius:50%;animation:sp .8s linear infinite;}
+@keyframes sp{to{transform:rotate(360deg);}}
+.spin-txt{font-size:13px;color:var(--tm);}
+.empty{text-align:center;padding:3rem;font-size:13px;color:var(--tm);background:#fff;border-radius:12px;border:0.5px solid var(--bd);}
+.err{background:var(--pc-terra-bg);border:0.5px solid #f0b99e;border-radius:12px;padding:16px;font-size:13px;color:var(--pc-terra-dark);line-height:1.7;}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--pc-teal);color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none;}
+.toast.show{opacity:1;}
+@media(max-width:600px){.kpi-row{grid-template-columns:repeat(2,1fr);}}
 </style>
 </head>
 <body>
 <div class="page">
-
-  <div class="header">
+  <div class="hdr">
     <div class="brand">
-      <svg width="40" height="40" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <svg width="38" height="38" viewBox="0 0 60 60" fill="none">
         <path d="M10 55 L10 30 Q10 10 30 10 Q50 10 50 30 L50 55" stroke="#303030" stroke-width="4" stroke-linecap="round" fill="none"/>
         <path d="M22 55 L22 40 Q22 32 30 32 Q38 32 38 40 L38 55" stroke="#303030" stroke-width="3" stroke-linecap="round" fill="none"/>
         <ellipse cx="17" cy="20" rx="7" ry="4" transform="rotate(-35 17 20)" fill="#69BAA5"/>
@@ -151,324 +127,344 @@
         <ellipse cx="32" cy="44" rx="5" ry="3" transform="rotate(-20 32 44)" fill="#69BAA5" opacity=".7"/>
         <circle cx="24" cy="28" r="1.5" fill="#303030"/>
         <circle cx="44" cy="35" r="1.5" fill="#303030"/>
-        <circle cx="16" cy="38" r="1.5" fill="#303030"/>
       </svg>
       <div>
-        <div class="brand-name">Prévenir<span>Care</span></div>
-        <div class="brand-sub">Morning Briefing · Copilote commercial</div>
+        <div class="bn">Prévenir<span>Care</span></div>
+        <div class="bs">Morning Briefing · Copilote commercial</div>
       </div>
     </div>
-    <div class="header-right">
+    <div class="hdr-r">
       <div class="date-chip" id="dchip"></div>
-      <button class="btn-refresh" onclick="boot()" id="rbtn">
-        <i class="ti ti-refresh"></i> Actualiser
-      </button>
+      <button class="btn" onclick="openAddContact()"><i class="ti ti-user-plus"></i> Nouveau contact</button>
+      <button class="btn btn-teal" onclick="boot()" id="rbtn"><i class="ti ti-refresh"></i> Actualiser</button>
     </div>
   </div>
-
   <div class="kpi-row">
-    <div class="kpi"><div class="kpi-n" id="k0">–</div><div class="kpi-l">contacts actifs</div></div>
-    <div class="kpi"><div class="kpi-n t" id="k1">–</div><div class="kpi-l">à contacter aujourd'hui</div></div>
-    <div class="kpi"><div class="kpi-n v" id="k2">–</div><div class="kpi-l">opportunités</div></div>
-    <div class="kpi"><div class="kpi-n o" id="k3">–</div><div class="kpi-l">relances en retard</div></div>
+    <div class="kpi"><div class="kpi-n t" id="k0">–</div><div class="kpi-l">entreprises actives</div></div>
+    <div class="kpi"><div class="kpi-n o" id="k1">–</div><div class="kpi-l">actions aujourd'hui</div></div>
+    <div class="kpi"><div class="kpi-n v" id="k2">–</div><div class="kpi-l">N3–N4 appropriation</div></div>
+    <div class="kpi"><div class="kpi-n g" id="k3">–</div><div class="kpi-l">contacts total</div></div>
   </div>
-
   <div class="tabs">
-    <button class="tab on" onclick="switchTab('today',this)">Aujourd'hui</button>
-    <button class="tab" onclick="switchTab('all',this)">Tous les contacts</button>
-    <button class="tab" onclick="switchTab('opps',this)">Opportunités</button>
+    <button class="tab on" onclick="sw('today',this)">Actions du jour</button>
+    <button class="tab" onclick="sw('all',this)">Toutes les entreprises</button>
+    <button class="tab" onclick="sw('pipeline',this)">Pipeline maturité</button>
   </div>
-
-  <div id="content">
-    <div class="spin-wrap"><div class="spin"></div><div class="spin-txt">Connexion au CRM PrévenirCare…</div></div>
-  </div>
-
+  <div id="content"><div class="spin-wrap"><div class="spin"></div><div class="spin-txt">Connexion au CRM PrévenirCare…</div></div></div>
 </div>
-<script>
-const NOW=new Date();
-const AIRTABLE_TOKEN='patBp1ANs8hOCg17w.631999d14abbce548f125e6796e50e70ca374e74cbba915e6a5e847478009618'; // Remplacer par votre token Airtable Personal Access Token
-const BASE_ID='appRusV4qJw9fxGKF';
-const TABLE_CONTACTS='tblSgCiw3GO0oa9dp';
-const TABLE_OPPS='tblSWdbKWnujbAi0b';
 
-// Délais de relance recommandés selon le statut
-const RELANCE_DELAIS={
-  'Envoyé – en attente': 7,
-  'Relance à faire': 3,
-  'RDV obtenu': 30,
-  'Réponse reçue': 5,
+<!-- MODAL INTERACTION -->
+<div class="modal-overlay" id="modal-inter">
+  <div class="modal">
+    <div class="modal-title">Enregistrer une interaction</div>
+    <div class="fg"><div class="fl">Canal</div>
+      <div class="canal-sel">
+        <div class="co sel" data-v="Email envoyé" onclick="so(this,'c')">📧 Email envoyé</div>
+        <div class="co" data-v="Réponse reçue" onclick="so(this,'c')">📬 Réponse reçue</div>
+        <div class="co" data-v="Appel téléphonique" onclick="so(this,'c')">📞 Appel</div>
+        <div class="co" data-v="LinkedIn" onclick="so(this,'c')">💼 LinkedIn</div>
+        <div class="co" data-v="Rencontre en personne" onclick="so(this,'c')">🤝 En personne</div>
+        <div class="co" data-v="RDV tenu" onclick="so(this,'c')">📅 RDV tenu</div>
+      </div>
+    </div>
+    <div class="fg"><div class="fl">Niveau de maturité après cet échange</div>
+      <div class="mat-sel" id="ms-inter">
+        <div class="mo" data-v="1" onclick="so(this,'mi')">N1 — Inconscience</div>
+        <div class="mo" data-v="2" onclick="so(this,'mi')">N2 — Prise de conscience</div>
+        <div class="mo sel" data-v="3" onclick="so(this,'mi')">N3 — Appropriation</div>
+        <div class="mo" data-v="4" onclick="so(this,'mi')">N4 — Recherche de solution</div>
+      </div>
+    </div>
+    <div class="fg"><div class="fl">Notes sur l'échange</div><textarea class="fta" id="in-notes" placeholder="Ce qui a été dit, ce qui a retenu l'attention, les objections, les prochaines étapes…"></textarea></div>
+    <div class="fg"><div class="fl">Prochaine action</div><input class="fi" id="in-na" placeholder="Ex : Envoyer la brochure, Relancer dans 2 semaines…"></div>
+    <div class="fg"><div class="fl">Date prochaine action</div><input class="fi" type="date" id="in-nd"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="cm('modal-inter')">Annuler</button>
+      <button class="btn btn-teal" onclick="saveInter()"><i class="ti ti-check"></i> Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOUVEAU CONTACT -->
+<div class="modal-overlay" id="modal-nc">
+  <div class="modal">
+    <div class="modal-title">Ajouter un contact</div>
+    <div class="fg"><div class="fl">Nom complet *</div><input class="fi" id="nc-nom" placeholder="Prénom Nom"></div>
+    <div class="fg"><div class="fl">Entreprise *</div><input class="fi" id="nc-ent" placeholder="Nom de l'entreprise"></div>
+    <div class="fg"><div class="fl">Rôle / Fonction</div><input class="fi" id="nc-role" placeholder="DRH, Responsable prévention, Directrice avantages sociaux…"></div>
+    <div class="fg"><div class="fl">Email</div><input class="fi" type="email" id="nc-email"></div>
+    <div class="fg"><div class="fl">Téléphone</div><input class="fi" id="nc-tel" placeholder="+33 6…"></div>
+    <div class="fg"><div class="fl">LinkedIn</div><input class="fi" id="nc-li" placeholder="https://linkedin.com/in/…"></div>
+    <div class="fg"><div class="fl">Contexte de la rencontre</div><input class="fi" id="nc-src" placeholder="VivaTech, Réseau Entreprendre, Introduction par…"></div>
+    <div class="fg"><div class="fl">Niveau de maturité estimé</div>
+      <div class="mat-sel" id="ms-nc">
+        <div class="mo sel" data-v="1" onclick="so(this,'mn')">N1 — Inconscience</div>
+        <div class="mo" data-v="2" onclick="so(this,'mn')">N2 — Prise de conscience</div>
+        <div class="mo" data-v="3" onclick="so(this,'mn')">N3 — Appropriation</div>
+        <div class="mo" data-v="4" onclick="so(this,'mn')">N4 — Recherche de solution</div>
+      </div>
+    </div>
+    <div class="fg"><div class="fl">Première impression / contexte</div><textarea class="fta" id="nc-notes" placeholder="Ce qui a retenu votre attention, le sujet évoqué, l'intérêt perçu…"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="cm('modal-nc')">Annuler</button>
+      <button class="btn btn-teal" onclick="saveNC()"><i class="ti ti-user-plus"></i> Créer le contact</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const TOKEN='patBp1ANs8hOCg17w';
+const BASE='appRusV4qJw9fxGKF';
+const TC='tblSgCiw3GO0oa9dp';
+const TE='tblPz7bhmL1eNogQS';
+const TI='tblxqjgr9IRrLevZw';
+const NOW=new Date();
+document.getElementById('dchip').textContent=NOW.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+
+let companies=[],contacts=[],currentTab='today',curCID=null;
+let sCanal='Email envoyé',sMat=3,sMatNC=1;
+
+const MC={
+  1:{label:'N1 — Inconscience',cls:'mat1',obj:'Ouvrir une réflexion',act:'Premier contact — apporter un angle de réflexion sans présenter PrévenirCare'},
+  2:{label:'N2 — Prise de conscience',cls:'mat2',obj:'Transformer l\'intuition en conviction',act:'Nourrir la réflexion — apporter des faits, des mécanismes, des observations terrain'},
+  3:{label:'N3 — Appropriation',cls:'mat3',obj:'Les aider à formuler leur propre problème',act:'Écouter et reformuler — créer les conditions d\'un échange en profondeur'},
+  4:{label:'N4 — Recherche de solution',cls:'mat4',obj:'Présenter PrévenirCare naturellement',act:'Proposer l\'approche PrévenirCare comme conséquence logique de la réflexion menée'}
 };
 
-document.getElementById('dchip').textContent=NOW.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
-let contacts=[],opps=[],currentTab='today';
-
-function ini(n){return(n||'').split(' ').map(p=>p[0]||'').join('').toUpperCase().slice(0,2)||'?';}
-function avcls(i){return['av0','av1','av2','av3'][i%4];}
-function daysDiff(d){if(!d)return null;return Math.floor((NOW-new Date(d))/86400000);}
-
-function statutDot(s){
-  if(!s||s==='Pas encore envoyé')return{cls:'s-init',label:'À initier'};
-  if(s==='Envoyé – en attente')return{cls:'s-attente',label:'En attente de réponse'};
-  if(s==='Réponse reçue')return{cls:'s-reponse',label:'Réponse reçue'};
-  if(s==='RDV obtenu')return{cls:'s-rdv',label:'RDV obtenu'};
-  if(s==='Relance à faire')return{cls:'s-relance',label:'Relance à faire'};
-  if(s==='Sans suite')return{cls:'s-suite',label:'Sans suite'};
-  return{cls:'s-init',label:s};
+function ini(s){return(s||'').split(' ').map(p=>p[0]||'').join('').toUpperCase().slice(0,2)||'?';}
+function avc(i){return['cav0','cav1','cav2','cav3'][i%4];}
+function avcs(i){return['cav-sm0','cav-sm1','cav-sm2'][i%3];}
+function ddiff(d){if(!d)return null;return Math.floor((NOW-new Date(d))/86400000);}
+function sdot(s){
+  if(!s||s==='Pas encore envoyé')return'si';
+  if(s==='Envoyé – en attente')return'sa';
+  if(s==='Réponse reçue')return'sr';
+  if(s==='RDV obtenu')return'srdv';
+  if(s==='Relance à faire')return'srl';
+  return'si';
 }
+function mb(n){const m=MC[n]||MC[1];return`<span class="mat ${m.cls}">${m.label}</span>`;}
+function getCC(comp){const id=comp._recordId;return contacts.filter(c=>{const l=c['Entreprise liée'];return Array.isArray(l)&&l.includes(id);});}
+function cMat(cc){let m=1;cc.forEach(c=>{const v=parseInt(c['Niveau maturité']||1);if(v>m)m=v;});return m;}
+function needsAct(c){const nd=c['Date prochaine action'];return nd&&new Date(nd)<=NOW;}
+function compNA(cc){return cc.some(c=>needsAct(c));}
+function urg(cc){return(compNA(cc)?10:0)+cMat(cc)*2;}
 
-function relanceReco(c){
-  const statut=c['Statut réponse'];
-  const dernierEmail=c['Date dernier email'];
-  if(!dernierEmail||!statut)return null;
-  const joursEcoules=daysDiff(dernierEmail);
-  const delai=RELANCE_DELAIS[statut];
-  if(!delai)return null;
-  const joursRestants=delai-joursEcoules;
-  if(joursRestants<=0){
-    return{urgent:true,msg:`Il y a ${joursEcoules} jours que le dernier email a été envoyé. Relance recommandée dès aujourd'hui.`};
-  }
-  if(joursRestants<=2){
-    return{urgent:false,msg:`Relance recommandée dans ${joursRestants} jour${joursRestants>1?'s':''} (${new Date(new Date(dernierEmail).getTime()+(delai*86400000)).toLocaleDateString('fr-FR')}).`};
-  }
-  return null;
-}
-
-function priorityOf(c){
-  const nd=c['Date prochaine action'];
-  const statut=c['Statut réponse'];
-  const reco=relanceReco(c);
-  if(reco&&reco.urgent)return{lbl:'Relance urgente',cls:'bu',sort:0};
-  if(nd){
-    const d=Math.floor((new Date(nd)-NOW)/86400000);
-    if(d<0)return{lbl:'En retard',cls:'bu',sort:1};
-    if(d===0)return{lbl:"Aujourd'hui",cls:'bu',sort:1};
-    if(d<=3)return{lbl:'Cette semaine',cls:'bh',sort:2};
-    return{lbl:`Dans ${d}j`,cls:'bm',sort:3};
-  }
-  if(reco&&!reco.urgent)return{lbl:'Relance bientôt',cls:'bh',sort:2};
-  const it=parseInt(c['Interactions totales'])||0;
-  if(it===0)return{lbl:'À initier',cls:'bn',sort:4};
-  return{lbl:'Suivi en cours',cls:'bm',sort:5};
-}
-
-function segAngle(ind){
-  const s=(ind||[]).join(' ').toLowerCase();
-  if(s.includes('assur')||s.includes('mutuel'))return{ico:'ti-shield-check',txt:'Angle mutuelle — la prévention comme levier de réduction du risque assurantiel, différenciateur d\'offre et fidélisation des adhérents.'};
-  if(s.includes('btp')||s.includes('construct')||s.includes('industri'))return{ico:'ti-tools',txt:'Angle industrie/BTP — prévention TMS, réduction de l\'absentéisme, conformité réglementaire et construction d\'une culture sécurité durable.'};
-  if(s.includes('collect')||s.includes('public')||s.includes('territ'))return{ico:'ti-building',txt:'Angle collectivité — santé des agents, responsabilité employeur public, ancrage territorial.'};
-  if(s.includes('service')||s.includes('conseil')||s.includes('tech')||s.includes('numéri'))return{ico:'ti-device-laptop',txt:'Angle services/tech — rétention des talents, prévention burn-out, QVCT dans des environnements à forte intensité cognitive.'};
-  return{ico:'ti-heartbeat',txt:'Angle universel — structurer une culture de santé lisible, utile et durable dans le quotidien des collaborateurs.'};
-}
-
-function emailDraft(c,ind){
+function draft(c,cn){
+  const n=parseInt(c['Niveau maturité']||1);
   const notes=c['Notes sur le contact']||'';
-  const statut=c['Statut réponse']||'';
-  const it=parseInt(c['Interactions totales'])||0;
-  const dernierEmail=c['Date dernier email'];
-  const joursEcoules=dernierEmail?daysDiff(dernierEmail):null;
-
-  let isRelance=statut==='Envoyé – en attente'||statut==='Relance à faire';
-  let sujet,corps;
-
-  if(isRelance&&joursEcoules!==null){
-    sujet='Une réflexion complémentaire — prévention santé';
-    corps=`Je reviens vers vous, non pas pour rappeler mon message précédent, mais parce qu'une réflexion m'est venue entretemps.
-
-Nous observons de plus en plus que les organisations qui réussissent à ancrer durablement la prévention ne le font pas en multipliant les dispositifs — elles le font en changeant ce que les collaborateurs comprennent de leur propre santé.
-
-C'est précisément ce que PrévenirCare structure : des parcours qui partent du mode de vie, expliquent les mécanismes, et créent une adhésion qui dure.
-
-Si cette perspective vous semble utile, je reste disponible pour en discuter.`;
-  } else if(notes&&notes.length>15){
-    sujet='Votre démarche autour de la santé des collaborateurs';
-    corps=`J'ai suivi avec intérêt votre démarche autour de ${notes.slice(0,60).trim()}. Ce qui retient mon attention, c'est la manière dont vous reliez ce sujet à une responsabilité qui dépasse le seul dispositif RH.
-
-Chez PrévenirCare, nous explorons une question complémentaire : comment faire en sorte que chaque collaborateur comprenne suffisamment sa propre santé pour pouvoir la préserver — avant que la maladie ne s'installe.
-
-Notre conviction est que la prévention n'adhère durablement que lorsqu'elle est comprise, pas seulement prescrite.
-
-Si cette réflexion fait écho à certains de vos enjeux, je serais heureuse d'en discuter avec vous — 30 minutes, à votre convenance.`;
+  let s,b;
+  if(n===1){
+    s=`Une réflexion sur la prévention santé chez ${cn}`;
+    b=`Bonjour,\n\nEn suivant les enjeux de santé au travail dans votre secteur, une question me revient régulièrement : comment faire en sorte que la prévention ne reste pas un sujet RH isolé, mais devienne réellement utile dans le quotidien des collaborateurs ?\n\nCette distinction me semble importante au moment où beaucoup d'organisations multiplient les dispositifs sans toujours mesurer leur impact réel sur les comportements de santé.\n\nSi ce sujet vous semble mériter une réflexion, je serais heureuse d'en discuter — 30 minutes, à votre convenance.\n\nBien cordialement,`;
+  } else if(n===2){
+    s=`Prévention santé — une perspective complémentaire`;
+    b=`Bonjour,\n\nDepuis notre dernier échange, j'ai continué à réfléchir à la question que vous soulevez${notes?' autour de '+notes.slice(0,50):''}.\n\nNous observons que les organisations qui réussissent à ancrer durablement la prévention ne le font pas en multipliant les dispositifs — elles le font en changeant ce que les collaborateurs comprennent de leur propre santé.\n\nUne recommandation sans compréhension n'adhère pas. Une compréhension sans recommandation, si.\n\nSi cette perspective nourrit votre réflexion, je reste disponible.\n\nBien cordialement,`;
+  } else if(n===3){
+    s=`Suite à notre échange — approfondir la réflexion`;
+    b=`Bonjour,\n\nMerci pour notre dernier échange. Ce que vous avez formulé${notes?' sur '+notes.slice(0,60):''} me semble être exactement la question centrale.\n\nJ'aimerais comprendre plus précisément comment cette limite se manifeste concrètement chez vous, et ce qui vous semble aujourd'hui le plus difficile à changer.\n\nSeriez-vous disponible 30 minutes dans les prochains jours ?\n\nBien cordialement,`;
   } else {
-    sujet='Votre démarche autour de la santé des collaborateurs';
-    corps=`J'ai suivi avec intérêt votre engagement autour de la santé des collaborateurs. Ce qui m'a retenue, c'est que votre approche ne se limite pas à un programme — elle pose une question de fond sur ce que signifie réellement prendre soin de ses équipes.
-
-Chez PrévenirCare, nous travaillons sur cette même question : comment rendre la prévention santé plus lisible, plus accessible et plus utile dans le quotidien des collaborateurs.
-
-Notre conviction est que la prévention n'adhère durablement que lorsqu'elle est comprise, pas seulement prescrite.
-
-Si cette réflexion vous semble utile, je serais heureuse d'en discuter avec vous — 30 minutes, à votre convenance.`;
+    s=`PrévenirCare — une réponse construite autour de vos enjeux`;
+    b=`Bonjour,\n\nAu regard de notre réflexion commune, je souhaitais vous présenter comment PrévenirCare structure concrètement ce que nous avons évoqué ensemble.\n\nNotre approche part du mode de vie de chaque collaborateur, l'analyse avec des professionnels de santé diplômés d'État, et construit des parcours de prévention compris — pas seulement prescrits.\n\nCe n'est pas une plateforme de bien-être. C'est une méthode clinique rendue accessible.\n\nSi vous souhaitez voir comment cela s'articule avec vos enjeux spécifiques, je suis disponible pour une présentation adaptée.\n\nBien cordialement,`;
   }
-  return{sujet,corps};
+  return{s,b};
 }
 
-function cardHTML(c,idx){
-  const name=c['Nom du contact']||'Contact';
-  const role=c['Rôle / Fonction']||c['Rôle']||'';
-  const ind=Array.isArray(c['Industrie'])?c['Industrie']:(c['Industrie']?[c['Industrie']]:[]);
-  const na=c['Prochaine action']||'';
-  const notes=c['Notes sur le contact']||'';
-  const it=parseInt(c['Interactions totales'])||0;
-  const statut=c['Statut réponse']||'';
-  const dernierEmail=c['Date dernier email'];
-  const joursEcoules=dernierEmail?daysDiff(dernierEmail):null;
-  const p=priorityOf(c);
-  const sd=statutDot(statut);
-  const seg=segAngle(ind);
-  const em=emailDraft(c,ind);
-  const reco=relanceReco(c);
-  const ne=name.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+function cardHTML(comp,idx,cc){
+  const name=comp['Nom de l\'entreprise']||'Entreprise';
+  const secteur=typeof comp['Secteur']==='object'?(comp['Secteur']?.name||''):(comp['Secteur']||'');
+  const taille=typeof comp['Taille']==='object'?(comp['Taille']?.name||''):(comp['Taille']||'');
+  const mat=cMat(cc);const m=MC[mat];
+  const hasAct=compNA(cc);
+  const pri=cc.find(c=>needsAct(c))||cc[0];
+  const prog=[1,2,3,4].map(i=>`<div class="mat-step ${i<mat?'done':i===mat?'active':''}"></div>`).join('');
+  const labs=[1,2,3,4].map(i=>`<div class="mat-label ${i===mat?'cur':''}">N${i}</div>`).join('');
+  const em=pri?draft(pri,name):{s:'',b:''};
 
-  let statutHTML='';
-  if(statut){
-    let joursLabel=joursEcoules!==null?` · il y a ${joursEcoules}j`:'';
-    statutHTML=`<div class="statut-row">
-      <div class="statut-dot ${sd.cls}"></div>
-      <span class="statut-txt">${sd.label}${joursLabel}</span>
+  const ctHTML=cc.map((c,ci)=>{
+    const st=c['Statut réponse']||'';
+    const nd=c['Date prochaine action'];
+    const du=nd?Math.floor((new Date(nd)-NOW)/86400000):null;
+    let al='';
+    if(du!==null){
+      if(du<0)al=`<span style="color:var(--pc-terra-dark);font-size:10px;font-weight:600;">En retard ${Math.abs(du)}j</span>`;
+      else if(du===0)al=`<span style="color:var(--pc-terra-dark);font-size:10px;font-weight:600;">Aujourd'hui</span>`;
+      else al=`<span style="color:var(--tm);font-size:10px;">Dans ${du}j</span>`;
+    }
+    const cid=c._recordId||'';
+    const cne=(c['Nom du contact']||'').replace(/'/g,"\\'");
+    return `<div class="contact-row">
+      <div class="crh">
+        <div class="cav-sm ${avcs(ci)}">${ini(c['Nom du contact'])}</div>
+        <div style="flex:1;min-width:0;"><div class="cnm">${c['Nom du contact']||'–'}</div><div class="crl">${c['Rôle / Fonction']||c['Rôle']||'–'}</div></div>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end;">${mb(parseInt(c['Niveau maturité']||1))}<div class="sd ${sdot(st)}" title="${st||'Non contacté'}"></div>${al}</div>
+      </div>
+      ${c['Notes sur le contact']?`<div style="margin-top:6px;font-size:11px;color:var(--tm);padding-left:40px;line-height:1.5;">${(c['Notes sur le contact']).slice(0,120)}${c['Notes sur le contact'].length>120?'…':''}</div>`:''}
+      <div class="ibtns">
+        <button class="btn btn-sm btn-teal" onclick="openInter('${cid}')"><i class="ti ti-plus"></i> Interaction</button>
+        <button class="btn btn-sm" onclick="qu('${cid}','Envoyé – en attente')">📧 Envoyé</button>
+        <button class="btn btn-sm" onclick="qu('${cid}','Réponse reçue')">📬 Réponse</button>
+        <button class="btn btn-sm" onclick="qu('${cid}','RDV obtenu')">📅 RDV</button>
+      </div>
     </div>`;
-  }
+  }).join('');
 
-  let recoHTML='';
-  if(reco){
-    recoHTML=`<div class="relance-box"><strong>${reco.urgent?'⚡ Relance urgente':'⏰ Relance recommandée'}</strong><br>${reco.msg}</div>`;
-  }
-
-  return `<div class="card" id="cd${idx}" onclick="tog(${idx})">
-  <div class="ch">
-    <div class="av ${avcls(idx)}">${ini(name)}</div>
-    <div class="cm">
-      <div class="cn">${name}</div>
-      <div class="cr">${role}${ind[0]?' · '+ind[0]:''}</div>
-      ${statutHTML}
-    </div>
-    <div class="cr2">
-      <span class="badge ${p.cls}">${p.lbl}</span>
-      <span class="dl">${it} interaction${it!==1?'s':''}</span>
-    </div>
+  return `<div class="ccard ${hasAct?'open':''}" id="cc${idx}">
+  <div class="ccard-hdr" onclick="tog(${idx})">
+    <div class="cav ${avc(idx)}">${ini(name)}</div>
+    <div class="cm"><div class="cname">${name}</div><div class="cmeta">${secteur?`<span>${secteur}</span>`:''} ${taille?`<span>· ${taille}</span>`:''} <span>· ${cc.length} contact${cc.length>1?'s':''}</span></div></div>
+    <div class="cr2">${mb(mat)}${hasAct?`<span style="font-size:10px;color:var(--pc-terra-dark);font-family:'Exo 2',sans-serif;font-weight:700;">⚡ Action aujourd'hui</span>`:''}</div>
     <i class="ti ti-chevron-down chevron"></i>
   </div>
-  <div class="detail">
-    ${reco?recoHTML:''}
-    ${na?`<div class="dsec"><div class="dl2">Action prévue</div><div class="dv">${na}</div></div>`:''}
-    <div class="dsec">
-      <div class="angle-tag"><i class="ti ${seg.ico}"></i> Angle recommandé</div>
-      <div class="dv">${seg.txt}</div>
+  ${hasAct&&pri?`<div class="action-today"><i class="ti ti-arrow-right"></i><div class="action-today-txt"><strong>${m.obj}</strong>${m.act} · Priorité : <strong>${pri['Nom du contact']||''}</strong></div></div>`:''}
+  <div class="cdetail">
+    <div style="margin-bottom:14px;">
+      <div class="sec-lbl">Maturité de la réflexion</div>
+      <div class="mat-progress">${prog}</div>
+      <div class="mat-labels">${labs}</div>
+      <div style="font-size:12px;color:var(--ts);background:var(--s1);border-radius:8px;padding:10px 12px;line-height:1.65;"><span style="font-family:'Exo 2',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;">Objectif :</span> ${m.obj}<br><span style="color:var(--tm);">${m.act}</span></div>
     </div>
-    ${notes?`<div class="dsec"><div class="dl2">Notes CRM</div><div class="dv">${notes}</div></div>`:''}
-    <div class="dsec">
-      <div class="dl2">Brouillon d'e-mail · à personnaliser avant envoi</div>
-      <div class="email-wrap">
-        <div class="email-subj">Objet : <strong>${em.sujet}</strong></div>
-        <div class="email-body">${em.corps}</div>
-        <div class="email-sig">
-          <div class="sig-name">Calvine TONGA</div>
-          <div class="sig-role">Fondatrice – Présidente</div>
-          <div class="sig-brand">PrévenirCare · prevenir.care · +336 31 81 41 07</div>
-        </div>
-      </div>
-    </div>
-    <div class="dsec">
-      <div class="dl2">Mettre à jour le statut après envoi</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button class="btn btn-teal" onclick="event.stopPropagation();updateStatut('${c._recordId||''}','Envoyé – en attente')"><i class="ti ti-send"></i> Email envoyé</button>
-        <button class="btn btn-violet" onclick="event.stopPropagation();updateStatut('${c._recordId||''}','Réponse reçue')"><i class="ti ti-message"></i> Réponse reçue</button>
-        <button class="btn" style="background:var(--pc-teal-bg);color:var(--pc-teal-dark);" onclick="event.stopPropagation();updateStatut('${c._recordId||''}','RDV obtenu')"><i class="ti ti-calendar"></i> RDV obtenu</button>
-        <button class="btn btn-terra" onclick="event.stopPropagation();updateStatut('${c._recordId||''}','Sans suite')"><i class="ti ti-x"></i> Sans suite</button>
-      </div>
-    </div>
+    <div class="sec-lbl">Contacts (${cc.length})</div>
+    <div class="contact-list">${ctHTML}</div>
+    ${pri?`<div class="dl2">Brouillon — ${pri['Nom du contact']||''}</div><div class="ew"><div class="esubj">Objet : <strong>${em.s}</strong></div><div class="ebody">${em.b}</div><div class="esig"><div class="sname">Calvine TONGA</div><div class="ssub">Fondatrice – Présidente · PrévenirCare · prevenir.care</div></div></div>`:''}
   </div>
 </div>`;
 }
 
-function oppHTML(o,idx){
-  const name=o['Nom de l\'opportunité']||'Opportunité';
-  const stade=typeof o['Stade']==='object'?(o['Stade']?.name||'–'):(o['Stade']||'–');
-  const score=Math.round(parseFloat(o['Score'])||0);
-  const jours=Math.round(parseFloat(o['Jours dans l\'étape'])||0);
-  const na=o['Prochaine action']||'';
-  const nd=o['Date prochaine action']||'';
-  const val=parseFloat(o['Valeur (EUR)'])||0;
-  return `<div class="card card-static">
-  <div class="ch">
-    <div class="av av1"><i class="ti ti-target" style="font-size:15px;"></i></div>
-    <div class="cm">
-      <div class="cn">${name}</div>
-      <div class="cr"><span class="stade-pill">${stade}</span>${val?' · '+val.toLocaleString('fr-FR')+'€':''}</div>
-    </div>
-    <div class="cr2">
-      <span class="score-pill">Score ${score}</span>
-      <span class="dl">${jours}j dans cette étape</span>
-    </div>
-  </div>
-  ${na?`<div class="next-action"><i class="ti ti-arrow-right" style="font-size:13px;flex-shrink:0;"></i><span>${na}${nd?' <span style="color:var(--text-muted);"> · '+new Date(nd).toLocaleDateString('fr-FR')+'</span>':''}</span></div>`:''}
-</div>`;
-}
-
-function tog(i){document.getElementById('cd'+i).classList.toggle('open');}
-function switchTab(t,el){
-  currentTab=t;
-  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
-  el.classList.add('on');
-  render();
-}
+function tog(i){document.getElementById('cc'+i).classList.toggle('open');}
+function sw(t,el){currentTab=t;document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));el.classList.add('on');render();}
 
 function render(){
   const el=document.getElementById('content');
+  const cl=companies.map(c=>({comp:c,cc:getCC(c)})).filter(x=>x.cc.length>0);
   if(currentTab==='today'){
-    const pri=contacts.filter(c=>priorityOf(c).sort<=2);
-    const init=contacts.filter(c=>priorityOf(c).sort===4).slice(0,3);
-    const list=[...pri,...init];
-    if(list.length===0){
-      el.innerHTML=`<div class="empty"><i class="ti ti-check" style="font-size:28px;display:block;margin-bottom:10px;color:var(--pc-teal);"></i>Aucune action urgente aujourd'hui.<br>Consultez "Tous les contacts" pour planifier la suite.</div>`;
-    } else {
-      el.innerHTML=`<div class="sec-lbl">Priorités du jour · ${list.length} contact${list.length>1?'s':''}</div><div class="cards">${list.map((c,i)=>cardHTML(c,i)).join('')}</div>`;
-    }
+    const list=cl.filter(x=>compNA(x.cc)||x.cc.some(c=>!c['Statut réponse']||c['Statut réponse']==='Pas encore envoyé')).sort((a,b)=>urg(b.cc)-urg(a.cc)).slice(0,12);
+    el.innerHTML=list.length===0?`<div class="empty"><i class="ti ti-check" style="font-size:28px;display:block;margin:0 auto 10px;color:var(--pc-teal);"></i>Aucune action urgente.<br>Consultez "Toutes les entreprises" pour planifier.</div>`:`<div class="sec-lbl">Entreprises à activer aujourd'hui · ${list.length}</div><div class="cards">${list.map(({comp,cc},i)=>cardHTML(comp,i,cc)).join('')}</div>`;
   } else if(currentTab==='all'){
-    const sorted=[...contacts].sort((a,b)=>priorityOf(a).sort-priorityOf(b).sort);
-    el.innerHTML=`<div class="sec-lbl">Tous les contacts · ${sorted.length}</div><div class="cards">${sorted.map((c,i)=>cardHTML(c,i)).join('')}</div>`;
+    const list=cl.sort((a,b)=>urg(b.cc)-urg(a.cc));
+    el.innerHTML=`<div class="sec-lbl">Toutes les entreprises · ${list.length}</div><div class="cards">${list.map(({comp,cc},i)=>cardHTML(comp,i,cc)).join('')}</div>`;
   } else {
-    const sorted=[...opps].sort((a,b)=>(parseFloat(b['Score'])||0)-(parseFloat(a['Score'])||0));
-    el.innerHTML=sorted.length===0
-      ?`<div class="empty">Aucune opportunité trouvée.</div>`
-      :`<div class="sec-lbl">Opportunités · ${sorted.length}</div><div class="cards">${sorted.map((o,i)=>oppHTML(o,i)).join('')}</div>`;
+    let html='';
+    [4,3,2,1].forEach(lv=>{
+      const items=cl.filter(x=>cMat(x.cc)===lv);
+      if(!items.length)return;
+      const m=MC[lv];
+      html+=`<div style="margin-bottom:1.5rem;"><div class="sec-lbl" style="display:flex;align-items:center;gap:8px;">${mb(lv)}<span>${items.length} entreprise${items.length>1?'s':''}</span></div><div style="font-size:11px;color:var(--tm);margin-bottom:8px;padding:8px 12px;background:#fff;border-radius:8px;border:0.5px solid var(--bd);">${m.act}</div><div class="cards">${items.map(({comp,cc},i)=>cardHTML(comp,lv*100+i,cc)).join('')}</div></div>`;
+    });
+    el.innerHTML=html||`<div class="empty">Aucune entreprise dans le pipeline.</div>`;
   }
 }
 
-async function fetchAirtable(tableId){
-  const url=`https://api.airtable.com/v0/${BASE_ID}/${tableId}?pageSize=100`;
-  const r=await fetch(url,{headers:{Authorization:`Bearer ${AIRTABLE_TOKEN}`}});
-  if(!r.ok)throw new Error(`Airtable ${r.status}: ${r.statusText}`);
-  const data=await r.json();
-  return data.records.map(rec=>({...rec.fields,_recordId:rec.id}));
+function so(el,g){
+  if(g==='c')document.querySelectorAll('.co').forEach(x=>x.classList.remove('sel'));
+  else if(g==='mi')document.querySelectorAll('#ms-inter .mo').forEach(x=>x.classList.remove('sel'));
+  else if(g==='mn')document.querySelectorAll('#ms-nc .mo').forEach(x=>x.classList.remove('sel'));
+  el.classList.add('sel');
+  const v=el.dataset.v;
+  if(g==='c')sCanal=v;
+  else if(g==='mi')sMat=parseInt(v);
+  else if(g==='mn')sMatNC=parseInt(v);
 }
 
-async function updateStatut(recordId,statut){
-  if(!recordId){alert('ID du contact manquant.');return;}
+function openInter(cid){
+  curCID=cid;
+  ['in-notes','in-na','in-nd'].forEach(id=>document.getElementById(id).value='');
+  sCanal='Email envoyé';sMat=3;
+  document.querySelectorAll('.co').forEach(x=>x.classList.toggle('sel',x.dataset.v==='Email envoyé'));
+  document.querySelectorAll('#ms-inter .mo').forEach(x=>x.classList.toggle('sel',x.dataset.v==='3'));
+  document.getElementById('modal-inter').classList.add('show');
+}
+
+async function saveInter(){
+  if(!curCID)return;
+  const notes=document.getElementById('in-notes').value;
+  const na=document.getElementById('in-na').value;
+  const nd=document.getElementById('in-nd').value;
   const today=NOW.toISOString().split('T')[0];
-  const body={fields:{'Statut réponse':statut}};
-  if(statut==='Envoyé – en attente')body.fields['Date dernier email']=today;
-  await fetch(`https://api.airtable.com/v0/${BASE_ID}/${TABLE_CONTACTS}/${recordId}`,{
-    method:'PATCH',
-    headers:{'Authorization':`Bearer ${AIRTABLE_TOKEN}`,'Content-Type':'application/json'},
-    body:JSON.stringify(body)
-  });
-  await boot();
+  await at('POST',TI,{fields:{'Type d\'interaction':sCanal,'Notes':notes,'Contact lié':[curCID],'Date d\'interaction':new Date().toISOString()}});
+  const f={'Niveau maturité':String(sMat)};
+  if(sCanal==='Email envoyé'){f['Date dernier email']=today;f['Statut réponse']='Envoyé – en attente';}
+  else if(sCanal==='Réponse reçue')f['Statut réponse']='Réponse reçue';
+  else if(sCanal==='RDV tenu')f['Statut réponse']='RDV obtenu';
+  if(notes)f['Notes sur le contact']=notes;
+  if(na)f['Prochaine action']=na;
+  if(nd)f['Date prochaine action']=nd;
+  await at('PATCH',TC,{fields:f},curCID);
+  cm('modal-inter');showToast('Interaction enregistrée ✓');await boot();
+}
+
+function openAddContact(){
+  ['nc-nom','nc-ent','nc-role','nc-email','nc-tel','nc-li','nc-src','nc-notes'].forEach(id=>document.getElementById(id).value='');
+  sMatNC=1;
+  document.querySelectorAll('#ms-nc .mo').forEach(x=>x.classList.toggle('sel',x.dataset.v==='1'));
+  document.getElementById('modal-nc').classList.add('show');
+}
+
+async function saveNC(){
+  const nom=document.getElementById('nc-nom').value.trim();
+  const ent=document.getElementById('nc-ent').value.trim();
+  if(!nom||!ent){alert('Nom et entreprise sont obligatoires.');return;}
+  let compId=null;
+  const ex=companies.find(c=>(c['Nom de l\'entreprise']||'').toLowerCase()===ent.toLowerCase());
+  if(ex){compId=ex._recordId;}
+  else{const r=await at('POST',TE,{fields:{'Nom de l\'entreprise':ent}});compId=r.id;}
+  const f={'Nom du contact':nom,'Niveau maturité':String(sMatNC),'Statut réponse':'Pas encore envoyé'};
+  if(document.getElementById('nc-role').value)f['Rôle / Fonction']=document.getElementById('nc-role').value;
+  if(document.getElementById('nc-email').value)f['Email']=document.getElementById('nc-email').value;
+  if(document.getElementById('nc-tel').value)f['Téléphone']=document.getElementById('nc-tel').value;
+  if(document.getElementById('nc-li').value)f['LinkedIn']=document.getElementById('nc-li').value;
+  const src=document.getElementById('nc-src').value;const notes=document.getElementById('nc-notes').value;
+  if(notes||src)f['Notes sur le contact']=`[${src||'Réseautage'}] ${notes}`.trim();
+  if(compId)f['Entreprise liée']=[compId];
+  await at('POST',TC,{fields:f});
+  cm('modal-nc');showToast(`${nom} ajouté au CRM ✓`);await boot();
+}
+
+async function qu(rid,statut){
+  if(!rid)return;
+  const f={'Statut réponse':statut};
+  if(statut==='Envoyé – en attente')f['Date dernier email']=NOW.toISOString().split('T')[0];
+  await at('PATCH',TC,{fields:f},rid);
+  showToast('Statut mis à jour ✓');await boot();
+}
+
+function cm(id){document.getElementById(id).classList.remove('show');}
+function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500);}
+
+async function at(method,table,body,id=''){
+  const r=await fetch(`https://api.airtable.com/v0/${BASE}/${table}${id?'/'+id:''}`,{method,headers:{'Authorization':`Bearer ${TOKEN}`,'Content-Type':'application/json'},body:JSON.stringify(body)});
+  return r.json();
+}
+
+async function fetchAll(table){
+  let recs=[],offset=null;
+  do{
+    let url=`https://api.airtable.com/v0/${BASE}/${table}?pageSize=100`;
+    if(offset)url+=`&offset=${offset}`;
+    const r=await fetch(url,{headers:{Authorization:`Bearer ${TOKEN}`}});
+    if(!r.ok)throw new Error(`Airtable ${r.status}`);
+    const d=await r.json();
+    recs=[...recs,...d.records.map(rec=>({...rec.fields,_recordId:rec.id}))];
+    offset=d.offset||null;
+  }while(offset);
+  return recs;
 }
 
 async function boot(){
   document.getElementById('rbtn').disabled=true;
   document.getElementById('content').innerHTML=`<div class="spin-wrap"><div class="spin"></div><div class="spin-txt">Connexion au CRM PrévenirCare…</div></div>`;
   try{
-    const[c,o]=await Promise.all([fetchAirtable(TABLE_CONTACTS),fetchAirtable(TABLE_OPPS)]);
-    contacts=c; opps=o;
-    const today=contacts.filter(x=>priorityOf(x).sort<=1).length;
-    const retard=contacts.filter(x=>priorityOf(x).sort===0).length;
-    document.getElementById('k0').textContent=contacts.length;
-    document.getElementById('k1').textContent=today||contacts.filter(x=>!(parseInt(x['Interactions totales'])||0)).length;
-    document.getElementById('k2').textContent=opps.length;
-    document.getElementById('k3').textContent=retard;
+    [companies,contacts]=await Promise.all([fetchAll(TE),fetchAll(TC)]);
+    const cl=companies.map(c=>({comp:c,cc:getCC(c)})).filter(x=>x.cc.length>0);
+    document.getElementById('k0').textContent=cl.length;
+    document.getElementById('k1').textContent=cl.filter(x=>compNA(x.cc)).length;
+    document.getElementById('k2').textContent=cl.filter(x=>cMat(x.cc)>=3).length;
+    document.getElementById('k3').textContent=contacts.length;
     render();
   }catch(e){
-    document.getElementById('content').innerHTML=`<div class="err"><strong>Connexion impossible au CRM.</strong><br>${e.message}<br><br>Vérifiez que votre token Airtable est bien renseigné dans le fichier HTML (variable AIRTABLE_TOKEN ligne 12).</div>`;
+    document.getElementById('content').innerHTML=`<div class="err"><strong>Connexion impossible.</strong><br>${e.message}</div>`;
   }
   document.getElementById('rbtn').disabled=false;
 }
