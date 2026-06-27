@@ -104,6 +104,30 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
 .co{padding:6px 11px;border-radius:99px;border:0.5px solid var(--bd);cursor:pointer;font-size:11px;font-family:'Exo 2',sans-serif;font-weight:600;transition:all .15s;}
 .co:hover{border-color:var(--pc-teal);}
 .co.sel{border-color:var(--pc-teal);background:var(--pc-teal-bg);color:var(--pc-teal-dark);}
+.btn-nouveau{background:var(--pc-dark);color:#fff;border-color:var(--pc-dark);font-weight:500;}
+.btn-nouveau:hover{background:#1a1a1a;}
+.nouveau-wrap{position:relative;}
+.nouveau-menu{display:none;position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:0.5px solid var(--bd);border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.1);min-width:200px;z-index:50;overflow:hidden;}
+.nouveau-menu.show{display:block;}
+.nouveau-item{display:flex;align-items:center;gap:10px;padding:11px 16px;font-size:13px;color:var(--ts);cursor:pointer;transition:background .1s;}
+.nouveau-item:hover{background:var(--s1);}
+.nouveau-item i{font-size:15px;color:var(--tm);}
+.nouveau-item:not(:last-child){border-bottom:0.5px solid var(--bd);}
+
+/* CARTES CONTACTS SPRINT 2.1 */
+.contact-card-21{background:#fff;border:0.5px solid var(--bd);border-radius:10px;padding:12px 14px;position:relative;}
+.contact-card-21-hdr{display:flex;align-items:center;gap:10px;}
+.contact-card-21-actions{display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:0.5px solid var(--bd);}
+.contact-card-21-actions a{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--pc-teal-dark);text-decoration:none;}
+.contact-card-21-actions a:hover{text-decoration:underline;}
+.ctx-btn{width:28px;height:28px;border-radius:50%;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--tm);font-size:16px;position:absolute;top:10px;right:10px;}
+.ctx-btn:hover{background:var(--s1);}
+.ctx-menu{display:none;position:absolute;top:36px;right:10px;background:#fff;border:0.5px solid var(--bd);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.1);min-width:200px;z-index:30;overflow:hidden;}
+.ctx-menu.show{display:block;}
+.ctx-item{display:flex;align-items:center;gap:8px;padding:9px 14px;font-size:12px;color:var(--ts);cursor:pointer;}
+.ctx-item:hover{background:var(--s1);}
+.ctx-item i{font-size:14px;color:var(--tm);}
+.btn-nouveau{background:var(--pc-dark);color:#fff;border-color:var(--pc-dark);font-weight:500;}
 .btn-copilot{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-family:'Exo 2',sans-serif;font-weight:600;padding:10px 18px;border-radius:10px;border:1.5px solid var(--pc-violet);background:var(--pc-violet-bg);color:var(--pc-violet-dark);cursor:pointer;transition:all .15s;}
 .btn-copilot:hover{background:var(--pc-violet);color:#fff;}
 .btn-copilot i{font-size:16px;}
@@ -158,7 +182,15 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
     </div>
     <div class="hdr-r">
       <div class="date-chip" id="dchip"></div>
-      <button class="btn" onclick="openAddContact()"><i class="ti ti-user-plus"></i> Nouveau contact</button>
+      <div class="nouveau-wrap" id="nouveau-wrap">
+        <button class="btn btn-nouveau" onclick="toggleNouveau(event)"><i class="ti ti-plus"></i> Nouveau</button>
+        <div class="nouveau-menu" id="nouveau-menu">
+          <div class="nouveau-item" onclick="openModal('modal-ne');closeNouveau()"><i class="ti ti-building"></i> Nouvelle entreprise</div>
+          <div class="nouveau-item" onclick="openAddContact();closeNouveau()"><i class="ti ti-user-plus"></i> Nouveau contact</div>
+          <div class="nouveau-item" onclick="openInterGlobal();closeNouveau()"><i class="ti ti-message-circle"></i> Nouvelle interaction</div>
+          <div class="nouveau-item" onclick="openModal('modal-opp');closeNouveau()"><i class="ti ti-target"></i> Nouvelle opportunité</div>
+        </div>
+      </div>
       <button class="btn btn-teal" onclick="boot()" id="rbtn"><i class="ti ti-refresh"></i> Actualiser</button>
     </div>
   </div>
@@ -174,6 +206,86 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
     <button class="tab" onclick="sw('pipeline',this)">Pipeline maturité</button>
   </div>
   <div id="content"><div class="spin-wrap"><div class="spin"></div><div class="spin-txt">Connexion au CRM PrévenirCare…</div></div></div>
+</div>
+
+<!-- MODAL NOUVELLE ENTREPRISE -->
+<div class="modal-overlay" id="modal-ne">
+  <div class="modal">
+    <div class="modal-title">Nouvelle entreprise</div>
+    <div class="fg"><div class="fl">Nom de l'entreprise *</div><input class="fi" id="ne-nom" placeholder="Capgemini, SUEZ, Mutuelle XYZ…"></div>
+    <div class="fg"><div class="fl">Secteur</div><input class="fi" id="ne-secteur" placeholder="Services, BTP, Mutuelle, Collectivité…"></div>
+    <div class="fg"><div class="fl">Site internet</div><input class="fi" type="url" id="ne-site" placeholder="https://…"></div>
+    <div class="fg"><div class="fl">LinkedIn</div><input class="fi" id="ne-li" placeholder="https://linkedin.com/company/…"></div>
+    <div class="fg"><div class="fl">Notes</div><textarea class="fta" id="ne-notes" placeholder="Contexte, enjeux identifiés, source…"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="cm('modal-ne')">Annuler</button>
+      <button class="btn btn-teal" onclick="saveNE()"><i class="ti ti-building"></i> Créer l'entreprise</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOUVELLE OPPORTUNITE -->
+<div class="modal-overlay" id="modal-opp">
+  <div class="modal">
+    <div class="modal-title">Nouvelle opportunité</div>
+    <div class="fg"><div class="fl">Nom de l'opportunité *</div><input class="fi" id="opp-nom" placeholder="Ex : Capgemini — Programme QVCT 2025"></div>
+    <div class="fg"><div class="fl">Entreprise</div>
+      <select class="fi" id="opp-ent" style="height:40px;"></select>
+    </div>
+    <div class="fg"><div class="fl">Stade</div>
+      <select class="fi" id="opp-stade" style="height:40px;">
+        <option>Identification</option>
+        <option>Premier contact</option>
+        <option>Échange en cours</option>
+        <option>Proposition envoyée</option>
+        <option>Négociation</option>
+        <option>Gagné</option>
+        <option>Perdu</option>
+      </select>
+    </div>
+    <div class="fg"><div class="fl">Valeur estimée (€)</div><input class="fi" type="number" id="opp-val" placeholder="0"></div>
+    <div class="fg"><div class="fl">Notes</div><textarea class="fta" id="opp-notes" placeholder="Contexte, décideurs impliqués, prochaines étapes…"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="cm('modal-opp')">Annuler</button>
+      <button class="btn btn-teal" onclick="saveOpp()"><i class="ti ti-target"></i> Créer l'opportunité</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL INTERACTION GLOBALE (sans contact pré-sélectionné) -->
+<div class="modal-overlay" id="modal-inter-global">
+  <div class="modal">
+    <div class="modal-title">Nouvelle interaction</div>
+    <div class="fg"><div class="fl">Contact *</div>
+      <select class="fi" id="ig-contact" style="height:40px;"></select>
+    </div>
+    <div class="fg"><div class="fl">Canal</div>
+      <div class="canal-sel" id="canal-global">
+        <div class="co sel" data-v="Email envoyé" onclick="soG(this)">📧 Email</div>
+        <div class="co" data-v="Appel téléphonique" onclick="soG(this)">📞 Appel</div>
+        <div class="co" data-v="LinkedIn" onclick="soG(this)">💼 LinkedIn</div>
+        <div class="co" data-v="RDV tenu" onclick="soG(this)">📅 RDV</div>
+        <div class="co" data-v="Salon" onclick="soG(this)">🎪 Salon</div>
+        <div class="co" data-v="Visioconférence" onclick="soG(this)">🖥 Visio</div>
+      </div>
+    </div>
+    <div class="fg"><div class="fl">Date</div><input class="fi" type="date" id="ig-date"></div>
+    <div class="fg"><div class="fl">Résumé</div><textarea class="fta" id="ig-notes" placeholder="Ce qui a été dit, les points clés, les engagements pris…"></textarea></div>
+    <div class="fg"><div class="fl">Niveau Kestio après cet échange</div>
+      <div class="mat-sel" id="ms-ig">
+        <div class="mo sel" data-v="1" onclick="so(this,'mg')">N1 — Inconscience</div>
+        <div class="mo" data-v="2" onclick="so(this,'mg')">N2 — Prise de conscience</div>
+        <div class="mo" data-v="3" onclick="so(this,'mg')">N3 — Appropriation</div>
+        <div class="mo" data-v="4" onclick="so(this,'mg')">N4 — Recherche de solution</div>
+      </div>
+    </div>
+    <div class="fg"><div class="fl">Prochaine action</div><input class="fi" id="ig-na" placeholder="Envoyer la brochure, Relancer dans 2 semaines…"></div>
+    <div class="fg"><div class="fl">Date prochaine action</div><input class="fi" type="date" id="ig-nd"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="cm('modal-inter-global')">Annuler</button>
+      <button class="btn btn-teal" onclick="saveInterGlobal()"><i class="ti ti-check"></i> Enregistrer</button>
+    </div>
+  </div>
 </div>
 
 <!-- MODAL INTERACTION -->
@@ -337,19 +449,33 @@ function cardHTML(comp,idx,cc){
     }
     const cid=c._recordId||'';
     const cne=(c['Nom du contact']||'').replace(/'/g,"\\'");
-    return `<div class="contact-row">
-      <div class="crh">
+    const email=c['Email']||'';
+    const tel=c['Téléphone']||'';
+    const li=c['LinkedIn']||'';
+    const menuId=`ctx-${idx}-${ci}`;
+    return `<div class="contact-card-21" onclick="event.stopPropagation()">
+      <button class="ctx-btn" onclick="toggleCtx('${menuId}',event)" title="Actions"><i class="ti ti-dots-vertical"></i></button>
+      <div class="ctx-menu" id="${menuId}">
+        <div class="ctx-item" onclick="openInter('${cid}');closeAllCtx()"><i class="ti ti-message-circle"></i> Ajouter une interaction</div>
+        <div class="ctx-item" onclick="prepareNextAction('${comp._recordId||''}','${name.replace(/'/g,"\\'")}');closeAllCtx()"><i class="ti ti-brain"></i> Préparer le prochain échange</div>
+        <div class="ctx-item" onclick="openEditContact('${cid}');closeAllCtx()"><i class="ti ti-pencil"></i> Modifier</div>
+        ${email?`<div class="ctx-item" onclick="window.open('mailto:${email}');closeAllCtx()"><i class="ti ti-mail"></i> Envoyer un email</div>`:''}
+      </div>
+      <div class="contact-card-21-hdr">
         <div class="cav-sm ${avcs(ci)}">${ini(c['Nom du contact'])}</div>
-        <div style="flex:1;min-width:0;"><div class="cnm">${c['Nom du contact']||'–'}</div><div class="crl">${c['Rôle / Fonction']||c['Rôle']||'–'}</div></div>
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end;">${mb(parseInt(c['Niveau maturité']||1))}<div class="sd ${sdot(st)}" title="${st||'Non contacté'}"></div>${al}</div>
+        <div style="flex:1;min-width:0;padding-right:30px;">
+          <div class="cnm">${c['Nom du contact']||'–'}</div>
+          <div class="crl">${c['Rôle / Fonction']||c['Rôle']||'–'}</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap;">${mb(parseInt(c['Niveau maturité']||1))}<div class="sd ${sdot(st)}" title="${st||'Non contacté'}"></div>${st?`<span style="font-size:10px;color:var(--tm);">${st}</span>`:''}${al}</div>
+        </div>
       </div>
-      ${c['Notes sur le contact']?`<div style="margin-top:6px;font-size:11px;color:var(--tm);padding-left:40px;line-height:1.5;">${(c['Notes sur le contact']).slice(0,120)}${c['Notes sur le contact'].length>120?'…':''}</div>`:''}
-      <div class="ibtns">
-        <button class="btn btn-sm btn-teal" onclick="openInter('${cid}')"><i class="ti ti-plus"></i> Interaction</button>
-        <button class="btn btn-sm" onclick="qu('${cid}','Envoyé – en attente')">📧 Envoyé</button>
-        <button class="btn btn-sm" onclick="qu('${cid}','Réponse reçue')">📬 Réponse</button>
-        <button class="btn btn-sm" onclick="qu('${cid}','RDV obtenu')">📅 RDV</button>
+      <div class="contact-card-21-actions">
+        ${email?`<a href="mailto:${email}" onclick="event.stopPropagation()"><i class="ti ti-mail" style="font-size:13px;"></i> Email</a>`:''}
+        ${tel?`<a href="tel:${tel}" onclick="event.stopPropagation()"><i class="ti ti-phone" style="font-size:13px;"></i> Appel</a>`:''}
+        ${li?`<a href="${li}" target="_blank" onclick="event.stopPropagation()"><i class="ti ti-brand-linkedin" style="font-size:13px;"></i> LinkedIn</a>`:''}
+        <button class="btn btn-sm" style="margin-left:auto;" onclick="event.stopPropagation();openInter('${cid}')"><i class="ti ti-plus"></i> Interaction</button>
       </div>
+      ${c['Notes sur le contact']?`<div style="margin-top:8px;font-size:11px;color:var(--tm);line-height:1.5;border-top:0.5px solid var(--bd);padding-top:6px;">${(c['Notes sur le contact']).slice(0,120)}${c['Notes sur le contact'].length>120?'…':''}</div>`:''}
     </div>`;
   }).join('');
 
@@ -368,7 +494,10 @@ function cardHTML(comp,idx,cc){
       <div class="mat-labels">${labs}</div>
       <div style="font-size:12px;color:var(--ts);background:var(--s1);border-radius:8px;padding:10px 12px;line-height:1.65;"><span style="font-family:'Exo 2',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;">Objectif :</span> ${m.obj}<br><span style="color:var(--tm);">${m.act}</span></div>
     </div>
-    <div class="sec-lbl">Contacts (${cc.length})</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div class="sec-lbl" style="margin-bottom:0;">Contacts (${cc.length})</div>
+      <button class="btn btn-sm" onclick="event.stopPropagation();openAddContactFromCompany('${comp._recordId||''}','${name.replace(/'/g,"\\'")}')"><i class="ti ti-user-plus"></i> Ajouter un contact</button>
+    </div>
     <div class="contact-list">${ctHTML}</div>
     ${pri?`<div class="dl2">Brouillon — ${pri['Nom du contact']||''}</div><div class="ew"><div class="esubj">Objet : <strong>${em.s}</strong></div><div class="ebody">${em.b}</div><div class="esig"><div class="sname">Calvine TONGA</div><div class="ssub">Fondatrice – Présidente · PrévenirCare · prevenir.care</div></div></div>`:''}
     <div style="margin-top:16px;padding-top:14px;border-top:0.5px solid var(--bd);">
@@ -413,6 +542,7 @@ function so(el,g){
   if(g==='c')sCanal=v;
   else if(g==='mi')sMat=parseInt(v);
   else if(g==='mn')sMatNC=parseInt(v);
+  else if(g==='mg')sMatIG=parseInt(v);
 }
 
 function openInter(cid){
@@ -451,12 +581,32 @@ function openAddContact(){
 
 async function saveNC(){
   const nom=document.getElementById('nc-nom').value.trim();
-  const ent=document.getElementById('nc-ent').value.trim();
+  const entInput=document.getElementById('nc-ent');
+  const ent=entInput.value.trim();
+  const editId=entInput.dataset.editId||'';
+
+  // Mode édition
+  if(editId){
+    const f={'Nom du contact':nom,'Niveau maturité':String(sMatNC)};
+    if(document.getElementById('nc-role').value)f['Rôle / Fonction']=document.getElementById('nc-role').value;
+    if(document.getElementById('nc-email').value)f['Email']=document.getElementById('nc-email').value;
+    if(document.getElementById('nc-tel').value)f['Téléphone']=document.getElementById('nc-tel').value;
+    if(document.getElementById('nc-li').value)f['LinkedIn']=document.getElementById('nc-li').value;
+    const notes=document.getElementById('nc-notes').value;
+    if(notes)f['Notes sur le contact']=notes;
+    await CRM.updateContact(editId,f);
+    entInput.dataset.editId='';
+    cm('modal-nc');showToast(`${nom} mis à jour ✓`);await boot();
+    return;
+  }
+
   if(!nom||!ent){alert('Nom et entreprise sont obligatoires.');return;}
-  let compId=null;
-  const ex=companies.find(c=>(c['Nom de l\'entreprise']||'').toLowerCase()===ent.toLowerCase());
-  if(ex){compId=ex._recordId;}
-  else{const r=await at('POST',TE,{fields:{'Nom de l\'entreprise':ent}});compId=r.id;}
+  let compId=entInput.dataset.prefilledId||null;
+  if(!compId){
+    const ex=companies.find(c=>(c['Nom de l\'entreprise']||'').toLowerCase()===ent.toLowerCase());
+    if(ex){compId=ex._recordId;}
+    else{const r=await CRM.createCompany({'Nom de l\'entreprise':ent});compId=r.id;}
+  }
   const f={'Nom du contact':nom,'Niveau maturité':String(sMatNC),'Statut réponse':'Pas encore envoyé'};
   if(document.getElementById('nc-role').value)f['Rôle / Fonction']=document.getElementById('nc-role').value;
   if(document.getElementById('nc-email').value)f['Email']=document.getElementById('nc-email').value;
@@ -465,7 +615,8 @@ async function saveNC(){
   const src=document.getElementById('nc-src').value;const notes=document.getElementById('nc-notes').value;
   if(notes||src)f['Notes sur le contact']=`[${src||'Réseautage'}] ${notes}`.trim();
   if(compId)f['Entreprise liée']=[compId];
-  await at('POST',TC,{fields:f});
+  await CRM.createContact(f);
+  entInput.dataset.prefilledId='';
   cm('modal-nc');showToast(`${nom} ajouté au CRM ✓`);await boot();
 }
 
@@ -498,6 +649,149 @@ async function fetchAll(table){
   }while(offset);
   return recs;
 }
+
+// ─── SPRINT 2.1 — MODULE CRM CENTRALISÉ ─────────────────────────────────────
+
+const CRM = {
+  async createCompany(fields){ return at('POST',TE,{fields}); },
+  async createContact(fields){ return at('POST',TC,{fields}); },
+  async updateContact(id,fields){ return at('PATCH',TC,{fields},id); },
+  async createInteraction(fields){ return at('POST',TI,{fields}); },
+  async createOpportunity(fields){ return at('POST',TO,{fields}); },
+};
+
+// Menu global Nouveau
+function toggleNouveau(e){
+  e.stopPropagation();
+  document.getElementById('nouveau-menu').classList.toggle('show');
+}
+function closeNouveau(){
+  document.getElementById('nouveau-menu').classList.remove('show');
+}
+document.addEventListener('click',()=>{ closeNouveau(); closeAllCtx(); });
+
+// Menus contextuels contacts
+function toggleCtx(id,e){
+  e.stopPropagation();
+  closeAllCtx();
+  document.getElementById(id)?.classList.add('show');
+}
+function closeAllCtx(){
+  document.querySelectorAll('.ctx-menu').forEach(m=>m.classList.remove('show'));
+}
+
+// Ouvrir modal générique
+function openModal(id){
+  if(id==='modal-opp'){
+    const sel=document.getElementById('opp-ent');
+    sel.innerHTML=companies.map(c=>`<option value="${c._recordId}">${c['Nom de l\'entreprise']||''}</option>`).join('');
+  }
+  document.getElementById(id).classList.add('show');
+}
+
+// Nouvelle entreprise
+async function saveNE(){
+  const nom=document.getElementById('ne-nom').value.trim();
+  if(!nom){alert('Le nom est obligatoire.');return;}
+  const f={'Nom de l\'entreprise':nom};
+  if(document.getElementById('ne-secteur').value)f['Secteur']=document.getElementById('ne-secteur').value;
+  if(document.getElementById('ne-site').value)f['site internet']=document.getElementById('ne-site').value;
+  if(document.getElementById('ne-li').value)f['LinkedIn']=document.getElementById('ne-li').value;
+  if(document.getElementById('ne-notes').value)f['Notes']=document.getElementById('ne-notes').value;
+  await CRM.createCompany(f);
+  cm('modal-ne');
+  ['ne-nom','ne-secteur','ne-site','ne-li','ne-notes'].forEach(id=>document.getElementById(id).value='');
+  showToast(`${nom} créée dans le CRM ✓`);
+  await boot();
+}
+
+// Nouvelle opportunité
+async function saveOpp(){
+  const nom=document.getElementById('opp-nom').value.trim();
+  if(!nom){alert('Le nom est obligatoire.');return;}
+  const f={'Nom de l\'opportunité':nom};
+  const entId=document.getElementById('opp-ent').value;
+  if(entId)f['Entreprise liée']=[entId];
+  f['Stade']=document.getElementById('opp-stade').value;
+  const val=parseFloat(document.getElementById('opp-val').value);
+  if(val)f['Valeur (EUR)']=val;
+  if(document.getElementById('opp-notes').value)f['Notes']=document.getElementById('opp-notes').value;
+  await CRM.createOpportunity(f);
+  cm('modal-opp');
+  ['opp-nom','opp-val','opp-notes'].forEach(id=>document.getElementById(id).value='');
+  showToast(`Opportunité "${nom}" créée ✓`);
+  await boot();
+}
+
+// Interaction globale
+let sIG='Email envoyé', sMatIG=1;
+function soG(el){
+  document.querySelectorAll('#canal-global .co').forEach(x=>x.classList.remove('sel'));
+  el.classList.add('sel');
+  sIG=el.dataset.v;
+}
+
+function openInterGlobal(){
+  const sel=document.getElementById('ig-contact');
+  sel.innerHTML=contacts.map(c=>`<option value="${c._recordId}">${c['Nom du contact']||''} — ${c['Rôle / Fonction']||''}</option>`).join('');
+  ['ig-notes','ig-na','ig-nd'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('ig-date').value=NOW.toISOString().split('T')[0];
+  sIG='Email envoyé'; sMatIG=1;
+  document.querySelectorAll('#canal-global .co').forEach(x=>x.classList.toggle('sel',x.dataset.v==='Email envoyé'));
+  document.querySelectorAll('#ms-ig .mo').forEach(x=>x.classList.toggle('sel',x.dataset.v==='1'));
+  document.getElementById('modal-inter-global').classList.add('show');
+}
+
+async function saveInterGlobal(){
+  const cid=document.getElementById('ig-contact').value;
+  if(!cid){alert('Sélectionnez un contact.');return;}
+  const notes=document.getElementById('ig-notes').value;
+  const na=document.getElementById('ig-na').value;
+  const nd=document.getElementById('ig-nd').value;
+  const date=document.getElementById('ig-date').value;
+  await CRM.createInteraction({'Type d\'interaction':sIG,'Notes':notes,'Contact lié':[cid],'Date d\'interaction':date?new Date(date).toISOString():new Date().toISOString()});
+  const f={'Niveau maturité':String(sMatIG)};
+  if(sIG==='Email envoyé'){f['Date dernier email']=date||NOW.toISOString().split('T')[0];f['Statut réponse']='Envoyé – en attente';}
+  else if(sIG==='Réponse reçue')f['Statut réponse']='Réponse reçue';
+  else if(sIG==='RDV tenu')f['Statut réponse']='RDV obtenu';
+  if(notes)f['Notes sur le contact']=notes;
+  if(na)f['Prochaine action']=na;
+  if(nd)f['Date prochaine action']=nd;
+  await CRM.updateContact(cid,f);
+  cm('modal-inter-global');
+  showToast('Interaction enregistrée ✓');
+  await boot();
+}
+
+// Ajouter contact depuis fiche entreprise (pré-remplit l'entreprise)
+function openAddContactFromCompany(compId, compName){
+  ['nc-nom','nc-role','nc-email','nc-tel','nc-li','nc-src','nc-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('nc-ent').value=compName;
+  document.getElementById('nc-ent').dataset.prefilledId=compId;
+  sMatNC=1;
+  document.querySelectorAll('#ms-nc .mo').forEach(x=>x.classList.toggle('sel',x.dataset.v==='1'));
+  document.getElementById('modal-nc').classList.add('show');
+}
+
+// Modifier un contact (stub — ouvre le modal pré-rempli)
+function openEditContact(cid){
+  const c=contacts.find(x=>x._recordId===cid);
+  if(!c)return;
+  document.getElementById('nc-nom').value=c['Nom du contact']||'';
+  document.getElementById('nc-role').value=c['Rôle / Fonction']||c['Rôle']||'';
+  document.getElementById('nc-email').value=c['Email']||'';
+  document.getElementById('nc-tel').value=c['Téléphone']||'';
+  document.getElementById('nc-li').value=c['LinkedIn']||'';
+  document.getElementById('nc-notes').value=c['Notes sur le contact']||'';
+  document.getElementById('nc-ent').value='';
+  document.getElementById('nc-ent').dataset.prefilledId='';
+  document.getElementById('nc-ent').dataset.editId=cid;
+  sMatNC=parseInt(c['Niveau maturité']||1);
+  document.querySelectorAll('#ms-nc .mo').forEach(x=>x.classList.toggle('sel',x.dataset.v===String(sMatNC)));
+  document.getElementById('modal-nc').classList.add('show');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 // ─── SPRINT 1 — SALES COPILOT ARCHITECTURE ───────────────────────────────────
 
