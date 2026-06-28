@@ -1494,8 +1494,17 @@ async function prepareNextAction(companyId, companyName){
     // Stocker pour utilisation future par generateEmail
     window.salesContext = salesContext;
 
-    // Appel futur Sprint 4 (commenté)
-    // const result = await generateEmail(salesContext);
+    // Envoi du salesContext vers Make (webhook)
+    console.log('📤 Envoi du salesContext vers Make…');
+    fetch('https://hook.eu2.make.com/n0ua9td3mfub2gmtujbanv4qce58pnox', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(salesContext)
+    }).then(r => {
+      console.log('✅ Make a reçu le contexte — statut :', r.status);
+    }).catch(e => {
+      console.warn('⚠️ Erreur envoi Make :', e.message);
+    });
 
     // Affichage dans le panneau
     const lastInter = salesContext.interactions[0];
