@@ -784,7 +784,11 @@ async function saveInter(){
   if(na)f['Prochaine action']=na;
   if(nd)f['Date prochaine action']=nd;
   await at('PATCH',TC,{fields:f},curCID);
-  cm('modal-inter');showToast('Interaction enregistrée ✓');await boot();
+  // Retrouver l'entreprise liée pour rouvrir sa fiche
+  const cont=contacts.find(c=>c._recordId===curCID);
+  const linkedComp=Array.isArray(cont?.['Entreprise liée'])?cont['Entreprise liée'][0]:null;
+  cm('modal-inter');showToast('Interaction enregistrée ✓');
+  await bootAndFocus(linkedComp);
 }
 
 function openAddContact(){
@@ -832,7 +836,9 @@ async function saveNC(){
   if(compId)f['Entreprise liée']=[compId];
   await CRM.createContact(f);
   entInput.dataset.prefilledId='';
-  cm('modal-nc');showToast(`${nom} ajouté au CRM ✓`);await boot();
+  cm('modal-nc');
+  showToast(`${nom} ajouté au CRM ✓`);
+  await bootAndFocus(compId);
 }
 
 async function qu(rid,statut){
@@ -845,6 +851,13 @@ async function qu(rid,statut){
 
 function cm(id){document.getElementById(id).classList.remove('show');}
 function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500);}
+
+// Recharge le CRM et rouvre la fiche d'une entreprise spécifique
+async function bootAndFocus(compId){
+  await boot();
+  if(!compId)return;
+  setTimeout(()=>focusCompany(compId),150);
+}
 
 async function at(method,table,body,id=''){
   const r=await fetch(`https://api.airtable.com/v0/${BASE}/${table}${id?'/'+id:''}`,{method,headers:{'Authorization':`Bearer ${TOKEN}`,'Content-Type':'application/json'},body:JSON.stringify(body)});
@@ -1069,7 +1082,7 @@ async function saveEditComp(){
   await at('PATCH',TE,{fields:f},id);
   cm('modal-edit-comp');
   showToast('Entreprise mise à jour ✓');
-  await boot();
+  await bootAndFocus(id);
 }
 
 // ÉDITION CONTACT
@@ -1105,9 +1118,12 @@ async function saveEditCont(){
   const notes=document.getElementById('eco-notes').value.trim();
   if(notes)f['Notes sur le contact']=notes;
   await CRM.updateContact(id,f);
+  // Retrouver l'entreprise pour rouvrir sa fiche
+  const cont=contacts.find(c=>c._recordId===id);
+  const linkedComp=Array.isArray(cont?.['Entreprise liée'])?cont['Entreprise liée'][0]:null;
   cm('modal-edit-cont');
   showToast('Contact mis à jour ✓');
-  await boot();
+  await bootAndFocus(linkedComp);
 }
 
 // RELANCE
@@ -1132,7 +1148,7 @@ async function saveRelance(){
   await at('PATCH',TE,{fields:f},id);
   cm('modal-relance');
   showToast('Relance programmée ✓');
-  await boot();
+  await bootAndFocus(id);
 }
 
 // INTERACTION DEPUIS FICHE ENTREPRISE (pré-sélectionne le premier contact)
