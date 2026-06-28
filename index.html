@@ -867,10 +867,6 @@ async function fetchAll(table){
 
 // ─── SPRINT 2.2 — CRM OPÉRATIONNEL ──────────────────────────────────────────
 
-// Étendre le module CRM
-CRM.updateCompany = function(id,fields){ return at('PATCH',TE,{fields},id); };
-CRM.updateOpportunity = function(id,fields){ return at('PATCH',TO,{fields},id); };
-
 // ÉDITION OPPORTUNITÉ
 function openEditOpp(oppId){
   const o=window._opps?.find(x=>x._recordId===oppId);
@@ -900,15 +896,23 @@ async function saveEditOpp(){
   if(date)f['Date estimée']=date;
   const notes=document.getElementById('eo-notes').value.trim();
   if(notes)f['Notes']=notes;
-  await CRM.updateOpportunity(id,f);
+  await at('PATCH',TO,{fields:f},id);
   cm('modal-edit-opp');
   showToast('Opportunité mise à jour ✓');
   await boot();
 }
 
+// OPPORTUNITÉ DEPUIS FICHE ENTREPRISE
+function openAddOppFromCompany(compId, compName){
+  const sel=document.getElementById('opp-ent');
+  sel.innerHTML=companies.map(c=>`<option value="${c._recordId}"${c._recordId===compId?' selected':''}>${c['Nom de l\'entreprise']||''}</option>`).join('');
+  ['opp-nom','opp-val','opp-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('modal-opp').classList.add('show');
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 
-// ─── SPRINT CRM — RECHERCHE, ÉDITION, QUICK ACTIONS ─────────────────────────
+// ─── SPRINT 2.1 — MODULE CRM CENTRALISÉ ─────────────────────────────────────
 
 // RECHERCHE GLOBALE
 function normalize(s){ return(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
@@ -1173,6 +1177,8 @@ const CRM = {
   async updateContact(id,fields){ return at('PATCH',TC,{fields},id); },
   async createInteraction(fields){ return at('POST',TI,{fields}); },
   async createOpportunity(fields){ return at('POST',TO,{fields}); },
+  async updateCompany(id,fields){ return at('PATCH',TE,{fields},id); },
+  async updateOpportunity(id,fields){ return at('PATCH',TO,{fields},id); },
 };
 
 // Menu global Nouveau
