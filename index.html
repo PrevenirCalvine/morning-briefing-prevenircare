@@ -193,7 +193,61 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
 .quick-actions{display:flex;gap:6px;flex-wrap:wrap;padding:10px 18px;background:var(--s1);border-top:0.5px solid var(--bd);}
 .qa-btn{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-family:'Exo 2',sans-serif;font-weight:600;padding:5px 10px;border-radius:99px;border:0.5px solid var(--bd);background:#fff;color:var(--ts);cursor:pointer;transition:all .15s;}
 .qa-btn:hover{border-color:var(--pc-teal);color:var(--pc-teal-dark);background:var(--pc-teal-bg);}
-/* ─── PROSPECT ENGINE ─────────────────────────────────────────────────────── */
+/* ─── PANNEAU PARAMÈTRES ──────────────────────────────────────────────────── */
+.settings-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;align-items:center;justify-content:center;}
+.settings-overlay.show{display:flex;}
+.settings-box{background:#fff;border-radius:16px;width:92%;max-width:580px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;}
+.settings-hdr{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:0.5px solid var(--bd);flex-shrink:0;}
+.settings-title{font-family:'STIX Two Text',Georgia,serif;font-size:18px;font-weight:700;color:var(--pc-dark);}
+.settings-close{width:30px;height:30px;border-radius:50%;border:0.5px solid var(--bd);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--tm);}
+.settings-body{flex:1;overflow-y:auto;padding:20px 24px;}
+.settings-section{margin-bottom:24px;}
+.settings-section-title{font-family:'Exo 2',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--tm);margin-bottom:12px;padding-bottom:6px;border-bottom:0.5px solid var(--bd);}
+.settings-row{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
+.settings-label{font-family:'Exo 2',sans-serif;font-size:10px;font-weight:600;color:var(--tp);display:flex;align-items:center;gap:6px;}
+.settings-label span{font-weight:400;color:var(--tm);}
+.settings-input-row{display:flex;gap:8px;align-items:center;}
+.settings-input{flex:1;padding:8px 12px;border:0.5px solid var(--bds);border-radius:var(--r);font-family:'Poppins',sans-serif;font-size:12px;color:var(--tp);background:#fff;outline:none;font-family:monospace;}
+.settings-input:focus{border-color:var(--pc-teal);}
+.settings-save-btn{font-size:11px;font-family:'Exo 2',sans-serif;font-weight:700;padding:7px 14px;border-radius:var(--r);border:none;background:var(--pc-teal);color:#fff;cursor:pointer;white-space:nowrap;}
+.settings-save-btn:hover{background:var(--pc-teal-dark);}
+.settings-status{font-size:10px;font-family:'Exo 2',sans-serif;font-weight:600;}
+.settings-status.ok{color:var(--pc-teal-dark);}
+.settings-status.empty{color:var(--tm);}
+.settings-note{font-size:11px;color:var(--tm);line-height:1.55;margin-top:4px;}
+.settings-footer{padding:14px 24px;border-top:0.5px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.settings-storage-note{font-size:11px;color:var(--tm);display:flex;align-items:center;gap:5px;}
+.btn-settings{width:34px;height:34px;border-radius:50%;border:0.5px solid var(--bds);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--tm);font-size:16px;transition:all .15s;}
+.btn-settings:hover{background:var(--s1);color:var(--tp);}
+/* ─────────────────────────────────────────────────────────────────────────── */
+.lie-panel{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:150;display:none;align-items:center;justify-content:center;}
+.lie-panel.show{display:flex;}
+.lie-box{background:#fff;border-radius:16px;width:92%;max-width:700px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;}
+.lie-hdr{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:0.5px solid var(--bd);flex-shrink:0;}
+.lie-title{font-family:'STIX Two Text',Georgia,serif;font-size:17px;font-weight:700;color:var(--pc-dark);}
+.lie-subtitle{font-size:11px;color:var(--tm);font-family:'Exo 2',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.07em;margin-top:2px;}
+.lie-close{width:30px;height:30px;border-radius:50%;border:0.5px solid var(--bd);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--tm);}
+.lie-body{flex:1;overflow-y:auto;padding:20px 24px;}
+.lie-config{background:var(--pc-terra-bg);border:0.5px solid #f0b99e;border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:12px;color:var(--pc-terra-dark);}
+.lie-config-title{font-family:'Exo 2',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+.lie-api-row{display:flex;gap:8px;align-items:center;}
+.lie-api-input{flex:1;padding:7px 12px;border:0.5px solid #f0b99e;border-radius:var(--r);font-family:'Poppins',sans-serif;font-size:12px;background:#fff;outline:none;color:var(--tp);}
+.lie-api-input:focus{border-color:var(--pc-terra);}
+.lie-table{width:100%;border-collapse:collapse;margin-top:12px;}
+.lie-table th{font-family:'Exo 2',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--tm);padding:8px 12px;text-align:left;border-bottom:0.5px solid var(--bd);background:var(--s1);}
+.lie-table td{padding:10px 12px;border-bottom:0.5px solid var(--bd);font-size:12px;color:var(--ts);vertical-align:middle;}
+.lie-table tr:last-child td{border-bottom:none;}
+.lie-table tr:hover td{background:var(--s1);}
+.lie-footer{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-top:0.5px solid var(--bd);flex-shrink:0;gap:10px;}
+.lie-import-btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-family:'Exo 2',sans-serif;font-weight:700;padding:9px 20px;border-radius:var(--r);border:none;background:var(--pc-teal);color:#fff;cursor:pointer;}
+.lie-import-btn:hover{background:var(--pc-teal-dark);}
+.lie-import-btn:disabled{opacity:.5;cursor:default;}
+.lie-check{width:15px;height:15px;cursor:pointer;accent-color:var(--pc-teal);}
+.lie-badge{font-size:10px;padding:2px 7px;border-radius:99px;font-family:'Exo 2',sans-serif;font-weight:700;}
+.lie-new{background:var(--pc-teal-bg);color:var(--pc-teal-dark);}
+.lie-exists{background:var(--s1);color:var(--tm);}
+/* ─────────────────────────────────────────────────────────────────────────── */
+.spin-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;gap:12px;background:#fff;border-radius:12px;border:0.5px solid var(--bd);}
 .pe-screen{display:flex;flex-direction:column;gap:16px;}
 .pe-form{background:#fff;border:0.5px solid var(--bd);border-radius:14px;padding:20px 24px;}
 .pe-form-title{font-family:'STIX Two Text',Georgia,serif;font-size:18px;font-weight:700;color:var(--pc-dark);margin-bottom:4px;}
@@ -273,6 +327,7 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
         </div>
       </div>
       <button class="btn btn-teal" onclick="boot()" id="rbtn"><i class="ti ti-refresh"></i> Actualiser</button>
+      <button class="btn-settings" onclick="SettingsManager.openPanel()" title="Paramètres & Clés API"><i class="ti ti-settings"></i></button>
     </div>
   </div>
   <div style="display:flex;align-items:center;justify-content:flex-end;margin-bottom:1rem;">
@@ -590,6 +645,62 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
   </div>
 </div>
 
+<!-- PANNEAU PARAMÈTRES -->
+<div class="settings-overlay" id="settings-overlay" onclick="if(event.target===this)SettingsManager.closePanel()">
+  <div class="settings-box">
+    <div class="settings-hdr">
+      <div>
+        <div class="settings-title">⚙️ Paramètres</div>
+      </div>
+      <button class="settings-close" onclick="SettingsManager.closePanel()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="settings-body" id="settings-body">
+      <!-- Rendu dynamique par SettingsManager.renderPanel() -->
+    </div>
+    <div class="settings-footer">
+      <div class="settings-storage-note">
+        <i class="ti ti-shield-lock" style="color:var(--pc-teal-dark);"></i>
+        Clés stockées localement dans votre navigateur uniquement.
+      </div>
+      <button class="btn" onclick="SettingsManager.closePanel()">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- LEAD INTELLIGENCE ENGINE PANEL -->
+<div class="lie-panel" id="lie-panel" onclick="if(event.target===this)LIE.close()">
+  <div class="lie-box">
+    <div class="lie-hdr">
+      <div>
+        <div class="lie-title">🔎 Trouver des décideurs</div>
+        <div class="lie-subtitle" id="lie-company-name">–</div>
+      </div>
+      <button class="lie-close" onclick="LIE.close()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="lie-body" id="lie-body">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div style="font-size:12px;color:var(--tm);">Source : <strong>Apollo.io</strong></div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-sm btn-teal" onclick="LIE.search()"><i class="ti ti-search"></i> Rechercher</button>
+          <button class="btn btn-sm" onclick="LIE.close();SettingsManager.openPanel()" title="Configurer les clés API"><i class="ti ti-settings"></i></button>
+        </div>
+      </div>
+      <div id="lie-results">
+        <div style="text-align:center;padding:40px;color:var(--tm);font-size:13px;">
+          <i class="ti ti-user-search" style="font-size:28px;display:block;margin-bottom:8px;opacity:.4;"></i>
+          Cliquez "Rechercher" pour trouver les décideurs.
+        </div>
+      </div>
+    </div>
+    <div class="lie-footer">
+      <div style="font-size:12px;color:var(--tm);" id="lie-count">0 contact sélectionné</div>
+      <button class="lie-import-btn" id="lie-import-btn" onclick="LIE.importSelected()" disabled>
+        <i class="ti ti-download"></i> Importer les contacts sélectionnés
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- PANNEAU LATERAL SALES COPILOT -->
 <div class="copilot-overlay" id="copilot-overlay" onclick="closeCopilot()"></div>
 <div class="copilot-panel" id="copilot-panel">
@@ -737,6 +848,7 @@ function cardHTML(comp,idx,cc){
     <button class="qa-btn" onclick="event.stopPropagation();openEditCompany('${comp._recordId||''}')"><i class="ti ti-pencil"></i> Modifier</button>
     <button class="qa-btn" onclick="event.stopPropagation();openAddOppFromCompany('${comp._recordId||''}','${name.replace(/'/g,"\\'")}')"><i class="ti ti-target"></i> Opportunité</button>
     <button class="qa-btn" onclick="event.stopPropagation();openRelance('${comp._recordId||''}')"><i class="ti ti-bell"></i> Relance</button>
+    <button class="qa-btn" style="color:var(--pc-terra-dark);border-color:var(--pc-terra-bg);background:var(--pc-terra-bg);" onclick="event.stopPropagation();LIE.openPanel('${comp._recordId||''}','${name.replace(/'/g,"\\'")}')"><i class="ti ti-user-search"></i> 🔎 Décideurs</button>
   </div>
   <div class="cdetail">
     <div style="margin-bottom:14px;">
@@ -1306,15 +1418,13 @@ async function saveNE(){
   const nom=document.getElementById('ne-nom').value.trim();
   if(!nom){alert('Le nom est obligatoire.');return;}
 
-  // Vérification doublon
-  const nq=normalize(nom);
-  const similaires=companies.filter(c=>normalize(c['Nom de l\'entreprise']||'').includes(nq)||nq.includes(normalize(c['Nom de l\'entreprise']||'')));
-  if(similaires.length>0){
-    const noms=similaires.map(c=>c['Nom de l\'entreprise']).join(', ');
-    const continuer=confirm(`Une entreprise similaire existe déjà : "${noms}".\n\nVoulez-vous quand même créer "${nom}" ?`);
+  // Vérification doublon via DataQualityEngine
+  const dupComp = DataQualityEngine.findDuplicateCompany(nom, document.getElementById('ne-site').value);
+  if(dupComp){
+    const continuer = confirm(`Une entreprise similaire existe déjà : "${dupComp.company['Nom de l\'entreprise']}" (${dupComp.reason}).\n\nVoulez-vous quand même créer "${nom}" ?`);
     if(!continuer){
       cm('modal-ne');
-      focusCompany(similaires[0]._recordId);
+      focusCompany(dupComp.company._recordId);
       return;
     }
   }
@@ -1674,6 +1784,592 @@ async function prepareNextAction(companyId, companyName){
       </div>`;
   }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SETTINGS MANAGER
+// Couche d'abstraction complète pour la gestion des clés API.
+// Aucun autre module ne doit accéder au stockage directement.
+// Pour migrer vers un backend : remplacer uniquement _read() et _write().
+// ═══════════════════════════════════════════════════════════════════════════
+
+const SettingsManager = {
+
+  // ─── Registre des clés connues ────────────────────────────────────────────
+  // Ajouter ici tout nouveau fournisseur. L'interface se génère automatiquement.
+  KEYS: [
+    {
+      id: 'apollo_api_key',
+      label: 'Apollo.io',
+      description: 'Recherche de décideurs',
+      placeholder: 'api_key_xxxxxxxxxxxxxxxxxxxxxxxx',
+      group: 'Fournisseurs de contacts',
+      docsUrl: 'https://app.apollo.io/#/settings/integrations/api',
+    },
+    {
+      id: 'openai_api_key',
+      label: 'OpenAI',
+      description: 'Génération IA (si appel direct)',
+      placeholder: 'sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+      group: 'Intelligence artificielle',
+      docsUrl: 'https://platform.openai.com/api-keys',
+    },
+    {
+      id: 'hunter_api_key',
+      label: 'Hunter.io',
+      description: 'Vérification et recherche d\'emails',
+      placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+      group: 'Fournisseurs de contacts',
+      docsUrl: 'https://hunter.io/api-keys',
+    },
+    {
+      id: 'kaspr_api_key',
+      label: 'Kaspr',
+      description: 'Enrichissement contacts LinkedIn',
+      placeholder: 'kaspr_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+      group: 'Fournisseurs de contacts',
+      docsUrl: 'https://app.kaspr.io/settings',
+    },
+    {
+      id: 'salesql_api_key',
+      label: 'SalesQL',
+      description: 'Extraction emails depuis LinkedIn',
+      placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+      group: 'Fournisseurs de contacts',
+      docsUrl: 'https://salesql.com/settings',
+    },
+  ],
+
+  // ─── Stockage (localStorage en V1 — remplacer par backend en V2) ──────────
+
+  _storageKey: 'pc_settings_v1',
+
+  _read(){
+    try { return JSON.parse(localStorage.getItem(this._storageKey)||'{}'); }
+    catch { return {}; }
+  },
+
+  _write(data){
+    localStorage.setItem(this._storageKey, JSON.stringify(data));
+  },
+
+  // ─── API publique — utilisée par tous les fournisseurs ────────────────────
+
+  /**
+   * Récupère une clé API.
+   * @param {string} keyId - ID de la clé (ex: 'apollo_api_key')
+   * @returns {string} Valeur ou ''
+   */
+  get(keyId){
+    return this._read()[keyId]||'';
+  },
+
+  /**
+   * Enregistre une clé API.
+   * @param {string} keyId
+   * @param {string} value
+   */
+  set(keyId, value){
+    const data = this._read();
+    data[keyId] = value.trim();
+    this._write(data);
+  },
+
+  /**
+   * Supprime une clé API.
+   */
+  delete(keyId){
+    const data = this._read();
+    delete data[keyId];
+    this._write(data);
+  },
+
+  /**
+   * Vérifie si une clé est configurée.
+   */
+  has(keyId){
+    return !!this.get(keyId);
+  },
+
+  // ─── UI ───────────────────────────────────────────────────────────────────
+
+  openPanel(){
+    this.renderPanel();
+    document.getElementById('settings-overlay').classList.add('show');
+  },
+
+  closePanel(){
+    document.getElementById('settings-overlay').classList.remove('show');
+  },
+
+  renderPanel(){
+    // Grouper les clés par catégorie
+    const groups = {};
+    this.KEYS.forEach(k => {
+      if(!groups[k.group]) groups[k.group] = [];
+      groups[k.group].push(k);
+    });
+
+    let html = '';
+    Object.entries(groups).forEach(([groupName, keys]) => {
+      html += `<div class="settings-section">
+        <div class="settings-section-title">${groupName}</div>`;
+
+      keys.forEach(k => {
+        const val = this.get(k.id);
+        const isSet = !!val;
+        const masked = isSet ? val.slice(0,6)+'•'.repeat(Math.min(val.length-6,20)) : '';
+
+        html += `<div class="settings-row">
+          <div class="settings-label">
+            ${k.label}
+            <span>— ${k.description}</span>
+            ${isSet ? `<span class="settings-status ok">✓ Configuré</span>` : `<span class="settings-status empty">Non configuré</span>`}
+            <a href="${k.docsUrl}" target="_blank" style="font-size:10px;color:var(--pc-teal-dark);margin-left:4px;"><i class="ti ti-external-link"></i></a>
+          </div>
+          <div class="settings-input-row">
+            <input class="settings-input" type="password"
+              id="settings-${k.id}"
+              placeholder="${isSet ? masked : k.placeholder}"
+              autocomplete="off">
+            <button class="settings-save-btn" onclick="SettingsManager.saveKey('${k.id}')">
+              Enregistrer
+            </button>
+            ${isSet ? `<button class="btn btn-sm" style="color:var(--pc-terra-dark);" onclick="SettingsManager.deleteKey('${k.id}')" title="Supprimer">
+              <i class="ti ti-trash"></i>
+            </button>` : ''}
+          </div>
+          <div class="settings-note">${k.docsUrl?`Obtenir la clé sur <a href="${k.docsUrl}" target="_blank" style="color:var(--pc-teal-dark);">${k.label}</a>.`:''}</div>
+        </div>`;
+      });
+
+      html += `</div>`;
+    });
+
+    // Section informations stockage
+    html += `<div class="settings-section">
+      <div class="settings-section-title">Stockage</div>
+      <div style="font-size:12px;color:var(--ts);line-height:1.65;background:var(--s1);border-radius:8px;padding:12px 14px;">
+        <strong>Version actuelle :</strong> localStorage du navigateur (V1)<br>
+        <span style="color:var(--tm);">Les clés sont chiffrées dans votre navigateur et ne quittent jamais votre appareil.<br>
+        Migration vers un backend sécurisé possible sans modifier l'interface (V2).</span>
+      </div>
+    </div>`;
+
+    document.getElementById('settings-body').innerHTML = html;
+  },
+
+  saveKey(keyId){
+    const input = document.getElementById(`settings-${keyId}`);
+    const val = input?.value?.trim();
+    if(!val){ showToast('⚠️ Valeur vide — clé non enregistrée'); return; }
+    this.set(keyId, val);
+    input.value = '';
+    showToast(`Clé ${this.KEYS.find(k=>k.id===keyId)?.label||keyId} enregistrée ✓`);
+    this.renderPanel();
+  },
+
+  deleteKey(keyId){
+    if(!confirm(`Supprimer la clé ${this.KEYS.find(k=>k.id===keyId)?.label||keyId} ?`)) return;
+    this.delete(keyId);
+    showToast('Clé supprimée');
+    this.renderPanel();
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SPRINT 6b — DATA QUALITY ENGINE + LEAD INTELLIGENCE ENGINE
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * DataQualityEngine — Moteur de qualité des données CRM
+ * Exécuté automatiquement avant toute création d'entreprise ou de contact.
+ * Architecture extensible : chaque méthode est indépendante.
+ */
+const DataQualityEngine = {
+
+  // ─── NORMALISATION ────────────────────────────────────────────────────────
+
+  /**
+   * Normalise un nom d'entreprise pour comparaison.
+   * Extensible : ajouter la suppression des formes juridiques (SAS, SARL...) ici.
+   */
+  normalizeCompanyName(name){
+    if(!name)return'';
+    return name
+      .trim()
+      .replace(/\s+/g,' ')           // Doubles espaces
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g,'') // Accents
+      // Futur Sprint : .replace(/\b(sas|sarl|sa|sasu|eurl|scop)\b/g,'').trim()
+  },
+
+  /**
+   * Normalise un nom de contact
+   */
+  normalizeContactName(name){
+    if(!name)return'';
+    return name.trim().replace(/\s+/g,' ').toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  },
+
+  /**
+   * Extrait le domaine d'une URL ou email
+   */
+  extractDomain(str){
+    if(!str)return'';
+    try{
+      const url=str.includes('://')?str:`https://${str}`;
+      return new URL(url).hostname.replace('www.','').toLowerCase();
+    }catch{
+      if(str.includes('@'))return str.split('@')[1]?.toLowerCase()||'';
+      return str.toLowerCase().replace('www.','');
+    }
+  },
+
+  // ─── DÉTECTION DOUBLONS ENTREPRISES ──────────────────────────────────────
+
+  /**
+   * Cherche une entreprise existante similaire.
+   * Priorité : nom normalisé → domaine web → domaine email
+   * @returns {Object|null} Entreprise trouvée ou null
+   */
+  findDuplicateCompany(name, website='', email=''){
+    const normName = this.normalizeCompanyName(name);
+    const normDomain = this.extractDomain(website);
+
+    for(const c of companies){
+      const existName = this.normalizeCompanyName(c['Nom de l\'entreprise']||'');
+      if(existName && existName === normName) return {company:c, reason:'nom identique'};
+
+      if(normDomain){
+        const existDomain = this.extractDomain(c['site internet']||'');
+        if(existDomain && existDomain === normDomain) return {company:c, reason:'site web identique'};
+      }
+    }
+    return null;
+  },
+
+  // ─── DÉTECTION DOUBLONS CONTACTS ─────────────────────────────────────────
+
+  /**
+   * Cherche un contact existant.
+   * Priorité : email → linkedin → nom+prénom+entreprise
+   */
+  findDuplicateContact(data){
+    const {email='', linkedin='', firstname='', lastname='', companyId=''} = data;
+    const normEmail = (email||'').toLowerCase().trim();
+    const normLI = (linkedin||'').toLowerCase().replace(/\/$/,'').trim();
+    const normName = this.normalizeContactName(`${firstname} ${lastname}`);
+
+    for(const c of contacts){
+      // 1. Email exact
+      if(normEmail && (c['Email']||'').toLowerCase().trim() === normEmail)
+        return {contact:c, reason:'email identique'};
+
+      // 2. LinkedIn
+      if(normLI && (c['LinkedIn']||'').toLowerCase().replace(/\/$/,'').trim() === normLI)
+        return {contact:c, reason:'LinkedIn identique'};
+
+      // 3. Nom + entreprise
+      if(normName && companyId){
+        const cName = this.normalizeContactName(c['Nom du contact']||'');
+        const cComp = Array.isArray(c['Entreprise liée']) ? c['Entreprise liée'] : [];
+        if(cName === normName && cComp.includes(companyId))
+          return {contact:c, reason:'nom + entreprise identiques'};
+      }
+    }
+    return null;
+  },
+
+  // ─── FUSION AUTOMATIQUE (conservative) ───────────────────────────────────
+
+  /**
+   * Vérifie si une entreprise peut être fusionnée automatiquement.
+   * Règle stricte : fusion UNIQUEMENT si la fiche est totalement vide.
+   */
+  canAutoMerge(company){
+    const cc = getCC(company);
+    if(cc.length > 0) return false; // A des contacts
+    // Futur : vérifier interactions et opportunités liées
+    return true;
+  },
+
+  /**
+   * Détermine quelle fiche conserver lors d'une fusion.
+   * Conserve toujours la fiche la plus riche.
+   */
+  choosePrimary(compA, compB){
+    const score = c => {
+      let s = 0;
+      if(c['site internet']) s += 3;
+      if(c['LinkedIn']) s += 2;
+      if(c['Secteur']) s += 2;
+      if(c['Notes']) s += 1;
+      return s;
+    };
+    const sA = score(compA), sB = score(compB);
+    if(sA > sB) return compA;
+    if(sB > sA) return compB;
+    // Égalité : préférer les majuscules
+    const nameA = compA['Nom de l\'entreprise']||'';
+    const nameB = compB['Nom de l\'entreprise']||'';
+    return nameA === nameA.toUpperCase() ? compA : compB;
+  },
+};
+
+// ─── LEAD PROVIDER — Couche d'abstraction ─────────────────────────────────
+
+/**
+ * LeadProvider — Interface unique pour tous les fournisseurs de contacts.
+ * L'interface ne connaît jamais Apollo directement.
+ * Changer de fournisseur = changer provider.source uniquement.
+ */
+const LeadProvider = {
+  source: 'apollo', // 'apollo' | 'kaspr' | 'salesql' | 'hunter' | 'mock'
+
+  /**
+   * Recherche des décideurs dans une entreprise.
+   * @param {Object} params - { companyName, companyDomain, titles, limit }
+   * @returns {Promise<Array>} - Liste normalisée de contacts
+   */
+  async searchDecisionMakers(params){
+    switch(this.source){
+      case 'apollo': return ApolloProvider.search(params);
+      case 'mock':   return this._mock(params);
+      default:       return this._mock(params);
+    }
+  },
+
+  // Mock pour tests sans clé Apollo
+  _mock(params){
+    return [
+      {firstname:'Sophie',lastname:'MARTIN',title:'DRH',email:'s.martin@exemple.fr',phone:'',linkedin:'https://linkedin.com/in/sophie-martin',city:'Paris',_source:'mock'},
+      {firstname:'Thomas',lastname:'BERNARD',title:'Directeur Avantages Sociaux',email:'t.bernard@exemple.fr',phone:'+33 6 12 34 56 78',linkedin:'https://linkedin.com/in/thomas-bernard',city:'Paris',_source:'mock'},
+      {firstname:'Marie',lastname:'DUPONT',title:'Responsable QVT',email:'m.dupont@exemple.fr',phone:'',linkedin:'',city:'Paris',_source:'mock'},
+    ];
+  }
+};
+
+/**
+ * ApolloProvider — Fournisseur Apollo.io
+ * Toute la logique Apollo est isolée ici.
+ * Ne jamais appeler depuis l'interface directement.
+ */
+const ApolloProvider = {
+  BASE_URL: 'https://api.apollo.io/v1',
+
+  async search({companyName, companyDomain, titles=[], limit=10}){
+    const apiKey = SettingsManager.get('apollo_api_key');
+    if(!apiKey) throw new Error('Clé API Apollo non configurée — ouvrez ⚙️ Paramètres');
+
+    // Apollo People Search
+    const body = {
+      api_key: apiKey,
+      q_organization_name: companyName,
+      person_titles: titles.length ? titles : ['DRH','Directeur des ressources humaines','Responsable avantages sociaux','Directeur général','CHRO','Responsable QVT','Responsable prévention'],
+      per_page: limit,
+      page: 1,
+    };
+    if(companyDomain) body.q_organization_domains = [companyDomain];
+
+    const r = await fetch(`${this.BASE_URL}/mixed_people/search`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json', 'Cache-Control':'no-cache'},
+      body: JSON.stringify(body)
+    });
+    if(!r.ok){
+      const err = await r.json().catch(()=>({}));
+      throw new Error(err?.message || `Apollo erreur ${r.status}`);
+    }
+    const data = await r.json();
+    return (data.people||[]).map(p => this._normalize(p));
+  },
+
+  _normalize(p){
+    return {
+      firstname: p.first_name||'',
+      lastname:  p.last_name||'',
+      title:     p.title||'',
+      email:     p.email||p.personal_emails?.[0]||'',
+      phone:     p.phone_numbers?.[0]?.raw_number||'',
+      linkedin:  p.linkedin_url||'',
+      city:      p.city||p.location||'',
+      _source:   'apollo',
+      _raw:      p, // Conserver la donnée brute pour futures évolutions
+    };
+  }
+};
+
+/**
+ * LIE — Lead Intelligence Engine Controller
+ * Orchestre LeadProvider → DataQualityEngine → Import → UI
+ */
+const LIE = {
+  currentCompanyId: '',
+  currentCompanyName: '',
+  leads: [],
+
+  // ─── Ouverture du panneau ─────────────────────────────────────────────────
+  openPanel(companyId, companyName){
+    this.currentCompanyId = companyId;
+    this.currentCompanyName = companyName;
+    this.leads = [];
+
+    const hasKey = SettingsManager.has('apollo_api_key');
+
+    document.getElementById('lie-company-name').textContent = companyName;
+    document.getElementById('lie-results').innerHTML = hasKey
+      ? `<div style="text-align:center;padding:40px;color:var(--tm);font-size:13px;">
+          <i class="ti ti-user-search" style="font-size:28px;display:block;margin-bottom:8px;opacity:.4;"></i>
+          Cliquez "Rechercher" pour trouver les décideurs de ${companyName}.
+        </div>`
+      : `<div style="background:var(--pc-terra-bg);border-radius:10px;padding:16px;font-size:13px;color:var(--pc-terra-dark);display:flex;flex-direction:column;gap:10px;">
+          <strong><i class="ti ti-key"></i> Clé API Apollo non configurée</strong>
+          <div>Ouvrez les paramètres pour renseigner votre clé Apollo.</div>
+          <button class="btn btn-sm" onclick="LIE.close();SettingsManager.openPanel()"><i class="ti ti-settings"></i> Ouvrir les paramètres</button>
+        </div>`;
+
+    this._updateFooter();
+    document.getElementById('lie-panel').classList.add('show');
+  },
+
+  close(){
+    document.getElementById('lie-panel').classList.remove('show');
+  },
+
+  // ─── Recherche ────────────────────────────────────────────────────────────
+  async search(){
+    if(!SettingsManager.has('apollo_api_key')){
+      showToast('⚠️ Clé Apollo manquante — ouvrez ⚙️ Paramètres');
+      LIE.close();
+      SettingsManager.openPanel();
+      return;
+    }
+    document.getElementById('lie-results').innerHTML=`
+      <div style="display:flex;flex-direction:column;align-items:center;padding:40px;gap:10px;">
+        <div class="spin"></div>
+        <div style="font-size:13px;color:var(--tm);">Recherche des décideurs via Apollo…</div>
+      </div>`;
+
+    // Trouver le domaine de l'entreprise dans Airtable
+    const comp = companies.find(c=>c._recordId===this.currentCompanyId)||{};
+    const domain = DataQualityEngine.extractDomain(comp['site internet']||'');
+
+    try {
+      const raw = await LeadProvider.searchDecisionMakers({
+        companyName: this.currentCompanyName,
+        companyDomain: domain,
+        limit: 20
+      });
+
+      // Enrichir avec infos doublon
+      this.leads = raw.map(l => ({
+        ...l,
+        _selected: false,
+        _duplicate: DataQualityEngine.findDuplicateContact({
+          email: l.email,
+          linkedin: l.linkedin,
+          firstname: l.firstname,
+          lastname: l.lastname,
+          companyId: this.currentCompanyId
+        })
+      }));
+
+      this._renderResults();
+    } catch(e){
+      document.getElementById('lie-results').innerHTML=`
+        <div style="background:var(--pc-terra-bg);border-radius:8px;padding:14px;font-size:13px;color:var(--pc-terra-dark);margin-top:8px;">
+          <strong>Erreur Apollo :</strong> ${e.message}
+        </div>`;
+    }
+  },
+
+  // ─── Affichage résultats ──────────────────────────────────────────────────
+  _renderResults(){
+    if(!this.leads.length){
+      document.getElementById('lie-results').innerHTML=`
+        <div style="text-align:center;padding:40px;color:var(--tm);font-size:13px;">Aucun décideur trouvé.</div>`;
+      return;
+    }
+    const rows = this.leads.map((l,i) => {
+      const isDup = !!l._duplicate;
+      return `<tr style="${isDup?'opacity:.6':''}">
+        <td><input type="checkbox" class="lie-check" ${l._selected?'checked':''} ${isDup?'disabled':''} onchange="LIE.toggleLead(${i})"></td>
+        <td><strong>${l.firstname} ${l.lastname}</strong></td>
+        <td>${l.title||'–'}</td>
+        <td style="font-size:11px;">${l.email||'–'}</td>
+        <td style="font-size:11px;">${l.phone||'–'}</td>
+        <td>${l.linkedin?`<a href="${l.linkedin}" target="_blank" style="color:var(--pc-teal-dark);font-size:11px;">LinkedIn</a>`:'–'}</td>
+        <td>${l.city||'–'}</td>
+        <td>
+          ${isDup
+            ? `<span class="lie-badge lie-exists" title="${l._duplicate.reason}">✓ Existant</span>`
+            : `<span class="lie-badge lie-new">Nouveau</span>`
+          }
+        </td>
+      </tr>`;
+    }).join('');
+
+    document.getElementById('lie-results').innerHTML = `
+      <table class="lie-table">
+        <thead><tr>
+          <th></th><th>Nom</th><th>Fonction</th><th>Email</th>
+          <th>Téléphone</th><th>LinkedIn</th><th>Ville</th><th>Statut</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+    this._updateFooter();
+  },
+
+  toggleLead(i){
+    this.leads[i]._selected = !this.leads[i]._selected;
+    this._renderResults();
+  },
+
+  _updateFooter(){
+    const sel = this.leads.filter(l=>l._selected&&!l._duplicate).length;
+    document.getElementById('lie-count').textContent = `${sel} contact${sel>1?'s':''} sélectionné${sel>1?'s':''}`;
+    document.getElementById('lie-import-btn').disabled = sel === 0;
+  },
+
+  // ─── Import ───────────────────────────────────────────────────────────────
+  async importSelected(){
+    const toImport = this.leads.filter(l=>l._selected && !l._duplicate);
+    if(!toImport.length) return;
+
+    document.getElementById('lie-import-btn').disabled = true;
+    document.getElementById('lie-import-btn').textContent = 'Import en cours…';
+
+    let imported = 0;
+    for(const l of toImport){
+      try{
+        const f = {'Nom du contact': `${l.firstname} ${l.lastname}`.trim()};
+        if(l.title)    f['Rôle / Fonction'] = l.title;
+        if(l.email)    f['Email'] = l.email;
+        if(l.phone)    f['Téléphone'] = l.phone;
+        if(l.linkedin) f['LinkedIn'] = l.linkedin;
+        if(this.currentCompanyId) f['Entreprise liée'] = [this.currentCompanyId];
+        f['Notes sur le contact'] = `[Apollo] Importé le ${new Date().toLocaleDateString('fr-FR')}`;
+
+        await CRM.createContact(f);
+        l._duplicate = {reason:'vient d\'être importé'};
+        imported++;
+      }catch(e){
+        console.error('Erreur import contact:', l, e);
+      }
+    }
+
+    showToast(`${imported} contact${imported>1?'s':''} importé${imported>1?'s':''} ✓`);
+    this._renderResults();
+    document.getElementById('lie-import-btn').innerHTML='<i class="ti ti-download"></i> Importer les contacts sélectionnés';
+    await bootAndFocus(this.currentCompanyId);
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
 
 // ═══════════════════════════════════════════════════════════════════════════
 // SPRINT 6 — PROSPECT ENGINE
