@@ -19,6 +19,24 @@
 body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:var(--tp);min-height:100vh;}
 .page{max-width:900px;margin:0 auto;padding:2rem 1.5rem 4rem;}
 .hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;background:#fff;border-radius:12px;padding:16px 20px;border:0.5px solid var(--bd);flex-wrap:wrap;gap:10px;}
+/* BARRE DE RECHERCHE */
+.search-wrap{flex:1;min-width:200px;max-width:320px;position:relative;}
+.search-input{width:100%;padding:7px 12px 7px 34px;border:0.5px solid var(--bds);border-radius:var(--r);font-family:'Poppins',sans-serif;font-size:13px;color:var(--tp);background:#fff;outline:none;transition:border-color .15s;}
+.search-input:focus{border-color:var(--pc-teal);}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--tm);font-size:15px;pointer-events:none;}
+.search-results{display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:0.5px solid var(--bd);border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.1);z-index:60;max-height:320px;overflow-y:auto;}
+.search-results.show{display:block;}
+.search-section{padding:6px 0;}
+.search-section-lbl{font-family:'Exo 2',sans-serif;font-size:9px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.08em;padding:4px 14px;}
+.search-item{display:flex;align-items:center;gap:10px;padding:8px 14px;cursor:pointer;transition:background .1s;}
+.search-item:hover{background:var(--s1);}
+.search-item-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:'Exo 2',sans-serif;flex-shrink:0;}
+.si-comp{background:var(--pc-teal-bg);color:var(--pc-teal-dark);}
+.si-cont{background:var(--pc-violet-bg);color:var(--pc-violet-dark);}
+.search-item-name{font-size:13px;color:var(--tp);font-weight:500;}
+.search-item-sub{font-size:11px;color:var(--tm);}
+.search-empty{padding:16px;text-align:center;font-size:12px;color:var(--tm);}
+.search-hl{background:var(--pc-teal-bg);border-radius:2px;}
 .brand{display:flex;align-items:center;gap:12px;}
 .bn{font-family:'STIX Two Text',Georgia,serif;font-size:20px;font-weight:700;color:var(--pc-dark);}
 .bn span{color:var(--pc-teal);}
@@ -151,6 +169,30 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
 .copilot-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-family:'Exo 2',sans-serif;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--pc-violet-bg);color:var(--pc-violet-dark);margin-bottom:10px;}
 .copilot-placeholder i{font-size:32px;color:var(--pc-violet);opacity:.4;display:block;margin:0 auto 8px;}
 .copilot-placeholder p{font-size:13px;color:var(--tm);line-height:1.6;text-align:center;}
+/* EDITION INLINE */
+.edit-panel{background:var(--s1);border-radius:10px;padding:14px;margin-bottom:14px;display:none;}
+.edit-panel.show{display:block;}
+.edit-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.edit-field{display:flex;flex-direction:column;gap:4px;}
+.edit-field.full{grid-column:1/-1;}
+.edit-label{font-family:'Exo 2',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tm);}
+.edit-input{padding:7px 10px;border:0.5px solid var(--bds);border-radius:var(--r);font-family:'Poppins',sans-serif;font-size:12px;color:var(--tp);background:#fff;outline:none;}
+.edit-input:focus{border-color:var(--pc-teal);}
+.edit-select{padding:7px 10px;border:0.5px solid var(--bds);border-radius:var(--r);font-family:'Poppins',sans-serif;font-size:12px;color:var(--tp);background:#fff;outline:none;height:34px;}
+.edit-actions{display:flex;gap:6px;margin-top:10px;justify-content:flex-end;}
+
+/* AUTOCOMPLETE ENTREPRISE */
+.ac-wrap{position:relative;}
+.ac-list{display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:0.5px solid var(--bd);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.1);z-index:70;max-height:200px;overflow-y:auto;}
+.ac-list.show{display:block;}
+.ac-item{padding:8px 12px;font-size:13px;color:var(--ts);cursor:pointer;display:flex;align-items:center;gap:8px;}
+.ac-item:hover{background:var(--s1);}
+.ac-new{color:var(--pc-teal-dark);font-weight:500;}
+
+/* QUICK ACTIONS */
+.quick-actions{display:flex;gap:6px;flex-wrap:wrap;padding:10px 18px;background:var(--s1);border-top:0.5px solid var(--bd);}
+.qa-btn{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-family:'Exo 2',sans-serif;font-weight:600;padding:5px 10px;border-radius:99px;border:0.5px solid var(--bd);background:#fff;color:var(--ts);cursor:pointer;transition:all .15s;}
+.qa-btn:hover{border-color:var(--pc-teal);color:var(--pc-teal-dark);background:var(--pc-teal-bg);}
 .spin-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;gap:12px;background:#fff;border-radius:12px;border:0.5px solid var(--bd);}
 .spin{width:28px;height:28px;border:2.5px solid var(--bd);border-top-color:var(--pc-teal);border-radius:50%;animation:sp .8s linear infinite;}
 @keyframes sp{to{transform:rotate(360deg);}}
@@ -181,7 +223,11 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
       </div>
     </div>
     <div class="hdr-r">
-      <div class="date-chip" id="dchip"></div>
+      <div class="search-wrap">
+        <i class="ti ti-search search-icon" aria-hidden="true"></i>
+        <input class="search-input" id="search-input" type="text" placeholder="Rechercher une entreprise, un contact…" autocomplete="off" oninput="onSearch(this.value)" onfocus="onSearch(this.value)">
+        <div class="search-results" id="search-results"></div>
+      </div>
       <div class="nouveau-wrap" id="nouveau-wrap">
         <button class="btn btn-nouveau" onclick="toggleNouveau(event)"><i class="ti ti-plus"></i> Nouveau</button>
         <div class="nouveau-menu" id="nouveau-menu">
@@ -193,6 +239,9 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
       </div>
       <button class="btn btn-teal" onclick="boot()" id="rbtn"><i class="ti ti-refresh"></i> Actualiser</button>
     </div>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:flex-end;margin-bottom:1rem;">
+    <div class="date-chip" id="dchip"></div>
   </div>
   <div class="kpi-row">
     <div class="kpi"><div class="kpi-n t" id="k0">–</div><div class="kpi-l">entreprises actives</div></div>
@@ -206,6 +255,159 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
     <button class="tab" onclick="sw('pipeline',this)">Pipeline maturité</button>
   </div>
   <div id="content"><div class="spin-wrap"><div class="spin"></div><div class="spin-txt">Connexion au CRM PrévenirCare…</div></div></div>
+</div>
+
+<!-- MODAL EDITION OPPORTUNITE -->
+<div class="modal-overlay" id="modal-edit-opp">
+  <div class="modal">
+    <div class="modal-title">Modifier l'opportunité</div>
+    <input type="hidden" id="eo-id">
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
+      <div class="edit-field" style="grid-column:1/-1">
+        <div class="edit-label">Nom</div><input class="edit-input" id="eo-nom" style="width:100%">
+      </div>
+      <div class="edit-field">
+        <div class="edit-label">Étape</div>
+        <select class="edit-select" id="eo-stade">
+          <option>Identification</option>
+          <option>Premier contact</option>
+          <option>Échange en cours</option>
+          <option>Proposition envoyée</option>
+          <option>Négociation</option>
+          <option>Gagné</option>
+          <option>Perdu</option>
+        </select>
+      </div>
+      <div class="edit-field">
+        <div class="edit-label">Probabilité (%)</div>
+        <input class="edit-input" type="number" id="eo-prob" min="0" max="100" placeholder="50">
+      </div>
+      <div class="edit-field">
+        <div class="edit-label">Valeur estimée (€)</div>
+        <input class="edit-input" type="number" id="eo-val" placeholder="0">
+      </div>
+      <div class="edit-field">
+        <div class="edit-label">Date estimée de closing</div>
+        <input class="edit-input" type="date" id="eo-date">
+      </div>
+      <div class="edit-field" style="grid-column:1/-1">
+        <div class="edit-label">Notes</div>
+        <textarea class="fta" id="eo-notes" rows="3" style="width:100%;resize:vertical;"></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="cm('modal-edit-opp')">Annuler</button>
+      <button class="btn btn-teal" onclick="saveEditOpp()"><i class="ti ti-check"></i> Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITION ENTREPRISE -->
+<div class="modal-overlay" id="modal-edit-comp">
+  <div class="modal">
+    <div class="modal-title">Modifier l'entreprise</div>
+    <input type="hidden" id="ec-id">
+    <div class="edit-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
+      <div class="edit-field full" style="grid-column:1/-1">
+        <div class="edit-label">Nom</div><input class="edit-input" id="ec-nom" style="width:100%">
+      </div>
+      <div class="edit-field">
+        <div class="edit-label">Secteur</div><input class="edit-input" id="ec-secteur">
+      </div>
+      <div class="edit-field">
+        <div class="edit-label">Priorité</div>
+        <select class="edit-select" id="ec-priorite">
+          <option value="">–</option>
+          <option>Haute</option><option>Moyenne</option><option>Basse</option>
+        </select>
+      </div>
+      <div class="edit-field">
+        <div class="edit-label">Responsable</div><input class="edit-input" id="ec-responsable" placeholder="Calvine TONGA">
+      </div>
+      <div class="edit-field">
+        <div class="edit-label">Niveau Kestio</div>
+        <select class="edit-select" id="ec-kestio">
+          <option value="1">N1 — Inconscience</option>
+          <option value="2">N2 — Prise de conscience</option>
+          <option value="3">N3 — Appropriation</option>
+          <option value="4">N4 — Recherche de solution</option>
+        </select>
+      </div>
+      <div class="edit-field">
+        <div class="edit-label">Statut</div>
+        <select class="edit-select" id="ec-statut">
+          <option value="">–</option>
+          <option>À contacter</option><option>En cours</option><option>RDV planifié</option><option>Proposition envoyée</option><option>En attente</option><option>Inactif</option>
+        </select>
+      </div>
+      <div class="edit-field">
+        <div class="edit-label">Date de relance</div><input class="edit-input" type="date" id="ec-relance">
+      </div>
+      <div class="edit-field" style="grid-column:1/-1">
+        <div class="edit-label">Prochaine action</div><input class="edit-input" id="ec-action" style="width:100%">
+      </div>
+      <div class="edit-field" style="grid-column:1/-1">
+        <div class="edit-label">Notes</div><textarea class="fta" id="ec-notes" rows="3" style="width:100%;resize:vertical;"></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="cm('modal-edit-comp')">Annuler</button>
+      <button class="btn btn-teal" onclick="saveEditComp()"><i class="ti ti-check"></i> Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITION CONTACT -->
+<div class="modal-overlay" id="modal-edit-cont">
+  <div class="modal">
+    <div class="modal-title">Modifier le contact</div>
+    <input type="hidden" id="eco-id">
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
+      <div class="edit-field" style="grid-column:1/-1">
+        <div class="edit-label">Nom</div><input class="edit-input" id="eco-nom" style="width:100%">
+      </div>
+      <div class="edit-field">
+        <div class="edit-label">Fonction</div><input class="edit-input" id="eco-role">
+      </div>
+      <div class="edit-field">
+        <div class="edit-label">Email</div><input class="edit-input" type="email" id="eco-email">
+      </div>
+      <div class="edit-field">
+        <div class="edit-label">Téléphone</div><input class="edit-input" id="eco-tel">
+      </div>
+      <div class="edit-field">
+        <div class="edit-label">LinkedIn</div><input class="edit-input" id="eco-li">
+      </div>
+      <div class="edit-field">
+        <div class="edit-label">Niveau Kestio</div>
+        <select class="edit-select" id="eco-kestio">
+          <option value="1">N1</option><option value="2">N2</option><option value="3">N3</option><option value="4">N4</option>
+        </select>
+      </div>
+      <div class="edit-field" style="grid-column:1/-1">
+        <div class="edit-label">Notes</div><textarea class="fta" id="eco-notes" rows="3" style="width:100%;resize:vertical;"></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="cm('modal-edit-cont')">Annuler</button>
+      <button class="btn btn-teal" onclick="saveEditCont()"><i class="ti ti-check"></i> Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PROGRAMMER UNE RELANCE -->
+<div class="modal-overlay" id="modal-relance">
+  <div class="modal">
+    <div class="modal-title">Programmer une relance</div>
+    <input type="hidden" id="rel-id">
+    <div class="fg"><div class="fl">Date de relance</div><input class="fi" type="date" id="rel-date"></div>
+    <div class="fg"><div class="fl">Action prévue</div><input class="fi" id="rel-action" placeholder="Envoyer email, Appel de suivi…"></div>
+    <div class="fg"><div class="fl">Notes</div><textarea class="fta" id="rel-notes" placeholder="Contexte de la relance…"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="cm('modal-relance')">Annuler</button>
+      <button class="btn btn-teal" onclick="saveRelance()"><i class="ti ti-calendar"></i> Programmer</button>
+    </div>
+  </div>
 </div>
 
 <!-- MODAL NOUVELLE ENTREPRISE -->
@@ -325,7 +527,12 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
   <div class="modal">
     <div class="modal-title">Ajouter un contact</div>
     <div class="fg"><div class="fl">Nom complet *</div><input class="fi" id="nc-nom" placeholder="Prénom Nom"></div>
-    <div class="fg"><div class="fl">Entreprise *</div><input class="fi" id="nc-ent" placeholder="Nom de l'entreprise"></div>
+    <div class="fg"><div class="fl">Entreprise *</div>
+      <div class="ac-wrap">
+        <input class="fi" id="nc-ent" placeholder="Nom de l'entreprise" autocomplete="off" oninput="onEntAC(this.value)" onfocus="onEntAC(this.value)">
+        <div class="ac-list" id="nc-ent-ac"></div>
+      </div>
+    </div>
     <div class="fg"><div class="fl">Rôle / Fonction</div><input class="fi" id="nc-role" placeholder="DRH, Responsable prévention, Directrice avantages sociaux…"></div>
     <div class="fg"><div class="fl">Email</div><input class="fi" type="email" id="nc-email"></div>
     <div class="fg"><div class="fl">Téléphone</div><input class="fi" id="nc-tel" placeholder="+33 6…"></div>
@@ -458,7 +665,7 @@ function cardHTML(comp,idx,cc){
       <div class="ctx-menu" id="${menuId}">
         <div class="ctx-item" onclick="openInter('${cid}');closeAllCtx()"><i class="ti ti-message-circle"></i> Ajouter une interaction</div>
         <div class="ctx-item" onclick="prepareNextAction('${comp._recordId||''}','${name.replace(/'/g,"\\'")}');closeAllCtx()"><i class="ti ti-brain"></i> Préparer le prochain échange</div>
-        <div class="ctx-item" onclick="openEditContact('${cid}');closeAllCtx()"><i class="ti ti-pencil"></i> Modifier</div>
+        <div class="ctx-item" onclick="openEditCont('${cid}');closeAllCtx()"><i class="ti ti-pencil"></i> Modifier</div>
         ${email?`<div class="ctx-item" onclick="window.open('mailto:${email}');closeAllCtx()"><i class="ti ti-mail"></i> Envoyer un email</div>`:''}
       </div>
       <div class="contact-card-21-hdr">
@@ -487,6 +694,14 @@ function cardHTML(comp,idx,cc){
     <i class="ti ti-chevron-down chevron"></i>
   </div>
   ${hasAct&&pri?`<div class="action-today"><i class="ti ti-arrow-right"></i><div class="action-today-txt"><strong>${m.obj}</strong>${m.act} · Priorité : <strong>${pri['Nom du contact']||''}</strong></div></div>`:''}
+  <div class="quick-actions">
+    <button class="qa-btn" onclick="event.stopPropagation();prepareNextAction('${comp._recordId||''}','${name.replace(/'/g,"\\'")}')"><i class="ti ti-brain"></i> Analyser</button>
+    <button class="qa-btn" onclick="event.stopPropagation();openAddContactFromCompany('${comp._recordId||''}','${name.replace(/'/g,"\\'")}')"><i class="ti ti-user-plus"></i> Ajouter un contact</button>
+    <button class="qa-btn" onclick="event.stopPropagation();openInterForCompany('${comp._recordId||''}')"><i class="ti ti-message-circle"></i> Interaction</button>
+    <button class="qa-btn" onclick="event.stopPropagation();openEditCompany('${comp._recordId||''}')"><i class="ti ti-pencil"></i> Modifier</button>
+    <button class="qa-btn" onclick="event.stopPropagation();openAddOppFromCompany('${comp._recordId||''}','${name.replace(/'/g,"\\'")}')"><i class="ti ti-target"></i> Opportunité</button>
+    <button class="qa-btn" onclick="event.stopPropagation();openRelance('${comp._recordId||''}')"><i class="ti ti-bell"></i> Relance</button>
+  </div>
   <div class="cdetail">
     <div style="margin-bottom:14px;">
       <div class="sec-lbl">Maturité de la réflexion</div>
@@ -650,6 +865,306 @@ async function fetchAll(table){
   return recs;
 }
 
+// ─── SPRINT 2.2 — CRM OPÉRATIONNEL ──────────────────────────────────────────
+
+// Étendre le module CRM
+CRM.updateCompany = function(id,fields){ return at('PATCH',TE,{fields},id); };
+CRM.updateOpportunity = function(id,fields){ return at('PATCH',TO,{fields},id); };
+
+// ÉDITION OPPORTUNITÉ
+function openEditOpp(oppId){
+  const o=window._opps?.find(x=>x._recordId===oppId);
+  if(!o)return;
+  document.getElementById('eo-id').value=oppId;
+  document.getElementById('eo-nom').value=o['Nom de l\'opportunité']||'';
+  document.getElementById('eo-stade').value=typeof o['Stade']==='object'?(o['Stade']?.name||''):(o['Stade']||'');
+  document.getElementById('eo-prob').value=o['Probabilité']||'';
+  document.getElementById('eo-val').value=o['Valeur (EUR)']||'';
+  document.getElementById('eo-date').value=o['Date estimée']||'';
+  document.getElementById('eo-notes').value=o['Notes']||'';
+  document.getElementById('modal-edit-opp').classList.add('show');
+}
+
+async function saveEditOpp(){
+  const id=document.getElementById('eo-id').value;
+  if(!id)return;
+  const f={};
+  const nom=document.getElementById('eo-nom').value.trim();
+  if(nom)f['Nom de l\'opportunité']=nom;
+  f['Stade']=document.getElementById('eo-stade').value;
+  const prob=parseFloat(document.getElementById('eo-prob').value);
+  if(!isNaN(prob))f['Probabilité']=prob;
+  const val=parseFloat(document.getElementById('eo-val').value);
+  if(!isNaN(val))f['Valeur (EUR)']=val;
+  const date=document.getElementById('eo-date').value;
+  if(date)f['Date estimée']=date;
+  const notes=document.getElementById('eo-notes').value.trim();
+  if(notes)f['Notes']=notes;
+  await CRM.updateOpportunity(id,f);
+  cm('modal-edit-opp');
+  showToast('Opportunité mise à jour ✓');
+  await boot();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─── SPRINT CRM — RECHERCHE, ÉDITION, QUICK ACTIONS ─────────────────────────
+
+// RECHERCHE GLOBALE
+function normalize(s){ return(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+
+function onSearch(q){
+  const box=document.getElementById('search-results');
+  if(!q||q.trim().length<1){box.classList.remove('show');return;}
+  const nq=normalize(q);
+  const matchComp=companies.filter(c=>{
+    const ind=Array.isArray(c['Industrie'])?c['Industrie'].join(' '):(c['Industrie']||'');
+    return normalize(c['Nom de l\'entreprise']||'').includes(nq)||normalize(c['Secteur']||'').includes(nq)||normalize(ind).includes(nq);
+  }).slice(0,5);
+  const matchCont=contacts.filter(c=>normalize(c['Nom du contact']||'').includes(nq)||normalize(c['Rôle / Fonction']||'').includes(nq)||normalize(c['Email']||'').includes(nq)).slice(0,5);
+  if(!matchComp.length&&!matchCont.length){
+    box.innerHTML=`<div class="search-empty">Aucun résultat pour "<strong>${q}</strong>"</div>`;
+    box.classList.add('show');return;
+  }
+  let html='';
+  if(matchComp.length){
+    html+=`<div class="search-section"><div class="search-section-lbl">Entreprises</div>`;
+    matchComp.forEach(c=>{
+      const n=c['Nom de l\'entreprise']||'';
+      const s=typeof c['Secteur']==='object'?(c['Secteur']?.name||''):(c['Secteur']||'');
+      html+=`<div class="search-item" onclick="focusCompany('${c._recordId||''}');closeSearch()">
+        <div class="search-item-icon si-comp">${ini(n)}</div>
+        <div><div class="search-item-name">${hl(n,q)}</div>${s?`<div class="search-item-sub">${s}</div>`:''}</div>
+      </div>`;
+    });
+    html+='</div>';
+  }
+  if(matchCont.length){
+    html+=`<div class="search-section"><div class="search-section-lbl">Contacts</div>`;
+    matchCont.forEach(c=>{
+      const n=c['Nom du contact']||'';
+      const r=c['Rôle / Fonction']||c['Rôle']||'';
+      html+=`<div class="search-item" onclick="focusContact('${c._recordId||''}');closeSearch()">
+        <div class="search-item-icon si-cont">${ini(n)}</div>
+        <div><div class="search-item-name">${hl(n,q)}</div>${r?`<div class="search-item-sub">${r}</div>`:''}</div>
+      </div>`;
+    });
+    html+='</div>';
+  }
+  box.innerHTML=html;
+  box.classList.add('show');
+}
+
+function hl(text,q){
+  if(!q)return text;
+  const re=new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
+  return text.replace(re,'<mark class="search-hl">$1</mark>');
+}
+
+function closeSearch(){
+  document.getElementById('search-results').classList.remove('show');
+  document.getElementById('search-input').value='';
+}
+
+function focusCompany(compId){
+  // Basculer sur l'onglet "Toutes les entreprises" et ouvrir la fiche
+  const tabs=document.querySelectorAll('.tab');
+  tabs.forEach(t=>t.classList.remove('on'));
+  tabs[1]?.classList.add('on');
+  currentTab='all';
+  render();
+  setTimeout(()=>{
+    const cl=companies.map(c=>({comp:c,cc:getCC(c)})).filter(x=>x.cc.length>0);
+    const sorted=[...cl].sort((a,b)=>urg(b.cc)-urg(a.cc));
+    const idx=sorted.findIndex(({comp})=>comp._recordId===compId);
+    if(idx>=0){
+      const card=document.getElementById(`cc${idx}`);
+      if(card){card.classList.add('open');card.scrollIntoView({behavior:'smooth',block:'center'});}
+    }
+  },100);
+}
+
+function focusContact(contId){
+  const c=contacts.find(x=>x._recordId===contId);
+  if(!c)return;
+  const linked=c['Entreprise liée'];
+  const compId=Array.isArray(linked)?linked[0]:null;
+  if(compId)focusCompany(compId);
+}
+
+// AUTOCOMPLÉTION ENTREPRISE dans modal contact
+function onEntAC(q){
+  const box=document.getElementById('nc-ent-ac');
+  const el=document.getElementById('nc-ent');
+  if(!q||q.length<1){box.classList.remove('show');return;}
+  const nq=normalize(q);
+  const matches=companies.filter(c=>normalize(c['Nom de l\'entreprise']||'').includes(nq)).slice(0,6);
+  let html='';
+  matches.forEach(c=>{
+    const n=c['Nom de l\'entreprise']||'';
+    html+=`<div class="ac-item" onclick="selectEntAC('${c._recordId}','${n.replace(/'/g,"\\'")}')"><i class="ti ti-building" style="color:var(--pc-teal-dark);font-size:14px;"></i>${hl(n,q)}</div>`;
+  });
+  // Option "Créer" si pas de correspondance exacte
+  const exact=companies.find(c=>(c['Nom de l\'entreprise']||'').toLowerCase()===q.toLowerCase());
+  if(!exact){
+    html+=`<div class="ac-item ac-new" onclick="selectEntNew('${q.replace(/'/g,"\\'")}')"><i class="ti ti-plus" style="font-size:14px;"></i> Créer "${q}"</div>`;
+  }
+  box.innerHTML=html;
+  box.classList.toggle('show',html.length>0);
+}
+
+function selectEntAC(id,name){
+  document.getElementById('nc-ent').value=name;
+  document.getElementById('nc-ent').dataset.prefilledId=id;
+  document.getElementById('nc-ent-ac').classList.remove('show');
+}
+
+function selectEntNew(name){
+  document.getElementById('nc-ent').value=name;
+  document.getElementById('nc-ent').dataset.prefilledId='';
+  document.getElementById('nc-ent-ac').classList.remove('show');
+}
+
+// ÉDITION ENTREPRISE
+function openEditCompany(compId){
+  const c=companies.find(x=>x._recordId===compId);
+  if(!c)return;
+  document.getElementById('ec-id').value=compId;
+  document.getElementById('ec-nom').value=c['Nom de l\'entreprise']||'';
+  document.getElementById('ec-secteur').value=typeof c['Secteur']==='object'?(c['Secteur']?.name||''):(c['Secteur']||'');
+  document.getElementById('ec-priorite').value=c['Priorité']||'';
+  document.getElementById('ec-responsable').value=c['Responsable']||'';
+  document.getElementById('ec-kestio').value='1'; // sera mis à jour via contacts
+  document.getElementById('ec-statut').value=c['Statut']||'';
+  document.getElementById('ec-relance').value=c['Date de relance']||'';
+  document.getElementById('ec-action').value=c['Prochaine action']||'';
+  document.getElementById('ec-notes').value=c['Notes']||'';
+  document.getElementById('modal-edit-comp').classList.add('show');
+}
+
+async function saveEditComp(){
+  const id=document.getElementById('ec-id').value;
+  if(!id)return;
+  const f={};
+  const nom=document.getElementById('ec-nom').value.trim();
+  if(nom)f['Nom de l\'entreprise']=nom;
+  const sec=document.getElementById('ec-secteur').value.trim();
+  if(sec)f['Secteur']=sec;
+  const pri=document.getElementById('ec-priorite').value;
+  if(pri)f['Priorité']=pri;
+  const resp=document.getElementById('ec-responsable').value.trim();
+  if(resp)f['Responsable']=resp;
+  const st=document.getElementById('ec-statut').value;
+  if(st)f['Statut']=st;
+  const rel=document.getElementById('ec-relance').value;
+  if(rel)f['Date de relance']=rel;
+  const act=document.getElementById('ec-action').value.trim();
+  if(act)f['Prochaine action']=act;
+  const notes=document.getElementById('ec-notes').value.trim();
+  if(notes)f['Notes']=notes;
+  await at('PATCH',TE,{fields:f},id);
+  cm('modal-edit-comp');
+  showToast('Entreprise mise à jour ✓');
+  await boot();
+}
+
+// ÉDITION CONTACT
+function openEditCont(contId){
+  const c=contacts.find(x=>x._recordId===contId);
+  if(!c)return;
+  document.getElementById('eco-id').value=contId;
+  document.getElementById('eco-nom').value=c['Nom du contact']||'';
+  document.getElementById('eco-role').value=c['Rôle / Fonction']||c['Rôle']||'';
+  document.getElementById('eco-email').value=c['Email']||'';
+  document.getElementById('eco-tel').value=c['Téléphone']||'';
+  document.getElementById('eco-li').value=c['LinkedIn']||'';
+  document.getElementById('eco-kestio').value=c['Niveau maturité']||'1';
+  document.getElementById('eco-notes').value=c['Notes sur le contact']||'';
+  document.getElementById('modal-edit-cont').classList.add('show');
+}
+
+async function saveEditCont(){
+  const id=document.getElementById('eco-id').value;
+  if(!id)return;
+  const f={};
+  const nom=document.getElementById('eco-nom').value.trim();
+  if(nom)f['Nom du contact']=nom;
+  const role=document.getElementById('eco-role').value.trim();
+  if(role)f['Rôle / Fonction']=role;
+  const email=document.getElementById('eco-email').value.trim();
+  if(email)f['Email']=email;
+  const tel=document.getElementById('eco-tel').value.trim();
+  if(tel)f['Téléphone']=tel;
+  const li=document.getElementById('eco-li').value.trim();
+  if(li)f['LinkedIn']=li;
+  f['Niveau maturité']=document.getElementById('eco-kestio').value;
+  const notes=document.getElementById('eco-notes').value.trim();
+  if(notes)f['Notes sur le contact']=notes;
+  await CRM.updateContact(id,f);
+  cm('modal-edit-cont');
+  showToast('Contact mis à jour ✓');
+  await boot();
+}
+
+// RELANCE
+function openRelance(compId){
+  document.getElementById('rel-id').value=compId;
+  document.getElementById('rel-date').value='';
+  document.getElementById('rel-action').value='';
+  document.getElementById('rel-notes').value='';
+  document.getElementById('modal-relance').classList.add('show');
+}
+
+async function saveRelance(){
+  const id=document.getElementById('rel-id').value;
+  if(!id)return;
+  const f={};
+  const d=document.getElementById('rel-date').value;
+  if(d)f['Date de relance']=d;
+  const a=document.getElementById('rel-action').value.trim();
+  if(a)f['Prochaine action']=a;
+  const n=document.getElementById('rel-notes').value.trim();
+  if(n)f['Notes']=n;
+  await at('PATCH',TE,{fields:f},id);
+  cm('modal-relance');
+  showToast('Relance programmée ✓');
+  await boot();
+}
+
+// INTERACTION DEPUIS FICHE ENTREPRISE (pré-sélectionne le premier contact)
+function openInterForCompany(compId){
+  const cc=getCC(companies.find(c=>c._recordId===compId)||{});
+  if(cc.length===0){openInterGlobal();return;}
+  if(cc.length===1){openInter(cc[0]._recordId);return;}
+  // Plusieurs contacts → ouvrir modal global pré-filtré
+  const sel=document.getElementById('ig-contact');
+  sel.innerHTML=cc.map(c=>`<option value="${c._recordId}">${c['Nom du contact']||''} — ${c['Rôle / Fonction']||''}</option>`).join('');
+  ['ig-notes','ig-na','ig-nd'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('ig-date').value=NOW.toISOString().split('T')[0];
+  sIG='Email envoyé'; sMatIG=1;
+  document.querySelectorAll('#canal-global .co').forEach(x=>x.classList.toggle('sel',x.dataset.v==='Email envoyé'));
+  document.querySelectorAll('#ms-ig .mo').forEach(x=>x.classList.toggle('sel',x.dataset.v==='1'));
+  document.getElementById('modal-inter-global').classList.add('show');
+}
+
+// Fermer recherche au clic extérieur
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.search-wrap'))closeSearch();
+  if(!e.target.closest('.ac-wrap'))document.querySelectorAll('.ac-list').forEach(x=>x.classList.remove('show'));
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+// OPPORTUNITÉ DEPUIS FICHE ENTREPRISE
+function openAddOppFromCompany(compId, compName){
+  const sel=document.getElementById('opp-ent');
+  sel.innerHTML=companies.map(c=>`<option value="${c._recordId}"${c._recordId===compId?' selected':''}>${c['Nom de l\'entreprise']||''}</option>`).join('');
+  ['opp-nom','opp-val','opp-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('modal-opp').classList.add('show');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 // ─── SPRINT 2.1 — MODULE CRM CENTRALISÉ ─────────────────────────────────────
 
 const CRM = {
@@ -689,10 +1204,24 @@ function openModal(id){
   document.getElementById(id).classList.add('show');
 }
 
-// Nouvelle entreprise
+// Nouvelle entreprise — avec vérification doublon
 async function saveNE(){
   const nom=document.getElementById('ne-nom').value.trim();
   if(!nom){alert('Le nom est obligatoire.');return;}
+
+  // Vérification doublon
+  const nq=normalize(nom);
+  const similaires=companies.filter(c=>normalize(c['Nom de l\'entreprise']||'').includes(nq)||nq.includes(normalize(c['Nom de l\'entreprise']||'')));
+  if(similaires.length>0){
+    const noms=similaires.map(c=>c['Nom de l\'entreprise']).join(', ');
+    const continuer=confirm(`Une entreprise similaire existe déjà : "${noms}".\n\nVoulez-vous quand même créer "${nom}" ?`);
+    if(!continuer){
+      cm('modal-ne');
+      focusCompany(similaires[0]._recordId);
+      return;
+    }
+  }
+
   const f={'Nom de l\'entreprise':nom};
   if(document.getElementById('ne-secteur').value)f['Secteur']=document.getElementById('ne-secteur').value;
   if(document.getElementById('ne-site').value)f['site internet']=document.getElementById('ne-site').value;
@@ -941,6 +1470,8 @@ async function boot(){
   document.getElementById('content').innerHTML=`<div class="spin-wrap"><div class="spin"></div><div class="spin-txt">Connexion au CRM PrévenirCare…</div></div>`;
   try{
     [companies,contacts]=await Promise.all([fetchAll(TE),fetchAll(TC)]);
+    const oppData=await fetchAll(TO);
+    window._opps=oppData;
     const cl=companies.map(c=>({comp:c,cc:getCC(c)})).filter(x=>x.cc.length>0);
     document.getElementById('k0').textContent=cl.length;
     document.getElementById('k1').textContent=cl.filter(x=>compNA(x.cc)).length;
