@@ -776,14 +776,14 @@ async function saveInter(){
   const nd=document.getElementById('in-nd').value;
   const today=NOW.toISOString().split('T')[0];
   await at('POST',TI,{fields:{'Type d\'interaction':sCanal,'Notes':notes,'Contact lié':[curCID],'Date d\'interaction':new Date().toISOString()}});
-  const f={'Niveau maturité':String(sMat)};
+  const f={};
   if(sCanal==='Email envoyé'){f['Date dernier email']=today;f['Statut réponse']='Envoyé – en attente';}
   else if(sCanal==='Réponse reçue')f['Statut réponse']='Réponse reçue';
   else if(sCanal==='RDV tenu')f['Statut réponse']='RDV obtenu';
   if(notes)f['Notes sur le contact']=notes;
   if(na)f['Prochaine action']=na;
   if(nd)f['Date prochaine action']=nd;
-  await at('PATCH',TC,{fields:f},curCID);
+  if(Object.keys(f).length>0)await at('PATCH',TC,{fields:f},curCID);
   // Retrouver l'entreprise liée pour rouvrir sa fiche
   const cont=contacts.find(c=>c._recordId===curCID);
   const linkedComp=Array.isArray(cont?.['Entreprise liée'])?cont['Entreprise liée'][0]:null;
@@ -806,7 +806,7 @@ async function saveNC(){
 
   // Mode édition
   if(editId){
-    const f={'Nom du contact':nom,'Niveau maturité':String(sMatNC)};
+    const f={'Nom du contact':nom};
     if(document.getElementById('nc-role').value)f['Rôle / Fonction']=document.getElementById('nc-role').value;
     if(document.getElementById('nc-email').value)f['Email']=document.getElementById('nc-email').value;
     if(document.getElementById('nc-tel').value)f['Téléphone']=document.getElementById('nc-tel').value;
@@ -826,7 +826,7 @@ async function saveNC(){
     if(ex){compId=ex._recordId;}
     else{const r=await CRM.createCompany({'Nom de l\'entreprise':ent});compId=r.id;}
   }
-  const f={'Nom du contact':nom,'Niveau maturité':String(sMatNC)};
+  const f={'Nom du contact':nom};
   if(document.getElementById('nc-role').value)f['Rôle / Fonction']=document.getElementById('nc-role').value;
   if(document.getElementById('nc-email').value)f['Email']=document.getElementById('nc-email').value;
   if(document.getElementById('nc-tel').value)f['Téléphone']=document.getElementById('nc-tel').value;
@@ -1124,7 +1124,6 @@ async function saveEditCont(){
   if(tel)f['Téléphone']=tel;
   const li=document.getElementById('eco-li').value.trim();
   if(li)f['LinkedIn']=li;
-  f['Niveau maturité']=document.getElementById('eco-kestio').value;
   const notes=document.getElementById('eco-notes').value.trim();
   if(notes)f['Notes sur le contact']=notes;
   await CRM.updateContact(id,f);
@@ -1311,14 +1310,14 @@ async function saveInterGlobal(){
   const nd=document.getElementById('ig-nd').value;
   const date=document.getElementById('ig-date').value;
   await CRM.createInteraction({'Type d\'interaction':sIG,'Notes':notes,'Contact lié':[cid],'Date d\'interaction':date?new Date(date).toISOString():new Date().toISOString()});
-  const f={'Niveau maturité':String(sMatIG)};
+  const f={};
   if(sIG==='Email envoyé'){f['Date dernier email']=date||NOW.toISOString().split('T')[0];f['Statut réponse']='Envoyé – en attente';}
   else if(sIG==='Réponse reçue')f['Statut réponse']='Réponse reçue';
   else if(sIG==='RDV tenu')f['Statut réponse']='RDV obtenu';
   if(notes)f['Notes sur le contact']=notes;
   if(na)f['Prochaine action']=na;
   if(nd)f['Date prochaine action']=nd;
-  await CRM.updateContact(cid,f);
+  if(Object.keys(f).length>0)await CRM.updateContact(cid,f);
   cm('modal-inter-global');
   showToast('Interaction enregistrée ✓');
   await boot();
