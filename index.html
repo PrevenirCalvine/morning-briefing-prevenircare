@@ -193,6 +193,20 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
 .quick-actions{display:flex;gap:6px;flex-wrap:wrap;padding:10px 18px;background:var(--s1);border-top:0.5px solid var(--bd);}
 .qa-btn{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-family:'Exo 2',sans-serif;font-weight:600;padding:5px 10px;border-radius:99px;border:0.5px solid var(--bd);background:#fff;color:var(--ts);cursor:pointer;transition:all .15s;}
 .qa-btn:hover{border-color:var(--pc-teal);color:var(--pc-teal-dark);background:var(--pc-teal-bg);}
+/* ─── SPRINT 6.3 — UX FLUIDITÉ ───────────────────────────────────────────── */
+.fab-wrap{position:fixed;bottom:28px;right:22px;display:flex;flex-direction:column;gap:10px;z-index:100;}
+.fab{width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 2px 14px rgba(0,0,0,.14);transition:opacity .25s,transform .2s;opacity:0;pointer-events:none;transform:translateY(6px);}
+.fab.visible{opacity:1;pointer-events:all;transform:translateY(0);}
+.fab-top{background:#fff;color:var(--tm);border:0.5px solid var(--bd);}
+.fab-top:hover{background:var(--s1);color:var(--tp);}
+.nav-seq{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(6px);display:flex;align-items:center;gap:6px;background:#fff;border:0.5px solid var(--bd);border-radius:99px;padding:5px 10px;box-shadow:0 2px 14px rgba(0,0,0,.12);z-index:100;opacity:0;pointer-events:none;transition:opacity .25s,transform .2s;}
+.nav-seq.visible{opacity:1;pointer-events:all;transform:translateX(-50%) translateY(0);}
+.nav-seq-btn{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-family:'Exo 2',sans-serif;font-weight:600;padding:5px 12px;border-radius:99px;border:none;background:transparent;color:var(--ts);cursor:pointer;transition:background .15s;}
+.nav-seq-btn:hover:not(:disabled){background:var(--s1);}
+.nav-seq-btn:disabled{opacity:.3;cursor:default;}
+.nav-seq-label{font-family:'Exo 2',sans-serif;font-size:11px;color:var(--tm);padding:0 6px;min-width:80px;text-align:center;white-space:nowrap;}
+/* ─────────────────────────────────────────────────────────────────────────── */
+
 /* ─── PANNEAU PARAMÈTRES ──────────────────────────────────────────────────── */
 .settings-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;align-items:center;justify-content:center;}
 .settings-overlay.show{display:flex;}
@@ -579,7 +593,7 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
 <!-- MODAL INTERACTION -->
 <div class="modal-overlay" id="modal-inter">
   <div class="modal">
-    <div class="modal-title">Enregistrer une interaction</div>
+    <div class="modal-title">Enregistrer une interaction<span id="modal-inter-contact-name" style="font-family:'Poppins',sans-serif;font-size:12px;font-weight:400;color:var(--tm);margin-left:8px;"></span></div>
     <div class="fg"><div class="fl">Canal</div>
       <div class="canal-sel" id="canal-inter">
         <!-- Généré dynamiquement depuis CRM_CONFIG.INTERACTION_TYPES -->
@@ -723,6 +737,56 @@ document.getElementById('dchip').textContent=NOW.toLocaleDateString('fr-FR',{wee
 
 let companies=[],contacts=[],currentTab='today',curCID=null;
 let sCanal='Email envoyé',sMat=3,sMatNC=1;
+
+// ─── ÉTAT ISOLÉ DU MODAL INTERACTION ─────────────────────────────────────────
+// Chaque ouverture de modal recrée un état propre et indépendant.
+// Aucune variable globale n'est partagée entre deux ouvertures.
+const _interState = {
+  contactId: null,      // ID Airtable du contact cible — source de vérité
+  contactName: null,    // Nom affiché — vérification visuelle
+  companyId: null,      // ID entreprise liée — pour bootAndFocus après save
+  canal: 'Email envoyé',
+  mat: 3,
+
+  // Réinitialise complètement l'état avant chaque ouverture
+  reset(contact){
+    this.contactId   = contact?._recordId || null;
+    this.contactName = contact?.['Nom du contact'] || '?';
+    const linked     = contact?.['Entreprise liée'];
+    this.companyId   = Array.isArray(linked) ? linked[0] : null;
+    this.canal       = 'Email envoyé';
+    this.mat         = 3;
+
+    // Log de debug — sprint cohérence données
+    console.group('🔍 openInter — Debug cohérence');
+    console.log('contactId  :', this.contactId);
+    console.log('contactName:', this.contactName);
+    console.log('companyId  :', this.companyId);
+    console.log('recordId   :', contact?._recordId);
+    console.log('Contact obj:', contact);
+    console.groupEnd();
+
+    // Garde-fou : alerter si l'ID est manquant
+    if(!this.contactId){
+      console.error('⚠️ openInter appelé sans _recordId valide — vérifier la source du clic');
+    }
+  },
+
+  // Vérifie la cohérence entre l'état et ce qui est affiché
+  verify(){
+    if(!this.contactId){
+      console.error('❌ saveInter bloqué : contactId null');
+      return false;
+    }
+    // Vérifier que le contact existe toujours dans le cache local
+    const inCache = contacts.find(c=>c._recordId===this.contactId);
+    if(!inCache){
+      console.warn('⚠️ Contact non trouvé dans le cache local — sera relu depuis Airtable');
+    }
+    console.log('✅ saveInter — contactId vérifié :', this.contactId, '/', this.contactName);
+    return true;
+  }
+};
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CRM_CONFIG — Fichier de configuration centralisé
@@ -963,46 +1027,82 @@ function render(){
 }
 
 function so(el,g){
-  if(g==='c')document.querySelectorAll('.co').forEach(x=>x.classList.remove('sel'));
-  else if(g==='mi')document.querySelectorAll('#ms-inter .mo').forEach(x=>x.classList.remove('sel'));
+  if(g==='c'){
+    document.querySelectorAll('#canal-inter .co').forEach(x=>x.classList.remove('sel'));
+    _interState.canal = el.dataset.v;
+    sCanal = el.dataset.v; // rétrocompatibilité
+  }
+  else if(g==='mi'){document.querySelectorAll('#ms-inter .mo').forEach(x=>x.classList.remove('sel'));_interState.mat=parseInt(el.dataset.v);sMat=parseInt(el.dataset.v);}
   else if(g==='mn')document.querySelectorAll('#ms-nc .mo').forEach(x=>x.classList.remove('sel'));
   el.classList.add('sel');
   const v=el.dataset.v;
-  if(g==='c')sCanal=v;
-  else if(g==='mi')sMat=parseInt(v);
-  else if(g==='mn')sMatNC=parseInt(v);
+  if(g==='mn')sMatNC=parseInt(v);
   else if(g==='mg')sMatIG=parseInt(v);
 }
 
 function openInter(cid){
-  curCID=cid;
-  ['in-notes','in-na','in-nd'].forEach(id=>document.getElementById(id).value='');
-  sCanal='Email envoyé';sMat=3;
+  // Trouver l'objet contact complet depuis son ID — source de vérité unique
+  const contact = contacts.find(c=>c._recordId===cid) || null;
+
+  // Réinitialiser l'état isolé — efface tout état précédent
+  _interState.reset(contact);
+  curCID = cid; // rétrocompatibilité
+
+  // Réinitialiser le formulaire
+  ['in-notes','in-na','in-nd'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+
+  // Afficher le nom du contact dans le titre du modal
+  const titleEl=document.getElementById('modal-inter-contact-name');
+  if(titleEl)titleEl.textContent=_interState.contactName;
+
+  // Générer les canaux depuis CRM_CONFIG
   renderQuickCanals('canal-inter','so_c','Email envoyé');
+
+  // Niveau Kestio par défaut N3
+  sMat=3; _interState.mat=3;
   document.querySelectorAll('#ms-inter .mo').forEach(x=>x.classList.toggle('sel',x.dataset.v==='3'));
+
   document.getElementById('modal-inter').classList.add('show');
 }
 
 async function saveInter(){
-  if(!curCID)return;
-  const notes=document.getElementById('in-notes').value;
-  const na=document.getElementById('in-na').value;
-  const nd=document.getElementById('in-nd').value;
-  const today=NOW.toISOString().split('T')[0];
-  await at('POST',TI,{fields:{'Type d\'interaction':sCanal,'Notes':notes,'Contact lié':[curCID],'Date d\'interaction':new Date().toISOString()}});
+  // Vérification de cohérence avant toute écriture
+  if(!_interState.verify()) return;
+
+  const contactId = _interState.contactId; // jamais curCID directement
+  const canal     = _interState.canal;
+  const mat       = _interState.mat;
+
+  const notes = document.getElementById('in-notes').value;
+  const na    = document.getElementById('in-na').value;
+  const nd    = document.getElementById('in-nd').value;
+  const today = NOW.toISOString().split('T')[0];
+
+  console.log('💾 saveInter — écriture vers Airtable', {contactId, canal, notes, na, nd});
+
+  // Créer l'interaction
+  await at('POST',TI,{fields:{
+    'Type d\'interaction': canal,
+    'Notes': notes,
+    'Contact lié': [contactId],
+    'Date d\'interaction': new Date().toISOString()
+  }});
+
+  // Mettre à jour le contact
   const f={};
-  if(sCanal==='Email envoyé'){f['Date dernier email']=today;f['Statut réponse']='Envoyé – en attente';}
-  else if(sCanal==='Réponse reçue')f['Statut réponse']='Réponse reçue';
-  else if(sCanal==='RDV tenu')f['Statut réponse']='RDV obtenu';
-  if(notes)f['Notes sur le contact']=notes;
-  if(na)f['Prochaine action']=na;
-  if(nd)f['Date prochaine action']=nd;
-  if(Object.keys(f).length>0)await at('PATCH',TC,{fields:f},curCID);
-  // Retrouver l'entreprise liée pour rouvrir sa fiche
-  const cont=contacts.find(c=>c._recordId===curCID);
-  const linkedComp=Array.isArray(cont?.['Entreprise liée'])?cont['Entreprise liée'][0]:null;
-  cm('modal-inter');showToast('Interaction enregistrée ✓');
-  await bootAndFocus(linkedComp);
+  const statut = CRM_CONFIG.getStatutFromType(canal);
+  if(statut) f['Statut réponse']=statut;
+  if(canal==='Email envoyé') f['Date dernier email']=today;
+  if(notes) f['Notes sur le contact']=notes;
+  if(na)    f['Prochaine action']=na;
+  if(nd)    f['Date prochaine action']=nd;
+  if(Object.keys(f).length>0) await at('PATCH',TC,{fields:f},contactId);
+
+  cm('modal-inter');
+  showToast('Interaction enregistrée ✓');
+
+  // bootAndFocus utilise l'entreprise mémorisée dans _interState — pas le cache local
+  await bootAndFocus(_interState.companyId);
 }
 
 function openAddContact(){
@@ -2926,6 +3026,162 @@ const PE = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
+// SPRINT 6.3 — FLUIDITÉ UX
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ─── 1. BOUTON RETOUR EN HAUT ────────────────────────────────────────────
+window.addEventListener('scroll',()=>{
+  const fab=document.getElementById('fab-top');
+  const visible=window.scrollY>300;
+  fab?.classList.toggle('visible',visible);
+  if(NavSeq._activeCompId) document.getElementById('nav-seq')?.classList.toggle('visible',visible);
+},{ passive:true });
+
+// ─── 2. PERSISTANCE DU CONTEXTE ──────────────────────────────────────────
+const NavContext={
+  _key:'pc_nav_ctx',
+  save(d){try{sessionStorage.setItem(this._key,JSON.stringify({...this.load(),...d}));}catch{}},
+  load(){try{return JSON.parse(sessionStorage.getItem(this._key)||'{}')}catch{return{}}},
+  saveScroll(){this.save({scroll:window.scrollY});},
+  restoreScroll(){const c=this.load();if(c.scroll)setTimeout(()=>window.scrollTo({top:c.scroll,behavior:'instant'}),80);},
+  saveTab(t){this.save({tab:t});},
+  saveOpenCompany(id){this.save({openCompanyId:id});}
+};
+
+let _scrollSaveTimer=null;
+window.addEventListener('scroll',()=>{clearTimeout(_scrollSaveTimer);_scrollSaveTimer=setTimeout(()=>NavContext.saveScroll(),300);},{passive:true});
+
+// ─── 3. NAVIGATION SÉQUENTIELLE ──────────────────────────────────────────
+const NavSeq={
+  _list:[],_activeCompId:null,_activeIdx:-1,
+
+  _getCurrentList(){
+    const cl=companies.map(c=>({comp:c,cc:getCC(c)})).filter(x=>x.cc.length>0);
+    if(currentTab==='today') return cl.filter(x=>compNA(x.cc)||x.cc.some(c=>!c['Statut réponse']||c['Statut réponse']==='Pas encore envoyé')).sort((a,b)=>urg(b.cc)-urg(a.cc)).slice(0,12);
+    if(currentTab==='all')   return [...cl].sort((a,b)=>urg(b.cc)-urg(a.cc));
+    if(currentTab==='pipeline') return [...cl].sort((a,b)=>cMat(b.cc)-cMat(a.cc));
+    return cl;
+  },
+
+  setActive(compId){
+    const cl=this._getCurrentList();
+    this._activeCompId=compId;
+    this._activeIdx=cl.findIndex(({comp})=>comp._recordId===compId);
+    NavContext.saveOpenCompany(compId);
+    this._ui();
+    if(window.scrollY>300) document.getElementById('nav-seq')?.classList.add('visible');
+  },
+
+  clearActive(){
+    this._activeCompId=null;this._activeIdx=-1;
+    document.getElementById('nav-seq')?.classList.remove('visible');
+    this._ui();
+  },
+
+  go(dir){
+    const cl=this._getCurrentList();
+    const ni=this._activeIdx+dir;
+    if(ni<0||ni>=cl.length) return;
+    const nComp=cl[ni].comp;
+    // Fermer toutes les fiches ouvertes
+    document.querySelectorAll('.ccard.open').forEach(c=>c.classList.remove('open'));
+    this._activeCompId=nComp._recordId;
+    this._activeIdx=ni;
+    NavContext.saveOpenCompany(nComp._recordId);
+    this._ui();
+    setTimeout(()=>{
+      const card=document.getElementById(`cc${ni}`);
+      if(card){
+        card.classList.add('open');
+        card.scrollIntoView({behavior:'smooth',block:'start'});
+        card.style.transition='box-shadow .3s';
+        card.style.boxShadow='0 0 0 2px var(--pc-teal)';
+        setTimeout(()=>{card.style.boxShadow='';},1500);
+      }
+    },50);
+  },
+
+  _ui(){
+    const cl=this._getCurrentList();
+    const n=cl.length,i=this._activeIdx;
+    const lbl=document.getElementById('nav-seq-label');
+    const prev=document.getElementById('nav-prev');
+    const next=document.getElementById('nav-next');
+    if(lbl) lbl.textContent=i>=0?`${i+1} / ${n}`:'–';
+    if(prev) prev.disabled=i<=0;
+    if(next) next.disabled=i<0||i>=n-1;
+  }
+};
+
+// ─── 4. RACCOURCIS CLAVIER ───────────────────────────────────────────────
+document.addEventListener('keydown',e=>{
+  const tag=(e.target.tagName||'').toLowerCase();
+  const inField=['input','textarea','select'].includes(tag);
+
+  if(e.key==='Escape'){
+    document.querySelectorAll('.modal-overlay.show,.lie-panel.show,.settings-overlay.show').forEach(m=>m.classList.remove('show'));
+    return;
+  }
+  if(inField)return;
+
+  if((e.ctrlKey||e.metaKey)&&e.key==='f'){
+    e.preventDefault();
+    const inp=document.getElementById('search-input');
+    if(inp){inp.focus();inp.select();}
+    return;
+  }
+  if(e.key==='ArrowRight'&&NavSeq._activeCompId){e.preventDefault();NavSeq.go(1);return;}
+  if(e.key==='ArrowLeft'&&NavSeq._activeCompId){e.preventDefault();NavSeq.go(-1);return;}
+});
+
+// ─── 5. RESTAURATION DU CONTEXTE AU DÉMARRAGE ────────────────────────────
+function restoreNavContext(){
+  const ctx=NavContext.load();
+  if(ctx.tab&&ctx.tab!==currentTab){
+    const tabs=document.querySelectorAll('.tab');
+    const labels=['today','all','pipeline','prospect'];
+    const idx=labels.indexOf(ctx.tab);
+    if(idx>=0&&tabs[idx]){
+      tabs.forEach(t=>t.classList.remove('on'));
+      tabs[idx].classList.add('on');
+      currentTab=ctx.tab;
+      if(ctx.tab==='prospect')PE.renderScreen();
+      else render();
+    }
+  }
+  if(ctx.openCompanyId){
+    NavSeq.setActive(ctx.openCompanyId);
+    setTimeout(()=>{
+      const cl=NavSeq._getCurrentList();
+      const idx=cl.findIndex(({comp})=>comp._recordId===ctx.openCompanyId);
+      if(idx>=0){const card=document.getElementById(`cc${idx}`);if(card)card.classList.add('open');}
+    },100);
+  }
+  NavContext.restoreScroll();
+}
+
+// ─── 6. PATCH tog() POUR TRACKER L'ENTREPRISE ACTIVE ─────────────────────
+const _origTog=window.tog||function(i){document.getElementById('cc'+i)?.classList.toggle('open');};
+window.tog=function(i){
+  _origTog(i);
+  const card=document.getElementById('cc'+i);
+  const cl=NavSeq._getCurrentList();
+  if(card?.classList.contains('open')){
+    NavSeq.setActive(cl[i]?.comp?._recordId||null);
+  } else {
+    NavSeq.clearActive();
+  }
+};
+
+// Patch sw() pour sauvegarder l'onglet
+const _origSw=window.sw;
+window.sw=function(t,el){
+  NavContext.saveTab(t);
+  NavSeq.clearActive();
+  _origSw(t,el);
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
 
 // Validation de l'email généré par l'IA avant utilisation
 function validateAndUseEmail(){
@@ -2969,6 +3225,12 @@ async function boot(){
     await checkAirtableSync();
 
     render();
+
+    // Restaurer le contexte de navigation au premier chargement
+    if(!window._bootDone){
+      window._bootDone=true;
+      setTimeout(()=>restoreNavContext(),200);
+    }
   }catch(e){
     document.getElementById('content').innerHTML=`<div class="err"><strong>Connexion impossible.</strong><br>${e.message}</div>`;
   }
@@ -3026,5 +3288,21 @@ async function checkAirtableSync(){
 
 boot();
 </script>
+<!-- BOUTONS FLOTTANTS UX -->
+<div class="fab-wrap">
+  <button class="fab fab-top" id="fab-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Retour en haut">
+    <i class="ti ti-arrow-up"></i>
+  </button>
+</div>
+<div class="nav-seq" id="nav-seq">
+  <button class="nav-seq-btn" id="nav-prev" onclick="NavSeq.go(-1)" title="Entreprise précédente (←)">
+    <i class="ti ti-chevron-left"></i> Précédente
+  </button>
+  <div class="nav-seq-label" id="nav-seq-label">–</div>
+  <button class="nav-seq-btn" id="nav-next" onclick="NavSeq.go(1)" title="Entreprise suivante (→)">
+    Suivante <i class="ti ti-chevron-right"></i>
+  </button>
+</div>
+
 </body>
 </html>
