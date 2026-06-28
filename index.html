@@ -554,12 +554,7 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
     </div>
     <div class="fg"><div class="fl">Canal</div>
       <div class="canal-sel" id="canal-global">
-        <div class="co sel" data-v="Email envoyé" onclick="soG(this)">📧 Email</div>
-        <div class="co" data-v="Appel téléphonique" onclick="soG(this)">📞 Appel</div>
-        <div class="co" data-v="LinkedIn" onclick="soG(this)">💼 LinkedIn</div>
-        <div class="co" data-v="RDV tenu" onclick="soG(this)">📅 RDV</div>
-        <div class="co" data-v="Salon" onclick="soG(this)">🎪 Salon</div>
-        <div class="co" data-v="Visioconférence" onclick="soG(this)">🖥 Visio</div>
+        <!-- Généré dynamiquement depuis CRM_CONFIG.INTERACTION_TYPES -->
       </div>
     </div>
     <div class="fg"><div class="fl">Date</div><input class="fi" type="date" id="ig-date"></div>
@@ -586,13 +581,8 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
   <div class="modal">
     <div class="modal-title">Enregistrer une interaction</div>
     <div class="fg"><div class="fl">Canal</div>
-      <div class="canal-sel">
-        <div class="co sel" data-v="Email envoyé" onclick="so(this,'c')">📧 Email envoyé</div>
-        <div class="co" data-v="Réponse reçue" onclick="so(this,'c')">📬 Réponse reçue</div>
-        <div class="co" data-v="Appel téléphonique" onclick="so(this,'c')">📞 Appel</div>
-        <div class="co" data-v="LinkedIn" onclick="so(this,'c')">💼 LinkedIn</div>
-        <div class="co" data-v="Rencontre en personne" onclick="so(this,'c')">🤝 En personne</div>
-        <div class="co" data-v="RDV tenu" onclick="so(this,'c')">📅 RDV tenu</div>
+      <div class="canal-sel" id="canal-inter">
+        <!-- Généré dynamiquement depuis CRM_CONFIG.INTERACTION_TYPES -->
       </div>
     </div>
     <div class="fg"><div class="fl">Niveau de maturité après cet échange</div>
@@ -734,12 +724,85 @@ document.getElementById('dchip').textContent=NOW.toLocaleDateString('fr-FR',{wee
 let companies=[],contacts=[],currentTab='today',curCID=null;
 let sCanal='Email envoyé',sMat=3,sMatNC=1;
 
-const MC={
-  1:{label:'N1 — Inconscience',cls:'mat1',obj:'Ouvrir une réflexion',act:'Premier contact — apporter un angle de réflexion sans présenter PrévenirCare'},
-  2:{label:'N2 — Prise de conscience',cls:'mat2',obj:'Transformer l\'intuition en conviction',act:'Nourrir la réflexion — apporter des faits, des mécanismes, des observations terrain'},
-  3:{label:'N3 — Appropriation',cls:'mat3',obj:'Les aider à formuler leur propre problème',act:'Écouter et reformuler — créer les conditions d\'un échange en profondeur'},
-  4:{label:'N4 — Recherche de solution',cls:'mat4',obj:'Présenter PrévenirCare naturellement',act:'Proposer l\'approche PrévenirCare comme conséquence logique de la réflexion menée'}
+// ═══════════════════════════════════════════════════════════════════════════
+// CRM_CONFIG — Fichier de configuration centralisé
+// Source unique de vérité pour toutes les valeurs métier.
+// Toute l'application génère ses listes depuis cette config.
+// Pour ajouter un type d'interaction : ajouter une ligne dans INTERACTION_TYPES.
+// ═══════════════════════════════════════════════════════════════════════════
+const CRM_CONFIG = {
+
+  // Types d'interactions — liste canonique synchronisée avec Airtable
+  // emoji : affiché dans les boutons de sélection rapide
+  // statut : si défini, met à jour le champ Statut réponse du contact
+  // quick  : affiché en bouton rapide (6 max pour l'ergonomie mobile)
+  INTERACTION_TYPES: [
+    { value:'Email envoyé',                    emoji:'📧', statut:'Envoyé – en attente', quick:true  },
+    { value:'Réponse reçue',                   emoji:'📬', statut:'Réponse reçue',       quick:true  },
+    { value:'LinkedIn',                        emoji:'💼', statut:null,                  quick:true  },
+    { value:'Appel téléphonique',              emoji:'📞', statut:null,                  quick:true  },
+    { value:'Appel entrant',                   emoji:'📲', statut:null,                  quick:false },
+    { value:'RDV planifié',                    emoji:'🗓', statut:null,                  quick:false },
+    { value:'RDV tenu',                        emoji:'📅', statut:'RDV obtenu',          quick:true  },
+    { value:'Réunion en présentiel',           emoji:'🤝', statut:null,                  quick:false },
+    { value:'Visioconférence',                 emoji:'🖥',  statut:null,                  quick:true  },
+    { value:'Brochure envoyée',                emoji:'📄', statut:null,                  quick:false },
+    { value:'Proposition de valeur présentée', emoji:'💡', statut:null,                  quick:false },
+    { value:'Devis présenté en rendez-vous',   emoji:'📊', statut:null,                  quick:false },
+    { value:'Devis envoyé par email',          emoji:'📨', statut:null,                  quick:false },
+    { value:'Relance',                         emoji:'🔔', statut:'Relance à faire',     quick:false },
+    { value:'Mise en relation',                emoji:'🔗', statut:null,                  quick:false },
+    { value:'Networking',                      emoji:'🎪', statut:null,                  quick:false },
+    { value:'Contrat envoyé',                  emoji:'📃', statut:null,                  quick:false },
+    { value:'Contrat signé',                   emoji:'✅', statut:null,                  quick:false },
+    { value:'Refus commercial',                emoji:'❌', statut:'Sans suite',          quick:false },
+    { value:'Sans réponse',                    emoji:'🔇', statut:null,                  quick:false },
+    { value:'Autre',                           emoji:'💬', statut:null,                  quick:false },
+  ],
+
+  // Statuts d'opportunité (migrés depuis les selects codés en dur — Sprint 6.2)
+  OPPORTUNITY_STAGES: [
+    'Identification','Premier contact','Échange en cours',
+    'Proposition envoyée','Négociation','Gagné','Perdu',
+  ],
+
+  // Niveaux KESTIO (référence — ne pas modifier sans valider la logique métier)
+  KESTIO_LEVELS: [
+    {level:1, label:'N1 — Inconscience',          cls:'mat1', obj:'Ouvrir une réflexion',              act:'Premier contact — apporter un angle de réflexion sans présenter PrévenirCare'},
+    {level:2, label:'N2 — Prise de conscience',   cls:'mat2', obj:'Transformer l\'intuition en conviction', act:'Nourrir la réflexion — apporter des faits, des mécanismes, des observations terrain'},
+    {level:3, label:'N3 — Appropriation',         cls:'mat3', obj:'Les aider à formuler leur propre problème', act:'Écouter et reformuler — créer les conditions d\'un échange en profondeur'},
+    {level:4, label:'N4 — Recherche de solution', cls:'mat4', obj:'Présenter PrévenirCare naturellement', act:'Proposer l\'approche PrévenirCare comme conséquence logique de la réflexion menée'},
+  ],
+
+  // Helpers
+  getInteractionType(value){ return this.INTERACTION_TYPES.find(t=>t.value===value)||null; },
+  getQuickTypes(){ return this.INTERACTION_TYPES.filter(t=>t.quick); },
+  getStatutFromType(value){ return this.getInteractionType(value)?.statut||null; },
 };
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Alias MC — rétrocompatibilité avec le code existant
+const MC = Object.fromEntries(CRM_CONFIG.KESTIO_LEVELS.map(k=>[k.level,k]));
+
+// Génère dynamiquement les boutons de canaux rapides depuis CRM_CONFIG
+function renderQuickCanals(containerId, onclickFn, selectedValue){
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  el.innerHTML = CRM_CONFIG.getQuickTypes().map(t =>
+    `<div class="co${t.value===selectedValue?' sel':''}" data-v="${t.value}" onclick="${onclickFn}(this)">
+      ${t.emoji} ${t.value}
+    </div>`
+  ).join('');
+}
+
+// Génère un select depuis CRM_CONFIG
+function renderInteractionSelect(selectId, selectedValue=''){
+  const el = document.getElementById(selectId);
+  if(!el) return;
+  el.innerHTML = CRM_CONFIG.INTERACTION_TYPES.map(t=>
+    `<option value="${t.value}"${t.value===selectedValue?' selected':''}>${t.emoji} ${t.value}</option>`
+  ).join('');
+}
 
 function ini(s){return(s||'').split(' ').map(p=>p[0]||'').join('').toUpperCase().slice(0,2)||'?';}
 function avc(i){return['cav0','cav1','cav2','cav3'][i%4];}
@@ -915,7 +978,7 @@ function openInter(cid){
   curCID=cid;
   ['in-notes','in-na','in-nd'].forEach(id=>document.getElementById(id).value='');
   sCanal='Email envoyé';sMat=3;
-  document.querySelectorAll('.co').forEach(x=>x.classList.toggle('sel',x.dataset.v==='Email envoyé'));
+  renderQuickCanals('canal-inter','so_c','Email envoyé');
   document.querySelectorAll('#ms-inter .mo').forEach(x=>x.classList.toggle('sel',x.dataset.v==='3'));
   document.getElementById('modal-inter').classList.add('show');
 }
@@ -1473,7 +1536,7 @@ function openInterGlobal(){
   ['ig-notes','ig-na','ig-nd'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('ig-date').value=NOW.toISOString().split('T')[0];
   sIG='Email envoyé'; sMatIG=1;
-  document.querySelectorAll('#canal-global .co').forEach(x=>x.classList.toggle('sel',x.dataset.v==='Email envoyé'));
+  renderQuickCanals('canal-global','soG','Email envoyé');
   document.querySelectorAll('#ms-ig .mo').forEach(x=>x.classList.toggle('sel',x.dataset.v==='1'));
   document.getElementById('modal-inter-global').classList.add('show');
 }
@@ -1487,9 +1550,10 @@ async function saveInterGlobal(){
   const date=document.getElementById('ig-date').value;
   await CRM.createInteraction({'Type d\'interaction':sIG,'Notes':notes,'Contact lié':[cid],'Date d\'interaction':date?new Date(date).toISOString():new Date().toISOString()});
   const f={};
-  if(sIG==='Email envoyé'){f['Date dernier email']=date||NOW.toISOString().split('T')[0];f['Statut réponse']='Envoyé – en attente';}
-  else if(sIG==='Réponse reçue')f['Statut réponse']='Réponse reçue';
-  else if(sIG==='RDV tenu')f['Statut réponse']='RDV obtenu';
+  // Utiliser CRM_CONFIG pour le statut — plus de valeurs codées en dur
+  const statut = CRM_CONFIG.getStatutFromType(sIG);
+  if(statut) f['Statut réponse']=statut;
+  if(sIG==='Email envoyé') f['Date dernier email']=date||NOW.toISOString().split('T')[0];
   if(notes)f['Notes sur le contact']=notes;
   if(na)f['Prochaine action']=na;
   if(nd)f['Date prochaine action']=nd;
@@ -2885,6 +2949,9 @@ function generateEmail(context){
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Alias so_c pour le modal interaction (évite conflit avec so global)
+function so_c(el){ so(el,'c'); }
+
 async function boot(){
   document.getElementById('rbtn').disabled=true;
   document.getElementById('content').innerHTML=`<div class="spin-wrap"><div class="spin"></div><div class="spin-txt">Connexion au CRM PrévenirCare…</div></div>`;
@@ -2897,12 +2964,66 @@ async function boot(){
     document.getElementById('k1').textContent=cl.filter(x=>compNA(x.cc)).length;
     document.getElementById('k2').textContent=cl.filter(x=>cMat(x.cc)>=3).length;
     document.getElementById('k3').textContent=contacts.length;
+
+    // Vérification synchronisation CRM_CONFIG ↔ Airtable
+    await checkAirtableSync();
+
     render();
   }catch(e){
     document.getElementById('content').innerHTML=`<div class="err"><strong>Connexion impossible.</strong><br>${e.message}</div>`;
   }
   document.getElementById('rbtn').disabled=false;
 }
+
+/**
+ * Vérifie que les types d'interactions de CRM_CONFIG existent dans Airtable.
+ * Affiche une alerte claire si des valeurs manquent.
+ * Ne bloque jamais le démarrage.
+ */
+async function checkAirtableSync(){
+  try{
+    // Récupérer le schéma du champ Type d'interaction dans TI
+    const schema = await fetch(
+      `https://api.airtable.com/v0/meta/bases/${BASE}/tables`,
+      {headers:{'Authorization':`Bearer ${TOKEN}`}}
+    ).then(r=>r.ok?r.json():null);
+
+    if(!schema) return; // Silencieux si meta API indisponible
+
+    const interTable = schema.tables?.find(t=>t.id===TI);
+    const typeField = interTable?.fields?.find(f=>f.name==="Type d'interaction");
+    const existingChoices = typeField?.options?.choices?.map(c=>c.name)||[];
+
+    if(!existingChoices.length) return; // Champ non trouvé ou pas un select
+
+    const missing = CRM_CONFIG.INTERACTION_TYPES
+      .map(t=>t.value)
+      .filter(v=>!existingChoices.includes(v));
+
+    if(missing.length > 0){
+      console.warn('⚠️ Types d\'interactions manquants dans Airtable :', missing);
+      // Afficher une alerte non bloquante
+      const alertId = 'sync-alert-inter';
+      if(!document.getElementById(alertId)){
+        const alert = document.createElement('div');
+        alert.id = alertId;
+        alert.style.cssText = 'position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:var(--pc-terra-bg);border:1px solid var(--pc-terra);border-radius:10px;padding:12px 18px;font-size:12px;color:var(--pc-terra-dark);z-index:500;max-width:500px;box-shadow:0 4px 16px rgba(0,0,0,.12);';
+        alert.innerHTML = `<strong><i class="ti ti-alert-triangle"></i> ${missing.length} type${missing.length>1?'s':''} d'interaction à ajouter dans Airtable :</strong><br>
+          <span style="font-family:monospace;font-size:11px;">${missing.join(' · ')}</span><br>
+          <div style="margin-top:8px;display:flex;gap:8px;">
+            <button onclick="this.closest('#sync-alert-inter').remove()" style="font-size:11px;padding:4px 10px;border-radius:6px;border:none;background:var(--pc-terra);color:#fff;cursor:pointer;">OK, je verrai plus tard</button>
+          </div>`;
+        document.body.appendChild(alert);
+        setTimeout(()=>alert.remove(), 15000);
+      }
+    } else {
+      console.log('✅ Synchronisation CRM_CONFIG ↔ Airtable OK');
+    }
+  }catch(e){
+    console.warn('Vérification sync Airtable ignorée :', e.message);
+  }
+}
+
 boot();
 </script>
 </body>
