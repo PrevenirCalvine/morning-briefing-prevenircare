@@ -882,7 +882,29 @@ function sdot(s){
 }
 function mb(n){const m=MC[n]||MC[1];return`<span class="mat ${m.cls}">${m.label}</span>`;}
 function getCC(comp){const id=comp._recordId;return contacts.filter(c=>{const l=c['Entreprise liée'];return Array.isArray(l)&&l.includes(id);});}
-function cMat(cc){let m=1;cc.forEach(c=>{const v=parseInt(c['Niveau maturité']||1);if(v>m)m=v;});return m;}
+/**
+ * cMat — Calcule le niveau KESTIO d'une entreprise depuis ses contacts.
+ * Source de vérité : Statut réponse (synchronisé par Make) > Niveau maturité (champ legacy instable).
+ * Règle : on prend le niveau MAX parmi tous les contacts de l'entreprise.
+ */
+function cMat(cc){
+  let m=1;
+  cc.forEach(c=>{
+    // Priorité 1 : déduire depuis Statut réponse (fiable, synchronisé Make)
+    const st=c['Statut réponse']||'';
+    let lvFromStatut=1;
+    if(st==='RDV obtenu'||st==='Réponse reçue') lvFromStatut=3;
+    else if(st==='Envoyé – en attente') lvFromStatut=2;
+    else if(st==='Relance à faire') lvFromStatut=2;
+    else if(st==='Sans suite') lvFromStatut=1;
+
+    // Priorité 2 : champ Niveau maturité si présent ET supérieur à la déduction
+    const lvFromField=parseInt(c['Niveau maturité']||0);
+    const lv=Math.max(lvFromStatut, lvFromField||0, 1);
+    if(lv>m) m=lv;
+  });
+  return Math.min(m,4);
+}
 function needsAct(c){const nd=c['Date prochaine action'];return nd&&new Date(nd)<=NOW;}
 function compNA(cc){return cc.some(c=>needsAct(c));}
 function urg(cc){return(compNA(cc)?10:0)+cMat(cc)*2;}
@@ -947,7 +969,7 @@ function cardHTML(comp,idx,cc){
         <div style="flex:1;min-width:0;padding-right:30px;">
           <div class="cnm">${c['Nom du contact']||'–'}</div>
           <div class="crl">${c['Rôle / Fonction']||c['Rôle']||'–'}</div>
-          <div style="display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap;">${mb(parseInt(c['Niveau maturité']||1))}<div class="sd ${sdot(st)}" title="${st||'Non contacté'}"></div>${st?`<span style="font-size:10px;color:var(--tm);">${st}</span>`:''}${al}</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap;"><div class="sd ${sdot(st)}" title="${st||'Non contacté'}"></div>${st?`<span style="font-size:10px;color:var(--tm);">${st}</span>`:''}${al}</div>
         </div>
       </div>
       <div class="contact-card-21-actions">
