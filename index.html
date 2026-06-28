@@ -2120,31 +2120,166 @@ const DataQualityEngine = {
   },
 };
 
-// ─── LEAD PROVIDER — Couche d'abstraction ─────────────────────────────────
+// ─── LEAD ACQUISITION ENGINE ──────────────────────────────────────────────
 
 /**
- * LeadProvider — Interface unique pour tous les fournisseurs de contacts.
- * L'interface ne connaît jamais Apollo directement.
- * Changer de fournisseur = changer provider.source uniquement.
+ * LeadAcquisitionEngine — Point d'entrée UNIQUE pour tous les leads.
+ *
+ * Toute donnée entrante suit obligatoirement ce pipeline :
+ *   Capture → Normalisation → Dédup entreprise → Dédup contact
+ *   → Création/MAJ entreprise → Création/MAJ contacts → Focus fiche
+ *
+ * Ajouter un fournisseur = implémenter LeadProvider.PROVIDERS[name]
+ * Le reste de l'application n'est jamais modifié.
  */
-const LeadProvider = {
-  source: 'apollo', // 'apollo' | 'kaspr' | 'salesql' | 'hunter' | 'mock'
+const LeadAcquisitionEngine = {
 
   /**
-   * Recherche des décideurs dans une entreprise.
-   * @param {Object} params - { companyName, companyDomain, titles, limit }
-   * @returns {Promise<Array>} - Liste normalisée de contacts
+   * Pipeline unique — point d'entrée pour TOUTES les sources.
+   * @param {string} source - 'apollo' | 'kaspr' | 'hunter' | 'salesql' | 'linkedin' | 'csv'
+   * @param {Object} payload - { company?: {}, contacts: [] }
+   * @returns {Promise<{companyId, imported, updated, skipped}>}
    */
-  async searchDecisionMakers(params){
-    switch(this.source){
-      case 'apollo': return ApolloProvider.search(params);
-      case 'mock':   return this._mock(params);
-      default:       return this._mock(params);
+  async captureLead(source, payload){
+    const result = { companyId: null, imported: 0, updated: 0, skipped: 0 };
+
+    // 1. NORMALISATION
+    const compData  = payload.company  ? this._normalizeCompany(payload.company)  : null;
+    const contDatas = (payload.contacts||[]).map(c => this._normalizeContact(c, source));
+
+    // 2. ENTREPRISE — dédup puis création/MAJ
+    if(compData){
+      const dup = DataQualityEngine.findDuplicateCompany(
+        compData.name, compData.website
+      );
+      if(dup){
+        // Mettre à jour la fiche existante avec les nouvelles données
+        result.companyId = dup.company._recordId;
+        await this._updateCompanyIfRicher(dup.company, compData);
+      } else {
+        // Créer
+        const r = await CRM.createCompany(this._toAirtableCompany(compData));
+        result.companyId = r.id;
+        // Recharger les entreprises localement pour la suite
+        companies.push({...this._toAirtableCompany(compData), _recordId: r.id});
+      }
     }
+
+    // 3. CONTACTS — dédup puis création/MAJ
+    for(const c of contDatas){
+      const dup = DataQualityEngine.findDuplicateContact({
+        email: c.email, linkedin: c.linkedin,
+        firstname: c.firstname, lastname: c.lastname,
+        companyId: result.companyId||''
+      });
+      if(dup){
+        // Mettre à jour si nouvelles données
+        await this._updateContactIfRicher(dup.contact, c, result.companyId);
+        result.updated++;
+      } else {
+        // Créer
+        await CRM.createContact(this._toAirtableContact(c, result.companyId));
+        result.imported++;
+      }
+    }
+
+    return result;
   },
 
-  // Mock pour tests sans clé Apollo
-  _mock(params){
+  // ─── Normalisation entrante (format interne commun) ───────────────────────
+
+  _normalizeCompany(raw){
+    return {
+      name:    (raw.name||raw['Nom de l\'entreprise']||'').trim(),
+      website: raw.website||raw['site internet']||'',
+      linkedin:raw.linkedin||raw['LinkedIn']||'',
+      industry:raw.industry||raw['Secteur']||'',
+      size:    raw.size ? String(raw.size) : '',
+      city:    raw.city||'',
+    };
+  },
+
+  _normalizeContact(raw, source=''){
+    return {
+      firstname: (raw.firstname||raw.first_name||'').trim(),
+      lastname:  (raw.lastname||raw.last_name||'').trim(),
+      title:     raw.title||raw['Rôle / Fonction']||'',
+      email:     raw.email||'',
+      phone:     raw.phone||'',
+      linkedin:  raw.linkedin||raw.linkedin_url||'',
+      city:      raw.city||'',
+      _source:   source,
+    };
+  },
+
+  // ─── Conversion vers format Airtable ─────────────────────────────────────
+
+  _toAirtableCompany(c){
+    const f = {'Nom de l\'entreprise': c.name};
+    if(c.website)  f['site internet'] = c.website.startsWith('http') ? c.website : `https://${c.website}`;
+    if(c.linkedin) f['LinkedIn'] = c.linkedin;
+    if(c.industry) f['Secteur']  = c.industry;
+    if(c.size)     f['Effectif'] = c.size;
+    return f;
+  },
+
+  _toAirtableContact(c, companyId){
+    const f = {'Nom du contact': `${c.firstname} ${c.lastname}`.trim()};
+    if(c.title)    f['Rôle / Fonction'] = c.title;
+    if(c.email)    f['Email']           = c.email;
+    if(c.phone)    f['Téléphone']       = c.phone;
+    if(c.linkedin) f['LinkedIn']        = c.linkedin;
+    if(companyId)  f['Entreprise liée'] = [companyId];
+    f['Notes sur le contact'] = `[${c._source||'import'}] ${new Date().toLocaleDateString('fr-FR')}`;
+    return f;
+  },
+
+  // ─── Mise à jour conservative (ne remplace que si nouveau champ plus riche) ─
+
+  async _updateCompanyIfRicher(existing, incoming){
+    const f = {};
+    if(incoming.website  && !existing['site internet']) f['site internet'] = incoming.website;
+    if(incoming.linkedin && !existing['LinkedIn'])      f['LinkedIn']       = incoming.linkedin;
+    if(incoming.industry && !existing['Secteur'])       f['Secteur']        = incoming.industry;
+    if(Object.keys(f).length) await CRM.updateCompany(existing._recordId, f);
+  },
+
+  async _updateContactIfRicher(existing, incoming, companyId){
+    const f = {};
+    if(incoming.phone    && !existing['Téléphone']) f['Téléphone'] = incoming.phone;
+    if(incoming.linkedin && !existing['LinkedIn'])  f['LinkedIn']  = incoming.linkedin;
+    if(incoming.title    && !existing['Rôle / Fonction']) f['Rôle / Fonction'] = incoming.title;
+    if(companyId && (!existing['Entreprise liée']||!existing['Entreprise liée'].length))
+      f['Entreprise liée'] = [companyId];
+    if(Object.keys(f).length) await CRM.updateContact(existing._recordId, f);
+  },
+};
+
+/**
+ * LeadProvider — Couche d'abstraction des fournisseurs de contacts.
+ * Ajouter un fournisseur = ajouter une entrée dans PROVIDERS.
+ * Aucun autre code n'est modifié.
+ */
+const LeadProvider = {
+  source: 'apollo',
+
+  // Registre des fournisseurs — extensible sans modifier l'interface
+  PROVIDERS: {
+    apollo: () => ApolloProvider,
+    // kaspr:  () => KasprProvider,   // Sprint futur
+    // hunter: () => HunterProvider,  // Sprint futur
+    // salesql:() => SalesQLProvider, // Sprint futur
+    // linkedin:()=> LinkedInProvider,// Sprint futur
+    mock:   () => ({ search: LeadProvider._mock }),
+  },
+
+  async searchDecisionMakers(params){
+    const provider = this.PROVIDERS[this.source]?.();
+    if(!provider) throw new Error(`Fournisseur "${this.source}" non disponible`);
+    return provider.search(params);
+  },
+
+  _mock(){
     return [
       {firstname:'Sophie',lastname:'MARTIN',title:'DRH',email:'s.martin@exemple.fr',phone:'',linkedin:'https://linkedin.com/in/sophie-martin',city:'Paris',_source:'mock'},
       {firstname:'Thomas',lastname:'BERNARD',title:'Directeur Avantages Sociaux',email:'t.bernard@exemple.fr',phone:'+33 6 12 34 56 78',linkedin:'https://linkedin.com/in/thomas-bernard',city:'Paris',_source:'mock'},
@@ -2335,34 +2470,50 @@ const LIE = {
     document.getElementById('lie-import-btn').disabled = sel === 0;
   },
 
-  // ─── Import ───────────────────────────────────────────────────────────────
+  // ─── Import via pipeline unifié ───────────────────────────────────────────
   async importSelected(){
     const toImport = this.leads.filter(l=>l._selected && !l._duplicate);
     if(!toImport.length) return;
 
     document.getElementById('lie-import-btn').disabled = true;
-    document.getElementById('lie-import-btn').textContent = 'Import en cours…';
+    document.getElementById('lie-import-btn').innerHTML = '<i class="ti ti-loader"></i> Import en cours…';
 
-    let imported = 0;
+    let imported = 0, updated = 0;
     for(const l of toImport){
       try{
-        const f = {'Nom du contact': `${l.firstname} ${l.lastname}`.trim()};
-        if(l.title)    f['Rôle / Fonction'] = l.title;
-        if(l.email)    f['Email'] = l.email;
-        if(l.phone)    f['Téléphone'] = l.phone;
-        if(l.linkedin) f['LinkedIn'] = l.linkedin;
-        if(this.currentCompanyId) f['Entreprise liée'] = [this.currentCompanyId];
-        f['Notes sur le contact'] = `[Apollo] Importé le ${new Date().toLocaleDateString('fr-FR')}`;
-
-        await CRM.createContact(f);
-        l._duplicate = {reason:'vient d\'être importé'};
-        imported++;
-      }catch(e){
+        // Pipeline unifié — même chemin que tout autre fournisseur
+        const result = await LeadAcquisitionEngine.captureLead(
+          LeadProvider.source,
+          {
+            company: this.currentCompanyId ? null : {name: this.currentCompanyName},
+            contacts: [l],
+          }
+        );
+        // Si pas d'entreprise courante, lier au companyId créé/trouvé
+        if(!this.currentCompanyId && result.companyId){
+          this.currentCompanyId = result.companyId;
+        }
+        // Si on a un companyId mais que captureLead ne l'a pas utilisé
+        // (entreprise déjà connue), forcer le lien
+        if(this.currentCompanyId && result.imported > 0){
+          // Le contact a été créé, on doit vérifier le lien entreprise
+          // (captureLead gère déjà ça via _toAirtableContact)
+        }
+        imported += result.imported;
+        updated  += result.updated;
+        l._duplicate = {reason: 'importé'};
+      } catch(e){
         console.error('Erreur import contact:', l, e);
+        showToast(`⚠️ Erreur : ${e.message}`);
       }
     }
 
-    showToast(`${imported} contact${imported>1?'s':''} importé${imported>1?'s':''} ✓`);
+    const msg = [
+      imported > 0 ? `${imported} contact${imported>1?'s':''} importé${imported>1?'s':''}` : '',
+      updated  > 0 ? `${updated} mis à jour` : '',
+    ].filter(Boolean).join(' · ');
+    showToast(msg + ' ✓');
+
     this._renderResults();
     document.getElementById('lie-import-btn').innerHTML='<i class="ti ti-download"></i> Importer les contacts sélectionnés';
     await bootAndFocus(this.currentCompanyId);
@@ -2499,45 +2650,27 @@ const ProspectScorer = {
  * L'interface ne dialogue jamais directement avec Airtable — tout passe ici.
  */
 const ProspectImporter = {
-  imported: new Set(), // Track des imports de la session
+  imported: new Set(),
 
   /**
-   * Importe un prospect dans le CRM
-   * @param {Object} prospect - Données normalisées du prospect
-   * @param {number} kestioLevel - Niveau KESTIO initial (toujours N1)
-   * @returns {Promise<string>} - ID Airtable créé
+   * Importe un prospect via le pipeline unifié LeadAcquisitionEngine.
+   * Usage 2 : même pipeline que pour les contacts Apollo.
    */
-  async importOne(prospect, kestioLevel=1){
-    // Vérification doublon
-    const exists = companies.find(c =>
-      (c['Nom de l\'entreprise']||'').toLowerCase() === prospect.name.toLowerCase()
-    );
-    if(exists){
-      showToast(`"${prospect.name}" existe déjà dans le CRM`);
-      return exists._recordId;
-    }
-
-    // Création entreprise dans Airtable
-    const fields = {
-      'Nom de l\'entreprise': prospect.name,
-    };
-    if(prospect.city)     fields['Ville'] = prospect.city;
-    if(prospect.industry) fields['Secteur'] = prospect.industry;
-    if(prospect.website)  fields['site internet'] = `https://${prospect.website}`;
-    if(prospect.size)     fields['Effectif'] = String(prospect.size);
-
-    const result = await CRM.createCompany(fields);
+  async importOne(prospect){
+    const result = await LeadAcquisitionEngine.captureLead('prospect_engine', {
+      company: {
+        name: prospect.name,
+        website: prospect.website ? `https://${prospect.website}` : '',
+        industry: prospect.industry||'',
+        size: prospect.size ? String(prospect.size) : '',
+        city: prospect.city||'',
+      },
+      contacts: [],
+    });
     this.imported.add(prospect.name);
-
-    // TODO Sprint 8 : créer automatiquement une opportunité liée
-    // TODO Sprint 8 : assigner niveau KESTIO N1 sur les contacts créés
-
-    return result.id;
+    return result.companyId;
   },
 
-  /**
-   * Importe une liste de prospects sélectionnés
-   */
   async importSelected(prospects){
     let count = 0;
     for(const p of prospects){
