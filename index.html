@@ -660,7 +660,7 @@ function cardHTML(comp,idx,cc){
     const tel=c['Téléphone']||'';
     const li=c['LinkedIn']||'';
     const menuId=`ctx-${idx}-${ci}`;
-    return `<div class="contact-card-21" onclick="event.stopPropagation()">
+    return `<div class="contact-card-21" data-contact-id="${cid}" onclick="event.stopPropagation()">
       <button class="ctx-btn" onclick="toggleCtx('${menuId}',event)" title="Actions"><i class="ti ti-dots-vertical"></i></button>
       <div class="ctx-menu" id="${menuId}">
         <div class="ctx-item" onclick="openInter('${cid}');closeAllCtx()"><i class="ti ti-message-circle"></i> Ajouter une interaction</div>
@@ -993,8 +993,8 @@ function closeSearch(){
   document.getElementById('search-input').value='';
 }
 
-function focusCompany(compId){
-  // Basculer sur l'onglet "Toutes les entreprises" et ouvrir la fiche
+function focusCompany(compId, highlightContactId=null){
+  // Basculer sur "Toutes les entreprises"
   const tabs=document.querySelectorAll('.tab');
   tabs.forEach(t=>t.classList.remove('on'));
   tabs[1]?.classList.add('on');
@@ -1004,11 +1004,38 @@ function focusCompany(compId){
     const cl=companies.map(c=>({comp:c,cc:getCC(c)})).filter(x=>x.cc.length>0);
     const sorted=[...cl].sort((a,b)=>urg(b.cc)-urg(a.cc));
     const idx=sorted.findIndex(({comp})=>comp._recordId===compId);
-    if(idx>=0){
-      const card=document.getElementById(`cc${idx}`);
-      if(card){card.classList.add('open');card.scrollIntoView({behavior:'smooth',block:'center'});}
+    if(idx<0)return;
+    const card=document.getElementById(`cc${idx}`);
+    if(!card)return;
+
+    // Ouvrir la fiche
+    card.classList.add('open');
+
+    // Scroll fluide vers la fiche
+    card.scrollIntoView({behavior:'smooth',block:'center'});
+
+    // Highlight de la fiche
+    card.style.transition='box-shadow .3s, border-color .3s';
+    card.style.boxShadow='0 0 0 3px rgba(105,186,165,.5)';
+    card.style.borderColor='var(--pc-teal)';
+    setTimeout(()=>{
+      card.style.boxShadow='';
+      card.style.borderColor='';
+    }, 2000);
+
+    // Si on cherche un contact spécifique, le mettre en évidence
+    if(highlightContactId){
+      setTimeout(()=>{
+        const contactCard=card.querySelector(`[data-contact-id="${highlightContactId}"]`);
+        if(contactCard){
+          contactCard.style.transition='box-shadow .3s';
+          contactCard.style.boxShadow='0 0 0 2px var(--pc-violet)';
+          contactCard.scrollIntoView({behavior:'smooth',block:'center'});
+          setTimeout(()=>{contactCard.style.boxShadow='';},2000);
+        }
+      },400);
     }
-  },100);
+  },120);
 }
 
 function focusContact(contId){
@@ -1016,7 +1043,7 @@ function focusContact(contId){
   if(!c)return;
   const linked=c['Entreprise liée'];
   const compId=Array.isArray(linked)?linked[0]:null;
-  if(compId)focusCompany(compId);
+  if(compId)focusCompany(compId, contId);
 }
 
 // AUTOCOMPLÉTION ENTREPRISE dans modal contact
