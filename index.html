@@ -1494,21 +1494,37 @@ async function prepareNextAction(companyId, companyName){
     // Stocker pour utilisation future par generateEmail
     window.salesContext = salesContext;
 
-    // Envoi du salesContext vers Make (webhook)
+    // Envoi du salesContext vers Make + réception réponse OpenAI
     console.log('📤 Envoi du salesContext vers Make…');
-    fetch('https://hook.eu2.make.com/n0ua9td3mfub2gmtujbanv4qce58pnox', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(salesContext)
-    }).then(r => {
-      console.log('✅ Make a reçu le contexte — statut :', r.status);
-    }).catch(e => {
-      console.warn('⚠️ Erreur envoi Make :', e.message);
-    });
+
+    // Afficher état d'analyse en attente
+    document.getElementById('copilot-body').innerHTML=`
+      <div class="copilot-badge"><i class="ti ti-building"></i> ${companyName}</div>
+      <div class="copilot-loading" style="min-height:120px;">
+        <div class="copilot-spin"></div>
+        <div class="copilot-loading-txt">Analyse IA en cours…</div>
+      </div>`;
+
+    let aiResponse = null;
+    try {
+      const makeRes = await fetch('https://hook.eu2.make.com/n0ua9td3mfub2gmtujbanv4qce58pnox', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(salesContext)
+      });
+      if(makeRes.ok){
+        const raw = await makeRes.text();
+        try { aiResponse = JSON.parse(raw); } catch { aiResponse = {email: raw}; }
+        console.log('✅ Réponse OpenAI reçue :', aiResponse);
+      } else {
+        console.warn('⚠️ Make a répondu avec statut :', makeRes.status);
+      }
+    } catch(e){
+      console.warn('⚠️ Erreur communication Make :', e.message);
+    }
 
     // Affichage dans le panneau
     const lastInter = salesContext.interactions[0];
-    const priorityContact = salesContext.contacts[0];
 
     document.getElementById('copilot-body').innerHTML=`
       <div class="copilot-badge"><i class="ti ti-building"></i> ${companyName}</div>
@@ -1523,35 +1539,92 @@ async function prepareNextAction(companyId, companyName){
         <div class="copilot-data">${salesContext.contacts.map(c=>`<div style="margin-bottom:6px;"><strong>${c.firstname} ${c.lastname}</strong> · ${c.role||'–'}<br><span style="color:var(--tm);font-size:11px;">${c.email||''}${c.phone?' · '+c.phone:''}</span></div>`).join('') || '–'}</div>
       </div>
 
-      ${salesContext.opportunities.length>0?`<div class="copilot-section">
-        <div class="copilot-sec-lbl">Opportunités (${salesContext.opportunities.length})</div>
-        <div class="copilot-data">${salesContext.opportunities.map(o=>`<div style="margin-bottom:4px;"><strong>${o.name}</strong> · ${o.stage}${o.value?' · '+Number(o.value).toLocaleString('fr-FR')+'€':''}</div>`).join('')}</div>
-      </div>`:''}
-
       ${lastInter?`<div class="copilot-section">
         <div class="copilot-sec-lbl">Dernière interaction</div>
         <div class="copilot-data">${lastInter.type} · ${lastInter.date?new Date(lastInter.date).toLocaleDateString('fr-FR'):''}<br><span style="color:var(--tm);font-size:11px;">${lastInter.notes||''}</span></div>
       </div>`:''}
 
+      ${aiResponse ? `
+      <div style="border-top:1.5px solid var(--pc-violet);margin:16px 0 14px;padding-top:14px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+          <i class="ti ti-brain" style="color:var(--pc-violet);font-size:18px;"></i>
+          <span style="font-family:'Exo 2',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--pc-violet-dark);">Analyse Sales Copilot</span>
+        </div>
+
+        ${aiResponse.resume?`<div class="copilot-section">
+          <div class="copilot-sec-lbl">Résumé</div>
+          <div class="copilot-data">${aiResponse.resume}</div>
+        </div>`:''}
+
+        ${aiResponse.analyse?`<div class="copilot-section">
+          <div class="copilot-sec-lbl">Analyse</div>
+          <div class="copilot-data">${aiResponse.analyse}</div>
+        </div>`:''}
+
+        ${aiResponse.strategie?`<div class="copilot-section">
+          <div class="copilot-sec-lbl">Stratégie recommandée</div>
+          <div class="copilot-data" style="color:var(--pc-violet-dark);border-left:2px solid var(--pc-violet);">${aiResponse.strategie}</div>
+        </div>`:''}
+
+        ${aiResponse.prochaine_action?`<div class="copilot-section">
+          <div class="copilot-sec-lbl">Prochaine action</div>
+          <div class="copilot-data">${aiResponse.prochaine_action}</div>
+        </div>`:''}
+
+        ${aiResponse.objections&&aiResponse.objections.length>0?`<div class="copilot-section">
+          <div class="copilot-sec-lbl">Objections anticipées</div>
+          <div class="copilot-data">${aiResponse.objections.map(o=>`<div style="margin-bottom:4px;">• ${o}</div>`).join('')}</div>
+        </div>`:''}
+
+        ${aiResponse.score_confiance?`<div class="copilot-section">
+          <div class="copilot-sec-lbl">Score de confiance</div>
+          <div class="copilot-data">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="flex:1;height:6px;background:var(--bd);border-radius:99px;overflow:hidden;">
+                <div style="width:${Math.round(aiResponse.score_confiance*100)}%;height:100%;background:var(--pc-teal);border-radius:99px;"></div>
+              </div>
+              <span style="font-family:'Exo 2',sans-serif;font-weight:700;color:var(--pc-teal-dark);">${Math.round(aiResponse.score_confiance*100)}%</span>
+            </div>
+          </div>
+        </div>`:''}
+
+        ${aiResponse.email?`<div class="copilot-section">
+          <div class="copilot-sec-lbl" style="display:flex;align-items:center;justify-content:space-between;">
+            Email généré
+            <button class="btn btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('ai-email-text').innerText);showToast('Email copié ✓')">
+              <i class="ti ti-copy"></i> Copier
+            </button>
+          </div>
+          <div class="ew" id="ai-email-text" style="white-space:pre-wrap;font-size:12px;line-height:1.8;">${aiResponse.email}</div>
+          <div style="margin-top:10px;display:flex;gap:8px;">
+            <button class="btn btn-teal" onclick="validateAndUseEmail()" style="flex:1;justify-content:center;">
+              <i class="ti ti-check"></i> Valider et utiliser
+            </button>
+            <button class="btn" onclick="showToast('Email ignoré')">
+              <i class="ti ti-x"></i> Ignorer
+            </button>
+          </div>
+        </div>`:''}
+      </div>
+      ` : `
       <div class="copilot-section">
         <div class="copilot-sec-lbl">Action recommandée</div>
         <div class="copilot-data" style="color:var(--pc-violet-dark);border-left:2px solid var(--pc-violet);">${salesContext.crm.kestioAction}</div>
       </div>
+      <div style="margin-top:12px;padding:10px 12px;background:var(--s1);border-radius:8px;font-size:12px;color:var(--tm);">
+        <i class="ti ti-info-circle" style="margin-right:4px;"></i>
+        Analyse IA non disponible — vérifiez le scénario Make.
+      </div>
+      `}
 
-      <div class="copilot-section">
-        <div class="copilot-sec-lbl" style="display:flex;align-items:center;justify-content:space-between;">
-          Contexte JSON complet
+      <div style="margin-top:16px;padding-top:14px;border-top:0.5px solid var(--bd);">
+        <div class="copilot-sec-lbl" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          Contexte JSON
           <button class="btn btn-sm" onclick="navigator.clipboard.writeText(JSON.stringify(window.salesContext,null,2));showToast('Contexte copié ✓')">
             <i class="ti ti-copy"></i> Copier
           </button>
         </div>
-        <pre style="background:var(--s1);border-radius:8px;padding:12px;font-size:10px;color:var(--tm);overflow-x:auto;max-height:200px;overflow-y:auto;line-height:1.5;">${JSON.stringify(salesContext, null, 2)}</pre>
-      </div>
-
-      <div style="margin-top:16px;padding-top:16px;border-top:0.5px solid var(--bd);text-align:center;">
-        <button class="btn-copilot" onclick="generateEmail(window.salesContext)" style="width:100%;justify-content:center;">
-          <i class="ti ti-mail"></i> Générer l'email (Sprint 4)
-        </button>
+        <pre style="background:var(--s1);border-radius:8px;padding:10px;font-size:9px;color:var(--tm);overflow-x:auto;max-height:150px;overflow-y:auto;line-height:1.5;">${JSON.stringify(salesContext, null, 2)}</pre>
       </div>`;
 
   } catch(e) {
@@ -1563,15 +1636,26 @@ async function prepareNextAction(companyId, companyName){
   }
 }
 
-// ─── SPRINT 3 — STUB generateEmail ───────────────────────────────────────────
-// Cette fonction sera implémentée au Sprint 4 avec l'API Claude.
-// Elle reçoit le salesContext et produira un email dans le style Calvine TONGA.
-// L'interface ne dialogue JAMAIS directement avec Claude — tout passe par ici.
+// ─── SPRINT 4 — RÉCEPTION RÉPONSE IA ────────────────────────────────────────
+
+// Validation de l'email généré par l'IA avant utilisation
+function validateAndUseEmail(){
+  const emailEl = document.getElementById('ai-email-text');
+  if(!emailEl)return;
+  const emailText = emailEl.innerText;
+  navigator.clipboard.writeText(emailText);
+  showToast('Email copié — prêt à coller dans Gmail ✓');
+  console.log('✅ Email validé par Calvine TONGA :', emailText);
+  // Futur Sprint 5 : ouvrir Gmail ou enregistrer l'interaction
+}
+
+// Stub generateEmail — sera remplacé au Sprint 5 si envoi direct depuis MB
 function generateEmail(context){
-  showToast('Génération IA — disponible au Sprint 4');
+  showToast('Génération via Make — cliquez Analyser');
   console.log('generateEmail() appelé avec context:', context);
   return 'Fonction en cours de développement';
 }
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ─────────────────────────────────────────────────────────────────────────────
