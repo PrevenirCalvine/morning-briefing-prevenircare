@@ -1371,20 +1371,20 @@ async function prepareNextAction(companyId, companyName){
   document.getElementById('copilot-body').innerHTML=`
     <div class="copilot-loading">
       <div class="copilot-spin"></div>
-      <div class="copilot-loading-txt">Préparation de l'analyse…</div>
+      <div class="copilot-loading-txt">Construction du contexte…</div>
     </div>`;
 
   try {
-    // 1. Récupérer l'entreprise
+    // 1. Entreprise
     const comp = companies.find(c => c._recordId === companyId) || {};
 
-    // 2. Récupérer les contacts liés
+    // 2. Contacts liés
     const compContacts = contacts.filter(c => {
       const l = c['Entreprise liée'];
       return Array.isArray(l) && l.includes(companyId);
     });
 
-    // 3. Récupérer les interactions liées aux contacts
+    // 3. Interactions
     const contactIds = compContacts.map(c => c._recordId).filter(Boolean);
     let compInteractions = [];
     if(contactIds.length > 0){
@@ -1392,107 +1392,151 @@ async function prepareNextAction(companyId, companyName){
       compInteractions = interRes.filter(i => {
         const linked = i['Contact lié'];
         return Array.isArray(linked) && linked.some(id => contactIds.includes(id));
-      });
+      }).sort((a,b) => new Date(b['Date d\'interaction']||0) - new Date(a['Date d\'interaction']||0));
     }
 
-    // 4. Récupérer les opportunités
-    const oppRes = await fetchAll(TO);
+    // 4. Opportunités liées à l'entreprise
+    const oppRes = window._opps || await fetchAll(TO);
     const compOpps = oppRes.filter(o => {
-      const linked = o['Contacts liés'] || o['Contact lié'] || [];
-      return Array.isArray(linked) && linked.some(id => contactIds.includes(id));
+      const linked = o['Entreprise liée'] || [];
+      return Array.isArray(linked) && linked.includes(companyId);
     });
 
-    // 5. Niveau Kestio de l'entreprise
+    // 5. Niveau Kestio
     const mat = cMat(compContacts);
-    const kestioLevel = `N${mat}`;
 
-    // 6. Construire l'objet contexte
-    const context = {
+    // ─── SPRINT 3 — salesContext ────────────────────────────────────────────
+    const salesContext = {
       company: {
         id: companyId,
         name: companyName,
-        secteur: typeof comp['Secteur']==='object' ? comp['Secteur']?.name : (comp['Secteur']||''),
-        taille: typeof comp['Taille']==='object' ? comp['Taille']?.name : (comp['Taille']||''),
+        industry: (() => {
+          const s = comp['Secteur'];
+          return typeof s === 'object' ? (s?.name || '') : (s || '');
+        })(),
+        website: comp['site internet'] || comp['Site internet'] || '',
+        linkedin: comp['LinkedIn'] || '',
+        notes: comp['Notes'] || comp['Besoins spécifiques'] || '',
       },
-      contacts: compContacts.map(c => ({
-        id: c._recordId,
-        nom: c['Nom du contact'] || '',
-        role: c['Rôle / Fonction'] || c['Rôle'] || '',
-        email: c['Email'] || '',
-        statut: c['Statut réponse'] || '',
-        niveau_maturite: c['Niveau maturité'] || '1',
-        dernierEmail: c['Date dernier email'] || '',
-        notes: c['Notes sur le contact'] || '',
-        prochaine_action: c['Prochaine action'] || '',
-        date_prochaine_action: c['Date prochaine action'] || '',
+      contacts: compContacts.map(c => {
+        const fullName = (c['Nom du contact'] || '').trim();
+        const parts = fullName.split(' ');
+        const firstname = parts[0] || '';
+        const lastname = parts.slice(1).join(' ') || '';
+        return {
+          firstname,
+          lastname,
+          role: c['Rôle / Fonction'] || c['Rôle'] || '',
+          email: c['Email'] || '',
+          linkedin: c['LinkedIn'] || '',
+          phone: c['Téléphone'] || '',
+        };
+      }),
+      opportunities: compOpps.map(o => ({
+        name: o['Nom de l\'opportunité'] || '',
+        stage: typeof o['Stade'] === 'object' ? (o['Stade']?.name || '') : (o['Stade'] || ''),
+        value: o['Valeur (EUR)'] || 0,
+        probability: o['Probabilité (%)'] || 0,
+        nextAction: o['Prochaine action'] || '',
+        closeDate: o['Date de clôture prévue'] || '',
       })),
       interactions: compInteractions.map(i => ({
         type: i['Type d\'interaction'] || '',
         date: i['Date d\'interaction'] || '',
         notes: i['Notes'] || '',
       })),
-      opportunities: compOpps.map(o => ({
-        nom: o['Nom de l\'opportunité'] || '',
-        stade: typeof o['Stade']==='object' ? o['Stade']?.name : (o['Stade']||''),
-        score: o['Score'] || 0,
-        valeur: o['Valeur (EUR)'] || 0,
-        prochaine_action: o['Prochaine action'] || '',
-      })),
-      kestioLevel,
-      kestioObjectif: MC[mat]?.obj || '',
-      kestioAction: MC[mat]?.act || '',
-      generatedAt: new Date().toISOString(),
+      crm: {
+        kestioLevel: `N${mat}`,
+        kestioObjectif: MC[mat]?.obj || '',
+        kestioAction: MC[mat]?.act || '',
+        status: comp['Statut'] || '',
+        priority: comp['Priorité'] || '',
+        nextAction: comp['Prochaine action'] || compContacts[0]?.['Prochaine action'] || '',
+        nextActionDate: comp['Date de relance'] || compContacts[0]?.['Date prochaine action'] || '',
+      },
+      _meta: {
+        generatedAt: new Date().toISOString(),
+        version: 'sprint3',
+      }
     };
+    // ────────────────────────────────────────────────────────────────────────
 
-    // 7. Afficher dans la console (critère de réussite du sprint)
-    console.log('🧠 PrévenirCare Sales Copilot — Contexte:', JSON.stringify(context, null, 2));
+    // Console — critère de réussite Sprint 3
+    console.log('🧠 PrévenirCare Sales Copilot — salesContext:', JSON.stringify(salesContext, null, 2));
 
-    // 8. Afficher le résumé dans le panneau
-    const lastInter = context.interactions.sort((a,b) => new Date(b.date)-new Date(a.date))[0];
-    const priorityContact = context.contacts.find(c => c.prochaine_action) || context.contacts[0];
+    // Stocker pour utilisation future par generateEmail
+    window.salesContext = salesContext;
+
+    // Appel futur Sprint 4 (commenté)
+    // const result = await generateEmail(salesContext);
+
+    // Affichage dans le panneau
+    const lastInter = salesContext.interactions[0];
+    const priorityContact = salesContext.contacts[0];
 
     document.getElementById('copilot-body').innerHTML=`
       <div class="copilot-badge"><i class="ti ti-building"></i> ${companyName}</div>
+
       <div class="copilot-section">
-        <div class="copilot-sec-lbl">Niveau de maturité</div>
-        <div class="copilot-data">${mb(mat)} <span style="margin-left:8px;font-size:12px;color:var(--ts);">${context.kestioObjectif}</span></div>
+        <div class="copilot-sec-lbl">Niveau Kestio</div>
+        <div class="copilot-data">${mb(mat)} <span style="margin-left:8px;font-size:12px;color:var(--ts);">${salesContext.crm.kestioObjectif}</span></div>
       </div>
+
       <div class="copilot-section">
-        <div class="copilot-sec-lbl">Contacts (${context.contacts.length})</div>
-        <div class="copilot-data">${context.contacts.map(c=>`<div style="margin-bottom:6px;"><strong>${c.nom}</strong> · ${c.role||'–'}<br><span style="color:var(--tm);font-size:11px;">${c.statut||'Non contacté'}${c.dernierEmail?' · dernier email '+new Date(c.dernierEmail).toLocaleDateString('fr-FR'):''}</span></div>`).join('')}</div>
+        <div class="copilot-sec-lbl">Contacts (${salesContext.contacts.length})</div>
+        <div class="copilot-data">${salesContext.contacts.map(c=>`<div style="margin-bottom:6px;"><strong>${c.firstname} ${c.lastname}</strong> · ${c.role||'–'}<br><span style="color:var(--tm);font-size:11px;">${c.email||''}${c.phone?' · '+c.phone:''}</span></div>`).join('') || '–'}</div>
       </div>
-      ${context.interactions.length>0?`<div class="copilot-section">
+
+      ${salesContext.opportunities.length>0?`<div class="copilot-section">
+        <div class="copilot-sec-lbl">Opportunités (${salesContext.opportunities.length})</div>
+        <div class="copilot-data">${salesContext.opportunities.map(o=>`<div style="margin-bottom:4px;"><strong>${o.name}</strong> · ${o.stage}${o.value?' · '+Number(o.value).toLocaleString('fr-FR')+'€':''}</div>`).join('')}</div>
+      </div>`:''}
+
+      ${lastInter?`<div class="copilot-section">
         <div class="copilot-sec-lbl">Dernière interaction</div>
-        <div class="copilot-data">${lastInter?`${lastInter.type} · ${lastInter.date?new Date(lastInter.date).toLocaleDateString('fr-FR'):''}<br><span style="color:var(--tm);font-size:11px;">${lastInter.notes||''}</span>`:'Aucune'}</div>
+        <div class="copilot-data">${lastInter.type} · ${lastInter.date?new Date(lastInter.date).toLocaleDateString('fr-FR'):''}<br><span style="color:var(--tm);font-size:11px;">${lastInter.notes||''}</span></div>
       </div>`:''}
-      ${priorityContact?.prochaine_action?`<div class="copilot-section">
-        <div class="copilot-sec-lbl">Prochaine action prévue</div>
-        <div class="copilot-data">${priorityContact.prochaine_action}${priorityContact.date_prochaine_action?' · <strong>'+new Date(priorityContact.date_prochaine_action).toLocaleDateString('fr-FR')+'</strong>':''}</div>
-      </div>`:''}
+
       <div class="copilot-section">
         <div class="copilot-sec-lbl">Action recommandée</div>
-        <div class="copilot-data" style="color:var(--pc-violet-dark);border-left:2px solid var(--pc-violet);">${context.kestioAction}</div>
+        <div class="copilot-data" style="color:var(--pc-violet-dark);border-left:2px solid var(--pc-violet);">${salesContext.crm.kestioAction}</div>
       </div>
-      <div style="margin-top:24px;padding-top:16px;border-top:0.5px solid var(--bd);font-size:11px;color:var(--tm);text-align:center;">
-        <i class="ti ti-code" style="display:block;margin-bottom:4px;"></i>
-        Contexte complet disponible en console (F12)<br>
-        <span style="font-family:'Exo 2',sans-serif;font-weight:600;color:var(--pc-violet-dark);">Sprint 2 — Génération IA à venir</span>
-      </div>`;
 
-    // Prépare le contexte pour le sprint 2 (fonction future)
-    // generateCommercialRecommendation(context); // Sprint 2
+      <div class="copilot-section">
+        <div class="copilot-sec-lbl" style="display:flex;align-items:center;justify-content:space-between;">
+          Contexte JSON complet
+          <button class="btn btn-sm" onclick="navigator.clipboard.writeText(JSON.stringify(window.salesContext,null,2));showToast('Contexte copié ✓')">
+            <i class="ti ti-copy"></i> Copier
+          </button>
+        </div>
+        <pre style="background:var(--s1);border-radius:8px;padding:12px;font-size:10px;color:var(--tm);overflow-x:auto;max-height:200px;overflow-y:auto;line-height:1.5;">${JSON.stringify(salesContext, null, 2)}</pre>
+      </div>
+
+      <div style="margin-top:16px;padding-top:16px;border-top:0.5px solid var(--bd);text-align:center;">
+        <button class="btn-copilot" onclick="generateEmail(window.salesContext)" style="width:100%;justify-content:center;">
+          <i class="ti ti-mail"></i> Générer l'email (Sprint 4)
+        </button>
+      </div>`;
 
   } catch(e) {
     console.error('Copilot error:', e);
     document.getElementById('copilot-body').innerHTML=`
       <div style="background:var(--pc-terra-bg);border-radius:8px;padding:14px;font-size:13px;color:var(--pc-terra-dark);">
-        <strong>Erreur lors de l'analyse.</strong><br>${e.message}
+        <strong>Erreur lors de la construction du contexte.</strong><br>${e.message}
       </div>`;
   }
 }
 
-// Stub Sprint 2 — sera implémenté au prochain sprint
-// async function generateCommercialRecommendation(context){ ... }
+// ─── SPRINT 3 — STUB generateEmail ───────────────────────────────────────────
+// Cette fonction sera implémentée au Sprint 4 avec l'API Claude.
+// Elle reçoit le salesContext et produira un email dans le style Calvine TONGA.
+// L'interface ne dialogue JAMAIS directement avec Claude — tout passe par ici.
+function generateEmail(context){
+  showToast('Génération IA — disponible au Sprint 4');
+  console.log('generateEmail() appelé avec context:', context);
+  return 'Fonction en cours de développement';
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 // ─────────────────────────────────────────────────────────────────────────────
 
