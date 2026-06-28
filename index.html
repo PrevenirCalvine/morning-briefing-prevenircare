@@ -193,6 +193,41 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
 .quick-actions{display:flex;gap:6px;flex-wrap:wrap;padding:10px 18px;background:var(--s1);border-top:0.5px solid var(--bd);}
 .qa-btn{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-family:'Exo 2',sans-serif;font-weight:600;padding:5px 10px;border-radius:99px;border:0.5px solid var(--bd);background:#fff;color:var(--ts);cursor:pointer;transition:all .15s;}
 .qa-btn:hover{border-color:var(--pc-teal);color:var(--pc-teal-dark);background:var(--pc-teal-bg);}
+/* ─── PROSPECT ENGINE ─────────────────────────────────────────────────────── */
+.pe-screen{display:flex;flex-direction:column;gap:16px;}
+.pe-form{background:#fff;border:0.5px solid var(--bd);border-radius:14px;padding:20px 24px;}
+.pe-form-title{font-family:'STIX Two Text',Georgia,serif;font-size:18px;font-weight:700;color:var(--pc-dark);margin-bottom:4px;}
+.pe-form-sub{font-size:12px;color:var(--tm);margin-bottom:18px;}
+.pe-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+.pe-field{display:flex;flex-direction:column;gap:4px;}
+.pe-field.full{grid-column:1/-1;}
+.pe-label{font-family:'Exo 2',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--tm);}
+.pe-input{padding:8px 12px;border:0.5px solid var(--bds);border-radius:var(--r);font-family:'Poppins',sans-serif;font-size:13px;color:var(--tp);background:#fff;outline:none;transition:border-color .15s;}
+.pe-input:focus{border-color:var(--pc-terra);}
+.pe-btn{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-family:'Exo 2',sans-serif;font-weight:700;padding:10px 24px;border-radius:var(--r);border:none;background:var(--pc-terra);color:#fff;cursor:pointer;transition:background .15s;}
+.pe-btn:hover{background:var(--pc-terra-dark);}
+.pe-btn:disabled{opacity:.5;cursor:default;}
+.pe-results{background:#fff;border:0.5px solid var(--bd);border-radius:14px;overflow:hidden;}
+.pe-results-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:0.5px solid var(--bd);}
+.pe-results-title{font-family:'Exo 2',sans-serif;font-size:13px;font-weight:700;color:var(--tp);}
+.pe-import-all{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-family:'Exo 2',sans-serif;font-weight:600;padding:6px 14px;border-radius:var(--r);border:0.5px solid var(--pc-terra);background:var(--pc-terra-bg);color:var(--pc-terra-dark);cursor:pointer;}
+.pe-import-all:hover{background:var(--pc-terra);color:#fff;}
+.pe-table{width:100%;border-collapse:collapse;}
+.pe-table th{font-family:'Exo 2',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--tm);padding:10px 16px;text-align:left;border-bottom:0.5px solid var(--bd);background:var(--s1);}
+.pe-table td{padding:12px 16px;border-bottom:0.5px solid var(--bd);font-size:13px;color:var(--ts);vertical-align:middle;}
+.pe-table tr:last-child td{border-bottom:none;}
+.pe-table tr:hover td{background:var(--s1);}
+.pe-score{display:inline-flex;align-items:center;gap:4px;font-family:'Exo 2',sans-serif;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;}
+.pe-score-high{background:var(--pc-teal-bg);color:var(--pc-teal-dark);}
+.pe-score-mid{background:#FFF3E0;color:#8C5A00;}
+.pe-score-low{background:var(--s1);color:var(--tm);}
+.pe-check{width:16px;height:16px;cursor:pointer;accent-color:var(--pc-terra);}
+.pe-import-btn{font-size:11px;font-family:'Exo 2',sans-serif;font-weight:600;padding:4px 10px;border-radius:99px;border:0.5px solid var(--pc-teal);background:var(--pc-teal-bg);color:var(--pc-teal-dark);cursor:pointer;}
+.pe-import-btn:hover{background:var(--pc-teal);color:#fff;}
+.pe-import-btn.done{background:var(--pc-teal);color:#fff;opacity:.6;cursor:default;}
+.pe-empty{padding:40px;text-align:center;font-size:13px;color:var(--tm);}
+.pe-loading{padding:40px;display:flex;flex-direction:column;align-items:center;gap:10px;}
+/* ─────────────────────────────────────────────────────────────────────────── */
 .spin-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;gap:12px;background:#fff;border-radius:12px;border:0.5px solid var(--bd);}
 .spin{width:28px;height:28px;border:2.5px solid var(--bd);border-top-color:var(--pc-teal);border-radius:50%;animation:sp .8s linear infinite;}
 @keyframes sp{to{transform:rotate(360deg);}}
@@ -253,6 +288,7 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
     <button class="tab on" onclick="sw('today',this)">Actions du jour</button>
     <button class="tab" onclick="sw('all',this)">Toutes les entreprises</button>
     <button class="tab" onclick="sw('pipeline',this)">Pipeline maturité</button>
+    <button class="tab" onclick="sw('prospect',this)" style="color:var(--pc-terra-dark);">🎯 Prospect Engine</button>
   </div>
   <div id="content"><div class="spin-wrap"><div class="spin"></div><div class="spin-txt">Connexion au CRM PrévenirCare…</div></div></div>
 </div>
@@ -725,7 +761,10 @@ function cardHTML(comp,idx,cc){
 }
 
 function tog(i){document.getElementById('cc'+i).classList.toggle('open');}
-function sw(t,el){currentTab=t;document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));el.classList.add('on');render();}
+function sw(t,el){currentTab=t;document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));el.classList.add('on');
+  if(t==='prospect'){PE.renderScreen();return;}
+  render();
+}
 
 function render(){
   const el=document.getElementById('content');
@@ -1636,7 +1675,364 @@ async function prepareNextAction(companyId, companyName){
   }
 }
 
-// ─── SPRINT 4 — RÉCEPTION RÉPONSE IA ────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// SPRINT 6 — PROSPECT ENGINE
+// Architecture modulaire : ProspectProvider → ProspectEngine → UI
+// Le fournisseur de données est interchangeable (mock → Apollo → multi-source)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * ProspectProvider — Couche d'abstraction des sources de données
+ * Remplacer uniquement cette classe pour intégrer Apollo ou tout autre fournisseur.
+ * L'interface (search) reste identique quelle que soit la source.
+ */
+const ProspectProvider = {
+
+  // Source active : 'mock' | 'apollo' | 'hubspot' | ...
+  source: 'mock',
+
+  /**
+   * Recherche des prospects selon des critères.
+   * @param {Object} criteria - { secteur, zone, effectifMin, effectifMax, limit }
+   * @returns {Promise<Array>} - Liste de prospects normalisés
+   */
+  async search(criteria){
+    switch(this.source){
+      case 'mock':   return this._searchMock(criteria);
+      case 'apollo': return this._searchApollo(criteria);
+      default:       return this._searchMock(criteria);
+    }
+  },
+
+  // ─── MOCK — Données simulées pour la V1 ──────────────────────────────────
+  _searchMock(criteria){
+    const { secteur='', zone='', effectifMin=0, effectifMax=99999, limit=20 } = criteria;
+    const MOCK_DATA = [
+      {name:'Renault Group',city:'Boulogne-Billancourt',region:'Île-de-France',size:110000,industry:'Automobile',website:'renaultgroup.com'},
+      {name:'Société Générale',city:'Paris',region:'Île-de-France',size:140000,industry:'Banque & Assurance',website:'societegenerale.com'},
+      {name:'Bouygues Construction',city:'Saint-Quentin-en-Yvelines',region:'Île-de-France',size:55000,industry:'BTP',website:'bouygues-construction.com'},
+      {name:'Sanofi',city:'Paris',region:'Île-de-France',size:91000,industry:'Santé & Pharma',website:'sanofi.com'},
+      {name:'Veolia',city:'Aubervilliers',region:'Île-de-France',size:213000,industry:'Services aux entreprises',website:'veolia.com'},
+      {name:'Capgemini France',city:'Paris',region:'Île-de-France',size:17000,industry:'Conseil & Tech',website:'capgemini.com'},
+      {name:'EDF',city:'Paris',region:'Île-de-France',size:165000,industry:'Énergie',website:'edf.fr'},
+      {name:'Axa France',city:'Nanterre',region:'Île-de-France',size:72000,industry:'Banque & Assurance',website:'axa.fr'},
+      {name:'La Poste',city:'Paris',region:'Île-de-France',size:240000,industry:'Services publics',website:'laposte.fr'},
+      {name:'Crédit Agricole',city:'Montrouge',region:'Île-de-France',size:150000,industry:'Banque & Assurance',website:'credit-agricole.fr'},
+      {name:'Michelin',city:'Clermont-Ferrand',region:'Auvergne-Rhône-Alpes',size:127000,industry:'Industrie',website:'michelin.com'},
+      {name:'Airbus',city:'Toulouse',region:'Occitanie',size:135000,industry:'Aéronautique',website:'airbus.com'},
+      {name:'SNCF',city:'Saint-Denis',region:'Île-de-France',size:250000,industry:'Transport',website:'sncf.com'},
+      {name:'Orange Business',city:'Paris',region:'Île-de-France',size:95000,industry:'Télécommunications',website:'orange-business.com'},
+      {name:'Thales',city:'Paris',region:'Île-de-France',size:81000,industry:'Défense & Tech',website:'thalesgroup.com'},
+      {name:'Engie',city:'Paris',region:'Île-de-France',size:170000,industry:'Énergie',website:'engie.com'},
+      {name:'Carrefour',city:'Massy',region:'Île-de-France',size:320000,industry:'Distribution',website:'carrefour.com'},
+      {name:'Danone',city:'Paris',region:'Île-de-France',size:100000,industry:'Agroalimentaire',website:'danone.com'},
+      {name:'Schneider Electric',city:'Rueil-Malmaison',region:'Île-de-France',size:128000,industry:'Industrie',website:'se.com'},
+      {name:'Safran',city:'Paris',region:'Île-de-France',size:79000,industry:'Aéronautique',website:'safran-group.com'},
+      {name:'Natixis',city:'Paris',region:'Île-de-France',size:16000,industry:'Banque & Assurance',website:'natixis.com'},
+      {name:'Decathlon',city:'Villeneuve-d\'Ascq',region:'Hauts-de-France',size:87000,industry:'Distribution',website:'decathlon.com'},
+      {name:'Dassault Systèmes',city:'Vélizy-Villacoublay',region:'Île-de-France',size:22000,industry:'Conseil & Tech',website:'3ds.com'},
+      {name:'Bureau Veritas',city:'Neuilly-sur-Seine',region:'Île-de-France',size:80000,industry:'Services aux entreprises',website:'bureauveritas.com'},
+      {name:'Sodexo',city:'Issy-les-Moulineaux',region:'Île-de-France',size:412000,industry:'Services aux entreprises',website:'sodexo.com'},
+      {name:'Malakoff Humanis',city:'Paris',region:'Île-de-France',size:10000,industry:'Banque & Assurance',website:'malakoffhumanis.com'},
+      {name:'MAIF',city:'Niort',region:'Nouvelle-Aquitaine',size:9500,industry:'Banque & Assurance',website:'maif.fr'},
+      {name:'Transdev',city:'Issy-les-Moulineaux',region:'Île-de-France',size:83000,industry:'Transport',website:'transdev.com'},
+      {name:'Keolis',city:'Paris',region:'Île-de-France',size:68000,industry:'Transport',website:'keolis.com'},
+      {name:'Vinci Energies',city:'Rueil-Malmaison',region:'Île-de-France',size:85000,industry:'BTP',website:'vinci-energies.com'},
+    ];
+
+    const nq = (s='') => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+
+    return MOCK_DATA.filter(p => {
+      const sMatch = !secteur || nq(p.industry).includes(nq(secteur));
+      const zMatch = !zone || nq(p.region).includes(nq(zone)) || nq(p.city).includes(nq(zone));
+      const sizeMatch = p.size >= effectifMin && p.size <= effectifMax;
+      return sMatch && zMatch && sizeMatch;
+    }).slice(0, limit);
+  },
+
+  // ─── APOLLO — Stub prêt pour intégration V2 ──────────────────────────────
+  async _searchApollo(criteria){
+    // TODO Sprint 7 : implémenter l'appel API Apollo
+    // POST https://api.apollo.io/v1/mixed_companies/search
+    // Headers: { 'X-Api-Key': APOLLO_API_KEY }
+    // Body: { organization_industry_tag_ids, organization_locations, num_employees_ranges, per_page }
+    console.warn('Apollo provider non encore configuré — fallback mock');
+    return this._searchMock(criteria);
+  }
+};
+
+/**
+ * ProspectScorer — Calcule le score de pertinence d'un prospect
+ * Évoluera vers un algorithme PrévenirCare complet (Sprint 8)
+ */
+const ProspectScorer = {
+  /**
+   * @param {Object} prospect - Données du prospect
+   * @param {Object} criteria - Critères de recherche
+   * @returns {number} Score entre 0 et 100
+   */
+  score(prospect, criteria){
+    let score = 0;
+    const nq = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+
+    // Compatibilité secteur (40 pts)
+    if(criteria.secteur && nq(prospect.industry).includes(nq(criteria.secteur))) score += 40;
+
+    // Compatibilité zone (30 pts)
+    if(criteria.zone){
+      if(nq(prospect.region).includes(nq(criteria.zone))) score += 30;
+      else if(nq(prospect.city).includes(nq(criteria.zone))) score += 20;
+    } else { score += 30; }
+
+    // Compatibilité effectif (30 pts)
+    const inRange = prospect.size >= (criteria.effectifMin||0) && prospect.size <= (criteria.effectifMax||99999);
+    if(inRange) score += 30;
+
+    return Math.min(100, score);
+  },
+
+  label(score){
+    if(score >= 80) return {cls:'pe-score-high', txt:`${score}%`};
+    if(score >= 50) return {cls:'pe-score-mid',  txt:`${score}%`};
+    return               {cls:'pe-score-low',  txt:`${score}%`};
+  }
+};
+
+/**
+ * ProspectImporter — Couche d'import vers Airtable
+ * L'interface ne dialogue jamais directement avec Airtable — tout passe ici.
+ */
+const ProspectImporter = {
+  imported: new Set(), // Track des imports de la session
+
+  /**
+   * Importe un prospect dans le CRM
+   * @param {Object} prospect - Données normalisées du prospect
+   * @param {number} kestioLevel - Niveau KESTIO initial (toujours N1)
+   * @returns {Promise<string>} - ID Airtable créé
+   */
+  async importOne(prospect, kestioLevel=1){
+    // Vérification doublon
+    const exists = companies.find(c =>
+      (c['Nom de l\'entreprise']||'').toLowerCase() === prospect.name.toLowerCase()
+    );
+    if(exists){
+      showToast(`"${prospect.name}" existe déjà dans le CRM`);
+      return exists._recordId;
+    }
+
+    // Création entreprise dans Airtable
+    const fields = {
+      'Nom de l\'entreprise': prospect.name,
+    };
+    if(prospect.city)     fields['Ville'] = prospect.city;
+    if(prospect.industry) fields['Secteur'] = prospect.industry;
+    if(prospect.website)  fields['site internet'] = `https://${prospect.website}`;
+    if(prospect.size)     fields['Effectif'] = String(prospect.size);
+
+    const result = await CRM.createCompany(fields);
+    this.imported.add(prospect.name);
+
+    // TODO Sprint 8 : créer automatiquement une opportunité liée
+    // TODO Sprint 8 : assigner niveau KESTIO N1 sur les contacts créés
+
+    return result.id;
+  },
+
+  /**
+   * Importe une liste de prospects sélectionnés
+   */
+  async importSelected(prospects){
+    let count = 0;
+    for(const p of prospects){
+      await this.importOne(p);
+      count++;
+    }
+    showToast(`${count} entreprise${count>1?'s':''} importée${count>1?'s':''} dans le CRM ✓`);
+    await boot();
+  }
+};
+
+/**
+ * ProspectEngine — Contrôleur principal du Prospect Engine
+ * Orchestre Provider → Scorer → Importer → UI
+ */
+const PE = {
+  results: [],
+  lastCriteria: {},
+  searching: false,
+
+  // Rend l'écran principal du Prospect Engine
+  renderScreen(){
+    document.getElementById('content').innerHTML = `
+      <div class="pe-screen">
+        <div class="pe-form">
+          <div class="pe-form-title">🎯 Prospect Engine</div>
+          <div class="pe-form-sub">Trouvez rapidement des entreprises cibles correspondant à vos critères PrévenirCare.</div>
+          <div class="pe-grid">
+            <div class="pe-field">
+              <div class="pe-label">Secteur</div>
+              <input class="pe-input" id="pe-secteur" placeholder="Banque, BTP, Transport…" list="pe-secteur-list">
+              <datalist id="pe-secteur-list">
+                <option>Banque & Assurance</option><option>BTP</option><option>Transport</option>
+                <option>Industrie</option><option>Santé & Pharma</option><option>Énergie</option>
+                <option>Services aux entreprises</option><option>Conseil & Tech</option>
+                <option>Distribution</option><option>Télécommunications</option>
+              </datalist>
+            </div>
+            <div class="pe-field">
+              <div class="pe-label">Zone géographique</div>
+              <input class="pe-input" id="pe-zone" placeholder="Île-de-France, Paris, Lyon…">
+            </div>
+            <div class="pe-field">
+              <div class="pe-label">Effectif minimum</div>
+              <input class="pe-input" id="pe-min" type="number" placeholder="500" min="0">
+            </div>
+            <div class="pe-field">
+              <div class="pe-label">Effectif maximum</div>
+              <input class="pe-input" id="pe-max" type="number" placeholder="50000" min="0">
+            </div>
+            <div class="pe-field">
+              <div class="pe-label">Nombre max de résultats</div>
+              <input class="pe-input" id="pe-limit" type="number" placeholder="20" min="1" max="100" value="20">
+            </div>
+          </div>
+          <button class="pe-btn" id="pe-search-btn" onclick="PE.search()">
+            <i class="ti ti-search"></i> Rechercher
+          </button>
+          <span style="font-size:11px;color:var(--tm);margin-left:12px;" id="pe-provider-label">
+            Source : Données simulées (V1)
+          </span>
+        </div>
+        <div id="pe-results-container"></div>
+      </div>`;
+  },
+
+  // Lance la recherche
+  async search(){
+    if(this.searching) return;
+    this.searching = true;
+
+    const criteria = {
+      secteur:    document.getElementById('pe-secteur')?.value.trim() || '',
+      zone:       document.getElementById('pe-zone')?.value.trim() || '',
+      effectifMin: parseInt(document.getElementById('pe-min')?.value) || 0,
+      effectifMax: parseInt(document.getElementById('pe-max')?.value) || 99999,
+      limit:      parseInt(document.getElementById('pe-limit')?.value) || 20,
+    };
+    this.lastCriteria = criteria;
+
+    const btn = document.getElementById('pe-search-btn');
+    if(btn){ btn.disabled=true; btn.innerHTML='<i class="ti ti-loader"></i> Recherche…'; }
+
+    const container = document.getElementById('pe-results-container');
+    container.innerHTML = `<div class="pe-results"><div class="pe-loading"><div class="spin"></div><div class="spin-txt">Recherche en cours…</div></div></div>`;
+
+    try {
+      const raw = await ProspectProvider.search(criteria);
+      this.results = raw.map(p => ({
+        ...p,
+        _score: ProspectScorer.score(p, criteria),
+        _selected: false,
+        _imported: ProspectImporter.imported.has(p.name),
+      })).sort((a,b) => b._score - a._score);
+
+      this.renderResults();
+    } catch(e){
+      container.innerHTML = `<div class="pe-results"><div class="pe-empty">Erreur : ${e.message}</div></div>`;
+    }
+
+    this.searching = false;
+    if(btn){ btn.disabled=false; btn.innerHTML='<i class="ti ti-search"></i> Rechercher'; }
+  },
+
+  // Affiche les résultats
+  renderResults(){
+    const container = document.getElementById('pe-results-container');
+    if(!this.results.length){
+      container.innerHTML = `<div class="pe-results"><div class="pe-empty"><i class="ti ti-mood-empty" style="font-size:28px;display:block;margin-bottom:8px;"></i>Aucun résultat pour ces critères.</div></div>`;
+      return;
+    }
+
+    const rows = this.results.map((p,i) => {
+      const score = ProspectScorer.label(p._score);
+      const alreadyInCRM = companies.find(c=>(c['Nom de l\'entreprise']||'').toLowerCase()===p.name.toLowerCase());
+      return `<tr>
+        <td><input type="checkbox" class="pe-check" id="pe-chk-${i}" ${p._selected?'checked':''} onchange="PE.toggleSelect(${i})"></td>
+        <td><strong>${p.name}</strong>${alreadyInCRM?` <span style="font-size:10px;color:var(--pc-teal-dark);font-family:'Exo 2',sans-serif;font-weight:700;">✓ CRM</span>`:''}</td>
+        <td>${p.city||'–'}</td>
+        <td>${p.size?p.size.toLocaleString('fr-FR'):'–'}</td>
+        <td>${p.industry||'–'}</td>
+        <td><span class="pe-score ${score.cls}">${score.txt}</span></td>
+        <td>
+          <button class="pe-import-btn ${p._imported||alreadyInCRM?'done':''}"
+            onclick="PE.importOne(${i})"
+            ${p._imported||alreadyInCRM?'disabled':''}>
+            ${p._imported||alreadyInCRM?'✓ Importé':'Importer'}
+          </button>
+        </td>
+      </tr>`;
+    }).join('');
+
+    const selectedCount = this.results.filter(p=>p._selected).length;
+
+    container.innerHTML = `
+      <div class="pe-results">
+        <div class="pe-results-hdr">
+          <div class="pe-results-title">${this.results.length} résultat${this.results.length>1?'s':''} · ${selectedCount} sélectionné${selectedCount>1?'s':''}</div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <button class="btn btn-sm" onclick="PE.selectAll()">Tout sélectionner</button>
+            <button class="pe-import-all" onclick="PE.importSelected()" ${selectedCount===0?'disabled':''}>
+              <i class="ti ti-download"></i> Importer la sélection (${selectedCount})
+            </button>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="pe-table">
+            <thead><tr>
+              <th></th>
+              <th>Entreprise</th>
+              <th>Ville</th>
+              <th>Effectif</th>
+              <th>Secteur</th>
+              <th>Score</th>
+              <th>Action</th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      </div>`;
+  },
+
+  toggleSelect(i){
+    this.results[i]._selected = !this.results[i]._selected;
+    this.renderResults();
+  },
+
+  selectAll(){
+    const allSelected = this.results.every(p=>p._selected);
+    this.results.forEach(p=>{ p._selected = !allSelected; });
+    this.renderResults();
+  },
+
+  async importOne(i){
+    const p = this.results[i];
+    if(!p) return;
+    await ProspectImporter.importOne(p);
+    this.results[i]._imported = true;
+    this.renderResults();
+  },
+
+  async importSelected(){
+    const selected = this.results.filter(p=>p._selected && !p._imported);
+    if(!selected.length){ showToast('Aucune entreprise sélectionnée'); return; }
+    await ProspectImporter.importSelected(selected);
+    selected.forEach(p=>{ p._imported=true; p._selected=false; });
+    this.renderResults();
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
 
 // Validation de l'email généré par l'IA avant utilisation
 function validateAndUseEmail(){
