@@ -732,11 +732,91 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
 
 <script>
 const TOKEN='patBp1ANs8hOCg17w.631999d14abbce548f125e6796e50e70ca374e74cbba915e6a5e847478009618';
-const BASE='appRusV4qJw9fxGKF';
-const TC='tblSgCiw3GO0oa9dp';
-const TE='tblPz7bhmL1eNogQS';
-const TI='tblxqjgr9IRrLevZw';
-const TO='tblSWdbKWnujbAi0b';
+// ─── SCHÉMA CRM CENTRALISÉ ────────────────────────────────────────────────────
+// Source : crmSchema.js — ne jamais écrire de noms de champs en dur ailleurs
+// Toutes les constantes de tables et champs sont définies ici.
+
+const TABLES = {
+  BASE:          'appRusV4qJw9fxGKF',
+  ENTREPRISES:   'tblPz7bhmL1eNogQS',
+  CONTACTS:      'tblSgCiw3GO0oa9dp',
+  OPPORTUNITES:  'tblSWdbKWnujbAi0b',
+  INTERACTIONS:  'tblxqjgr9IRrLevZw',
+};
+
+// Alias courts pour compatibilité avec le code existant
+const BASE = TABLES.BASE;
+const TC   = TABLES.CONTACTS;
+const TE   = TABLES.ENTREPRISES;
+const TI   = TABLES.INTERACTIONS;
+const TO   = TABLES.OPPORTUNITES;
+
+// Champs Entreprises
+const COMPANY = {
+  NAME:           "Nom de l'entreprise",
+  ADDRESS:        "Adresse",
+  SECTOR:         "Secteur",
+  SPECIFIC_NEEDS: "Besoins spécifiques",
+  WEBSITE:        "Site internet",
+  SIZE:           "Taille",
+  STATUS:         "Statut",
+  KESTIO:         "KESTIO Entreprise",
+  CONTACTS_LINK:  "Contacts",
+  OPPS_LINK:      "Opportunités",
+};
+
+// Champs Contacts
+const CONTACT = {
+  NAME:             "Nom du contact",
+  ROLE:             "Rôle / Fonction",
+  EMAIL:            "Email",
+  PHONE:            "Téléphone",
+  LINKEDIN:         "LinkedIn",
+  NOTES:            "Notes sur le contact",
+  NEXT_ACTION:      "Prochaine action",
+  NEXT_ACTION_DATE: "Date prochaine action",
+  LAST_EMAIL_DATE:  "Date dernier email",
+  STATUS_REPLY:     "Statut réponse",
+  KESTIO:           "KESTIO Contact",
+  COMPANY_LINK:     "Entreprise liée",
+};
+
+// Champs Interactions
+const INTERACTION = {
+  TYPE:  "Type d'interaction",
+  NOTES: "Notes",
+  DATE:  "Date d'interaction",
+  CONTACT_LINK: "Contact lié",
+};
+
+// Champs Opportunités
+const OPP = {
+  NAME:         "Nom de l'opportunité",
+  VALUE:        "Valeur (EUR)",
+  STAGE:        "Stade",
+  COMPANY_LINK: "Entreprise liée",
+  NEXT_ACTION:  "Prochaine action",
+};
+
+// Valeurs singleSelect critiques
+const SELECT_VALUES = {
+  STATUS_REPLY: {
+    NOT_SENT: "Pas encore envoyé",
+    SENT:     "Envoyé \u2013 en attente",
+    REPLIED:  "Réponse reçue",
+    MEETING:  "RDV obtenu",
+    FOLLOWUP: "Relance à faire",
+    DROPPED:  "Sans suite",
+  },
+  KESTIO: {
+    N1: "N1 \u2014 Inconscience",
+    N2: "N2 \u2014 Prise de conscience",
+    N3: "N3 \u2014 Appropriation",
+    N4: "N4 \u2014 Recherche de solution",
+  },
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 const NOW=new Date();
 document.getElementById('dchip').textContent=NOW.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
 
@@ -1442,15 +1522,17 @@ function openEditCompany(compId){
   if(!c)return;
   document.getElementById('ec-id').value=compId;
   document.getElementById('ec-nom').value=c['Nom de l\'entreprise']||'';
-  document.getElementById('ec-secteur').value=typeof c['Secteur']==='object'?(c['Secteur']?.name||''):(c['Secteur']||'');
-  document.getElementById('ec-priorite').value=c['Priorité']||'';
-  document.getElementById('ec-responsable').value=c['Responsable']||'';
+  const sec=c['Secteur'];
+  document.getElementById('ec-secteur').value=typeof sec==='object'?(sec?.name||''):(sec||'');
+  document.getElementById('ec-priorite').value=''; // non présent dans Airtable
+  document.getElementById('ec-responsable').value=''; // non présent dans Airtable
   const ke=c['KESTIO Entreprise'];
-  document.getElementById('ec-kestio').value=typeof ke==='object'?(ke?.name||''):(ke||''); // sera mis à jour via contacts
-  document.getElementById('ec-statut').value=c['Statut']||'';
-  document.getElementById('ec-relance').value=c['Date de relance']||'';
-  document.getElementById('ec-action').value=c['Prochaine action']||'';
-  document.getElementById('ec-notes').value=c['Notes']||'';
+  document.getElementById('ec-kestio').value=typeof ke==='object'?(ke?.name||''):(ke||'');
+  const st=c['Statut'];
+  document.getElementById('ec-statut').value=typeof st==='object'?(st?.name||''):(st||'');
+  document.getElementById('ec-relance').value=''; // non présent dans Airtable
+  document.getElementById('ec-action').value=''; // non présent dans Airtable
+  document.getElementById('ec-notes').value=c['Besoins spécifiques']||'';
   document.getElementById('modal-edit-comp').classList.add('show');
 }
 
@@ -1462,20 +1544,17 @@ async function saveEditComp(){
   if(nom)f['Nom de l\'entreprise']=nom;
   const sec=document.getElementById('ec-secteur').value.trim();
   if(sec)f['Secteur']=sec;
-  const ke=document.getElementById('ec-kestio').value;
-  if(ke) f['KESTIO Entreprise']=ke;
-  const pri=document.getElementById('ec-priorite').value;
-  if(pri)f['Priorité']=pri;
-  const resp=document.getElementById('ec-responsable').value.trim();
-  if(resp)f['Responsable']=resp;
+  // Statut — champ singleSelect existant
   const st=document.getElementById('ec-statut').value;
   if(st)f['Statut']=st;
-  const rel=document.getElementById('ec-relance').value;
-  if(rel)f['Date de relance']=rel;
-  const act=document.getElementById('ec-action').value.trim();
-  if(act)f['Prochaine action']=act;
+  // KESTIO Entreprise — champ singleSelect créé au Sprint 6.5
+  const ke=document.getElementById('ec-kestio').value;
+  if(ke)f['KESTIO Entreprise']=ke;
+  // Besoins spécifiques — correspond au champ Notes dans l'interface
   const notes=document.getElementById('ec-notes').value.trim();
-  if(notes)f['Notes']=notes;
+  if(notes)f['Besoins spécifiques']=notes;
+  // Champs non présents dans Airtable (Priorité, Responsable, Date de relance,
+  // Prochaine action) — ignorés jusqu'à leur création dans Airtable
   await at('PATCH',TE,{fields:f},id);
   cm('modal-edit-comp');
   showToast('Entreprise mise à jour ✓');
@@ -1538,15 +1617,17 @@ async function saveRelance(){
   const id=document.getElementById('rel-id').value;
   if(!id)return;
   const f={};
-  const d=document.getElementById('rel-date').value;
-  if(d)f['Date de relance']=d;
+  // Ces champs n'existent pas dans Airtable — on stocke dans Besoins spécifiques
   const a=document.getElementById('rel-action').value.trim();
-  if(a)f['Prochaine action']=a;
   const n=document.getElementById('rel-notes').value.trim();
-  if(n)f['Notes']=n;
+  const d=document.getElementById('rel-date').value;
+  if(a||n||d){
+    const txt=[d?`Relance prévue le ${d}`:'',a?`Action : ${a}`:'',n?`Note : ${n}`:''].filter(Boolean).join(' — ');
+    f['Besoins spécifiques']=txt;
+  }
   await at('PATCH',TE,{fields:f},id);
   cm('modal-relance');
-  showToast('Relance programmée ✓');
+  showToast('Relance enregistrée dans les notes ✓');
   await bootAndFocus(id);
 }
 
@@ -1643,7 +1724,7 @@ async function saveNE(){
 
   const f={'Nom de l\'entreprise':nom};
   if(document.getElementById('ne-secteur').value)f['Secteur']=document.getElementById('ne-secteur').value;
-  if(document.getElementById('ne-site').value)f['site internet']=document.getElementById('ne-site').value;
+  if(document.getElementById('ne-site').value)f['Site internet']=document.getElementById('ne-site').value;
   if(document.getElementById('ne-li').value)f['LinkedIn']=document.getElementById('ne-li').value;
   if(document.getElementById('ne-notes').value)f['Notes']=document.getElementById('ne-notes').value;
   await CRM.createCompany(f);
@@ -2432,10 +2513,9 @@ const LeadAcquisitionEngine = {
 
   _toAirtableCompany(c){
     const f = {'Nom de l\'entreprise': c.name};
-    if(c.website)  f['site internet'] = c.website.startsWith('http') ? c.website : `https://${c.website}`;
-    if(c.linkedin) f['LinkedIn'] = c.linkedin;
-    if(c.industry) f['Secteur']  = c.industry;
-    if(c.size)     f['Effectif'] = c.size;
+    if(c.website)  f['Site internet'] = c.website.startsWith('http') ? c.website : `https://${c.website}`;
+    if(c.industry) f['Secteur'] = c.industry;
+    // Champs Effectif, Ville non présents dans Airtable — ignorés
     return f;
   },
 
