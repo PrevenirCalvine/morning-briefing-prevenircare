@@ -2043,10 +2043,10 @@ async function prepareNextAction(companyId, companyName){
           </div>
           <div class="ew" id="ai-email-text" style="white-space:pre-wrap;font-size:12px;line-height:1.8;">${aiResponse.email}</div>
           <div style="margin-top:10px;display:flex;gap:8px;">
-            <button class="btn btn-teal" onclick="validateAndUseEmail()" style="flex:1;justify-content:center;">
-              <i class="ti ti-check"></i> Valider et utiliser
+            <button class="btn btn-teal" onclick="copilotCopyEmail()" style="flex:1;justify-content:center;">
+              <i class="ti ti-copy"></i> Copier l'email
             </button>
-            <button class="btn" onclick="showToast('Email ignoré')">
+            <button class="btn" onclick="copilotIgnoreEmail()" title="Effacer le brouillon">
               <i class="ti ti-x"></i> Ignorer
             </button>
           </div>
@@ -2066,7 +2066,7 @@ async function prepareNextAction(companyId, companyName){
       <div style="margin-top:16px;padding-top:14px;border-top:0.5px solid var(--bd);">
         <div class="copilot-sec-lbl" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
           Contexte JSON
-          <button class="btn btn-sm" onclick="navigator.clipboard.writeText(JSON.stringify(window.salesContext,null,2));showToast('Contexte copié ✓')">
+          <button class="btn btn-sm" onclick="copilotCopyJSON()">
             <i class="ti ti-copy"></i> Copier
           </button>
         </div>
@@ -3316,22 +3316,43 @@ window.sw=function(t,el){
 // ═══════════════════════════════════════════════════════════════════════════
 
 // Validation de l'email généré par l'IA avant utilisation
-function validateAndUseEmail(){
-  const emailEl = document.getElementById('ai-email-text');
-  if(!emailEl)return;
-  const emailText = emailEl.innerText;
-  navigator.clipboard.writeText(emailText);
-  showToast('Email copié — prêt à coller dans Gmail ✓');
-  console.log('✅ Email validé par Calvine TONGA :', emailText);
-  // Futur Sprint 5 : ouvrir Gmail ou enregistrer l'interaction
+// ─── SALES COPILOT — ACTIONS ─────────────────────────────────────────────────
+
+function copilotCopyEmail(){
+  console.log('SalesCopilot > Copy clicked');
+  const emailEl=document.getElementById('ai-email-text');
+  if(!emailEl){console.error('SalesCopilot > #ai-email-text introuvable');return;}
+  const txt=emailEl.innerText.trim();
+  if(!txt){showToast('⚠️ Aucun email à copier');return;}
+  navigator.clipboard.writeText(txt)
+    .then(()=>{showToast('Email copié — prêt à coller dans Gmail ✓');console.log('SalesCopilot > Email copié');})
+    .catch(e=>{showToast('⚠️ Copie impossible — copiez manuellement');console.error('SalesCopilot > Clipboard error:',e);});
 }
 
-// Stub generateEmail — sera remplacé au Sprint 5 si envoi direct depuis MB
-function generateEmail(context){
-  showToast('Génération via Make — cliquez Analyser');
-  console.log('generateEmail() appelé avec context:', context);
-  return 'Fonction en cours de développement';
+function copilotIgnoreEmail(){
+  console.log('SalesCopilot > Ignore clicked');
+  const emailEl=document.getElementById('ai-email-text');
+  if(emailEl){
+    emailEl.innerText='';
+    const section=emailEl.closest('.copilot-section');
+    if(section)section.style.display='none';
+  }
+  showToast('Brouillon ignoré — l\'analyse est conservée');
 }
+
+function copilotCopyJSON(){
+  console.log('SalesCopilot > CopyJSON clicked');
+  if(!window.salesContext){showToast('⚠️ Aucun contexte disponible');return;}
+  navigator.clipboard.writeText(JSON.stringify(window.salesContext,null,2))
+    .then(()=>{showToast('Contexte JSON copié ✓');console.log('SalesCopilot > JSON copié');})
+    .catch(e=>{showToast('⚠️ Copie impossible');console.error('SalesCopilot > Clipboard JSON error:',e);});
+}
+
+// Alias rétrocompatibilité
+function validateAndUseEmail(){copilotCopyEmail();}
+function generateEmail(context){showToast('Génération via Make — cliquez Analyser');console.log('generateEmail() appelé',context);return 'Fonction en cours de développement';}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 // ─────────────────────────────────────────────────────────────────────────────
 
