@@ -430,12 +430,13 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
         <div class="edit-label">Responsable</div><input class="edit-input" id="ec-responsable" placeholder="Calvine TONGA">
       </div>
       <div class="edit-field">
-        <div class="edit-label">Niveau Kestio</div>
+        <div class="edit-label">KESTIO Entreprise</div>
         <select class="edit-select" id="ec-kestio">
-          <option value="1">N1 — Inconscience</option>
-          <option value="2">N2 — Prise de conscience</option>
-          <option value="3">N3 — Appropriation</option>
-          <option value="4">N4 — Recherche de solution</option>
+          <option value="">– Non défini</option>
+          <option value="N1 — Inconscience">N1 — Inconscience</option>
+          <option value="N2 — Prise de conscience">N2 — Prise de conscience</option>
+          <option value="N3 — Appropriation">N3 — Appropriation</option>
+          <option value="N4 — Recherche de solution">N4 — Recherche de solution</option>
         </select>
       </div>
       <div class="edit-field">
@@ -484,9 +485,13 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
         <div class="edit-label">LinkedIn</div><input class="edit-input" id="eco-li">
       </div>
       <div class="edit-field">
-        <div class="edit-label">Niveau Kestio</div>
+        <div class="edit-label">KESTIO Contact</div>
         <select class="edit-select" id="eco-kestio">
-          <option value="1">N1</option><option value="2">N2</option><option value="3">N3</option><option value="4">N4</option>
+          <option value="">– Non défini</option>
+          <option value="N1 — Inconscience">N1 — Inconscience</option>
+          <option value="N2 — Prise de conscience">N2 — Prise de conscience</option>
+          <option value="N3 — Appropriation">N3 — Appropriation</option>
+          <option value="N4 — Recherche de solution">N4 — Recherche de solution</option>
         </select>
       </div>
       <div class="edit-field" style="grid-column:1/-1">
@@ -883,31 +888,38 @@ function sdot(s){
 function mb(n){const m=MC[n]||MC[1];return`<span class="mat ${m.cls}">${m.label}</span>`;}
 function getCC(comp){const id=comp._recordId;return contacts.filter(c=>{const l=c['Entreprise liée'];return Array.isArray(l)&&l.includes(id);});}
 /**
- * cMat — Calcule le niveau KESTIO d'une entreprise depuis ses contacts.
- * Source de vérité : Statut réponse (synchronisé par Make) > Niveau maturité (champ legacy instable).
- * Règle : on prend le niveau MAX parmi tous les contacts de l'entreprise.
+ * cMat — Niveau KESTIO d'une entreprise.
+ * Source : champ "KESTIO Entreprise" (singleSelect Airtable).
+ * Aucun calcul automatique — valeur 100% pilotée par l'utilisateur.
+ * Retourne 1 si non renseigné.
  */
-function cMat(cc){
-  let m=1;
-  cc.forEach(c=>{
-    // Priorité 1 : déduire depuis Statut réponse (fiable, synchronisé Make)
-    const st=c['Statut réponse']||'';
-    let lvFromStatut=1;
-    if(st==='RDV obtenu'||st==='Réponse reçue') lvFromStatut=3;
-    else if(st==='Envoyé – en attente') lvFromStatut=2;
-    else if(st==='Relance à faire') lvFromStatut=2;
-    else if(st==='Sans suite') lvFromStatut=1;
+function cMat(cc, comp){
+  const raw = comp?.['KESTIO Entreprise'];
+  const val = typeof raw === 'object' ? (raw?.name||'') : (raw||'');
+  if(val.startsWith('N4')) return 4;
+  if(val.startsWith('N3')) return 3;
+  if(val.startsWith('N2')) return 2;
+  return 1;
+}
 
-    // Priorité 2 : champ Niveau maturité si présent ET supérieur à la déduction
-    const lvFromField=parseInt(c['Niveau maturité']||0);
-    const lv=Math.max(lvFromStatut, lvFromField||0, 1);
-    if(lv>m) m=lv;
-  });
-  return Math.min(m,4);
+/**
+ * cMatContact — Niveau KESTIO d'un contact individuel.
+ * Source : champ "KESTIO Contact" (singleSelect Airtable).
+ * Aucune déduction automatique — valeur 100% pilotée par l'utilisateur.
+ * Retourne null si non renseigné (affiché comme "–").
+ */
+function cMatContact(c){
+  const raw = c?.['KESTIO Contact'];
+  const val = typeof raw === 'object' ? (raw?.name||'') : (raw||'');
+  if(val.startsWith('N4')) return 4;
+  if(val.startsWith('N3')) return 3;
+  if(val.startsWith('N2')) return 2;
+  if(val.startsWith('N1')) return 1;
+  return null;
 }
 function needsAct(c){const nd=c['Date prochaine action'];return nd&&new Date(nd)<=NOW;}
 function compNA(cc){return cc.some(c=>needsAct(c));}
-function urg(cc){return(compNA(cc)?10:0)+cMat(cc)*2;}
+function urg(cc,comp){return(compNA(cc)?10:0)+cMat(cc,comp)*2;}
 
 function draft(c,cn){
   const n=parseInt(c['Niveau maturité']||1);
@@ -933,7 +945,7 @@ function cardHTML(comp,idx,cc){
   const name=comp['Nom de l\'entreprise']||'Entreprise';
   const secteur=typeof comp['Secteur']==='object'?(comp['Secteur']?.name||''):(comp['Secteur']||'');
   const taille=typeof comp['Taille']==='object'?(comp['Taille']?.name||''):(comp['Taille']||'');
-  const mat=cMat(cc);const m=MC[mat];
+  const mat=cMat(cc,comp);const m=MC[mat];
   const hasAct=compNA(cc);
   const pri=cc.find(c=>needsAct(c))||cc[0];
   const prog=[1,2,3,4].map(i=>`<div class="mat-step ${i<mat?'done':i===mat?'active':''}"></div>`).join('');
@@ -969,7 +981,11 @@ function cardHTML(comp,idx,cc){
         <div style="flex:1;min-width:0;padding-right:30px;">
           <div class="cnm">${c['Nom du contact']||'–'}</div>
           <div class="crl">${c['Rôle / Fonction']||c['Rôle']||'–'}</div>
-          <div style="display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap;"><div class="sd ${sdot(st)}" title="${st||'Non contacté'}"></div>${st?`<span style="font-size:10px;color:var(--tm);">${st}</span>`:''}${al}</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap;">
+            ${cMatContact(c)!==null ? mb(cMatContact(c)) : '<span style="font-size:10px;color:var(--tm);font-family:\'Exo 2\',sans-serif;">KESTIO –</span>'}
+            <div class="sd ${sdot(st)}" title="${st||'Non contacté'}"></div>
+            ${st?`<span style="font-size:10px;color:var(--tm);">${st}</span>`:''}${al}
+          </div>
         </div>
       </div>
       <div class="contact-card-21-actions">
@@ -1031,15 +1047,15 @@ function render(){
   const el=document.getElementById('content');
   const cl=companies.map(c=>({comp:c,cc:getCC(c)})).filter(x=>x.cc.length>0);
   if(currentTab==='today'){
-    const list=cl.filter(x=>compNA(x.cc)||x.cc.some(c=>!c['Statut réponse']||c['Statut réponse']==='Pas encore envoyé')).sort((a,b)=>urg(b.cc)-urg(a.cc)).slice(0,12);
+    const list=cl.filter(x=>compNA(x.cc)||x.cc.some(c=>!c['Statut réponse']||c['Statut réponse']==='Pas encore envoyé')).sort((a,b)=>urg(b.cc,b.comp)-urg(a.cc,a.comp)).slice(0,12);
     el.innerHTML=list.length===0?`<div class="empty"><i class="ti ti-check" style="font-size:28px;display:block;margin:0 auto 10px;color:var(--pc-teal);"></i>Aucune action urgente.<br>Consultez "Toutes les entreprises" pour planifier.</div>`:`<div class="sec-lbl">Entreprises à activer aujourd'hui · ${list.length}</div><div class="cards">${list.map(({comp,cc},i)=>cardHTML(comp,i,cc)).join('')}</div>`;
   } else if(currentTab==='all'){
-    const list=cl.sort((a,b)=>urg(b.cc)-urg(a.cc));
+    const list=cl.sort((a,b)=>urg(b.cc,b.comp)-urg(a.cc,a.comp));
     el.innerHTML=`<div class="sec-lbl">Toutes les entreprises · ${list.length}</div><div class="cards">${list.map(({comp,cc},i)=>cardHTML(comp,i,cc)).join('')}</div>`;
   } else {
     let html='';
     [4,3,2,1].forEach(lv=>{
-      const items=cl.filter(x=>cMat(x.cc)===lv);
+      const items=cl.filter(x=>cMat(x.cc,x.comp)===lv);
       if(!items.length)return;
       const m=MC[lv];
       html+=`<div style="margin-bottom:1.5rem;"><div class="sec-lbl" style="display:flex;align-items:center;gap:8px;">${mb(lv)}<span>${items.length} entreprise${items.length>1?'s':''}</span></div><div style="font-size:11px;color:var(--tm);margin-bottom:8px;padding:8px 12px;background:#fff;border-radius:8px;border:0.5px solid var(--bd);">${m.act}</div><div class="cards">${items.map(({comp,cc},i)=>cardHTML(comp,lv*100+i,cc)).join('')}</div></div>`;
@@ -1110,7 +1126,7 @@ async function saveInter(){
     'Date d\'interaction': new Date().toISOString()
   }});
 
-  // Mettre à jour le contact
+  // Mettre à jour le contact — KESTIO Contact + statut
   const f={};
   const statut = CRM_CONFIG.getStatutFromType(canal);
   if(statut) f['Statut réponse']=statut;
@@ -1118,6 +1134,11 @@ async function saveInter(){
   if(notes) f['Notes sur le contact']=notes;
   if(na)    f['Prochaine action']=na;
   if(nd)    f['Date prochaine action']=nd;
+  // KESTIO Contact — uniquement si l'utilisateur a sélectionné un niveau
+  if(mat && mat>=1 && mat<=4){
+    const kestioVal=`N${mat} \u2014 ${['','Inconscience','Prise de conscience','Appropriation','Recherche de solution'][mat]}`;
+    f['KESTIO Contact']=kestioVal;
+  }
   if(Object.keys(f).length>0) await at('PATCH',TC,{fields:f},contactId);
 
   cm('modal-inter');
@@ -1424,7 +1445,8 @@ function openEditCompany(compId){
   document.getElementById('ec-secteur').value=typeof c['Secteur']==='object'?(c['Secteur']?.name||''):(c['Secteur']||'');
   document.getElementById('ec-priorite').value=c['Priorité']||'';
   document.getElementById('ec-responsable').value=c['Responsable']||'';
-  document.getElementById('ec-kestio').value='1'; // sera mis à jour via contacts
+  const ke=c['KESTIO Entreprise'];
+  document.getElementById('ec-kestio').value=typeof ke==='object'?(ke?.name||''):(ke||''); // sera mis à jour via contacts
   document.getElementById('ec-statut').value=c['Statut']||'';
   document.getElementById('ec-relance').value=c['Date de relance']||'';
   document.getElementById('ec-action').value=c['Prochaine action']||'';
@@ -1440,6 +1462,8 @@ async function saveEditComp(){
   if(nom)f['Nom de l\'entreprise']=nom;
   const sec=document.getElementById('ec-secteur').value.trim();
   if(sec)f['Secteur']=sec;
+  const ke=document.getElementById('ec-kestio').value;
+  if(ke) f['KESTIO Entreprise']=ke;
   const pri=document.getElementById('ec-priorite').value;
   if(pri)f['Priorité']=pri;
   const resp=document.getElementById('ec-responsable').value.trim();
@@ -1468,7 +1492,8 @@ function openEditCont(contId){
   document.getElementById('eco-email').value=c['Email']||'';
   document.getElementById('eco-tel').value=c['Téléphone']||'';
   document.getElementById('eco-li').value=c['LinkedIn']||'';
-  document.getElementById('eco-kestio').value=c['Niveau maturité']||'1';
+  const kc=c['KESTIO Contact'];
+  document.getElementById('eco-kestio').value=typeof kc==='object'?(kc?.name||''):(kc||'');
   document.getElementById('eco-notes').value=c['Notes sur le contact']||'';
   document.getElementById('modal-edit-cont').classList.add('show');
 }
@@ -1487,6 +1512,8 @@ async function saveEditCont(){
   if(tel)f['Téléphone']=tel;
   const li=document.getElementById('eco-li').value.trim();
   if(li)f['LinkedIn']=li;
+  const kc=document.getElementById('eco-kestio').value;
+  if(kc) f['KESTIO Contact']=kc;
   const notes=document.getElementById('eco-notes').value.trim();
   if(notes)f['Notes sur le contact']=notes;
   await CRM.updateContact(id,f);
@@ -1785,6 +1812,7 @@ async function prepareNextAction(companyId, companyName){
         const parts = fullName.split(' ');
         const firstname = parts[0] || '';
         const lastname = parts.slice(1).join(' ') || '';
+        const kc = c['KESTIO Contact'];
         return {
           firstname,
           lastname,
@@ -1792,6 +1820,7 @@ async function prepareNextAction(companyId, companyName){
           email: c['Email'] || '',
           linkedin: c['LinkedIn'] || '',
           phone: c['Téléphone'] || '',
+          kestioContact: typeof kc==='object'?(kc?.name||''):(kc||''),
         };
       }),
       opportunities: compOpps.map(o => ({
@@ -1809,6 +1838,7 @@ async function prepareNextAction(companyId, companyName){
       })),
       crm: {
         kestioLevel: `N${mat}`,
+        kestioEntreprise: (()=>{const ke=comp['KESTIO Entreprise'];return typeof ke==='object'?(ke?.name||''):(ke||'');})(),
         kestioObjectif: MC[mat]?.obj || '',
         kestioAction: MC[mat]?.act || '',
         status: comp['Statut'] || '',
