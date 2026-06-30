@@ -2114,7 +2114,7 @@ async function saveOpp(){
   f['Stade']=document.getElementById('opp-stade').value;
   const val=parseFloat(document.getElementById('opp-val').value);
   if(val)f['Valeur (EUR)']=val;
-  if(document.getElementById('opp-notes').value)f['Notes']=document.getElementById('opp-notes').value;
+  if(document.getElementById('opp-notes').value)f['Commentaires']=document.getElementById('opp-notes').value;
   await CRM.createOpportunity(f);
   cm('modal-opp');
   ['opp-nom','opp-val','opp-notes'].forEach(id=>document.getElementById(id).value='');
