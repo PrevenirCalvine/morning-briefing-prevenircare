@@ -260,6 +260,47 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
 .lie-badge{font-size:10px;padding:2px 7px;border-radius:99px;font-family:'Exo 2',sans-serif;font-weight:700;}
 .lie-new{background:var(--pc-teal-bg);color:var(--pc-teal-dark);}
 .lie-exists{background:var(--s1);color:var(--tm);}
+
+/* ─── SPRINT 7 — NOUVELLES VUES ──────────────────────────────────────────── */
+.view-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.view-title{font-family:'STIX Two Text',Georgia,serif;font-size:20px;font-weight:700;color:var(--pc-dark);}
+.view-count{font-family:'Exo 2',sans-serif;font-size:12px;color:var(--tm);font-weight:600;margin-left:8px;}
+.data-table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;border:0.5px solid var(--bd);}
+.data-table th{font-family:'Exo 2',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--tm);padding:10px 16px;text-align:left;border-bottom:0.5px solid var(--bd);background:var(--s1);white-space:nowrap;}
+.data-table td{padding:11px 16px;border-bottom:0.5px solid var(--bd);font-size:12px;color:var(--ts);vertical-align:middle;}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:var(--s1);cursor:pointer;}
+.data-table .td-primary{font-weight:600;color:var(--tp);}
+.data-table .td-sub{font-size:11px;color:var(--tm);}
+.td-actions{display:flex;gap:6px;align-items:center;}
+.stade-badge{display:inline-flex;align-items:center;font-family:'Exo 2',sans-serif;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap;}
+.stade-identification{background:#F0F4FF;color:#3B5BDB;}
+.stade-contact{background:var(--pc-teal-bg);color:var(--pc-teal-dark);}
+.stade-echange{background:#FFF3E0;color:#8C5A00;}
+.stade-proposition{background:var(--pc-violet-bg);color:var(--pc-violet-dark);}
+.stade-negociation{background:#FFF0F6;color:#9C2F72;}
+.stade-gagne{background:#EBFBEE;color:#1B5E20;}
+.stade-perdu{background:var(--s1);color:var(--tm);}
+.cockpit{display:flex;flex-direction:column;gap:0;}
+.cockpit-section{background:#fff;border:0.5px solid var(--bd);border-radius:12px;margin-bottom:12px;overflow:hidden;}
+.cockpit-section-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:0.5px solid var(--bd);background:var(--s1);}
+.cockpit-section-title{font-family:'Exo 2',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--tm);}
+.cockpit-section-body{padding:14px 18px;}
+.cockpit-info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.cockpit-info-item{display:flex;flex-direction:column;gap:2px;}
+.cockpit-info-label{font-family:'Exo 2',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tm);}
+.cockpit-info-value{font-size:13px;color:var(--tp);}
+.cockpit-info-value a{color:var(--pc-teal-dark);text-decoration:none;}
+.cockpit-contact-row,.cockpit-opp-row,.cockpit-inter-row{padding:10px 0;border-bottom:0.5px solid var(--bd);display:flex;align-items:center;gap:10px;}
+.cockpit-contact-row:last-child,.cockpit-opp-row:last-child{border-bottom:none;}
+.cockpit-inter-row{flex-direction:column;align-items:flex-start;gap:2px;}
+.cockpit-inter-date{font-family:'Exo 2',sans-serif;font-size:10px;color:var(--tm);font-weight:600;}
+.cockpit-empty{font-size:12px;color:var(--tm);padding:8px 0;font-style:italic;}
+.view-filters{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.view-filter-input{padding:7px 12px;border:0.5px solid var(--bds);border-radius:var(--r);font-family:'Poppins',sans-serif;font-size:12px;color:var(--tp);background:#fff;outline:none;min-width:180px;}
+.view-filter-input:focus{border-color:var(--pc-teal);}
+.view-filter-select{padding:7px 12px;border:0.5px solid var(--bds);border-radius:var(--r);font-family:'Poppins',sans-serif;font-size:12px;color:var(--tp);background:#fff;outline:none;height:34px;}
+/* ─────────────────────────────────────────────────────────────────────────── */
 /* ─────────────────────────────────────────────────────────────────────────── */
 .spin-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;gap:12px;background:#fff;border-radius:12px;border:0.5px solid var(--bd);}
 .pe-screen{display:flex;flex-direction:column;gap:16px;}
@@ -350,13 +391,15 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
   <div class="kpi-row">
     <div class="kpi"><div class="kpi-n t" id="k0">–</div><div class="kpi-l">entreprises actives</div></div>
     <div class="kpi"><div class="kpi-n o" id="k1">–</div><div class="kpi-l">actions aujourd'hui</div></div>
-    <div class="kpi"><div class="kpi-n v" id="k2">–</div><div class="kpi-l">N3–N4 appropriation</div></div>
+    <div class="kpi"><div class="kpi-n v" id="k2">–</div><div class="kpi-l">opportunités actives</div></div>
     <div class="kpi"><div class="kpi-n g" id="k3">–</div><div class="kpi-l">contacts total</div></div>
   </div>
   <div class="tabs">
     <button class="tab on" onclick="sw('today',this)">Actions du jour</button>
-    <button class="tab" onclick="sw('all',this)">Toutes les entreprises</button>
-    <button class="tab" onclick="sw('pipeline',this)">Pipeline maturité</button>
+    <button class="tab" onclick="sw('entreprises',this)">Entreprises</button>
+    <button class="tab" onclick="sw('contacts',this)">Contacts</button>
+    <button class="tab" onclick="sw('opportunites',this)">Opportunités</button>
+    <button class="tab" onclick="sw('clients',this)">Clients</button>
     <button class="tab" onclick="sw('prospect',this)" style="color:var(--pc-terra-dark);">🎯 Prospect Engine</button>
   </div>
   <div id="content"><div class="spin-wrap"><div class="spin"></div><div class="spin-txt">Connexion au CRM PrévenirCare…</div></div></div>
@@ -364,12 +407,13 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
 
 <!-- MODAL EDITION OPPORTUNITE -->
 <div class="modal-overlay" id="modal-edit-opp">
-  <div class="modal">
+  <div class="modal" style="max-width:600px;">
     <div class="modal-title">Modifier l'opportunité</div>
     <input type="hidden" id="eo-id">
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
       <div class="edit-field" style="grid-column:1/-1">
-        <div class="edit-label">Nom</div><input class="edit-input" id="eo-nom" style="width:100%">
+        <div class="edit-label">Nom de l'opportunité *</div>
+        <input class="edit-input" id="eo-nom" style="width:100%">
       </div>
       <div class="edit-field">
         <div class="edit-label">Étape</div>
@@ -384,6 +428,10 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
         </select>
       </div>
       <div class="edit-field">
+        <div class="edit-label">Responsable</div>
+        <input class="edit-input" id="eo-responsable" placeholder="Calvine TONGA">
+      </div>
+      <div class="edit-field">
         <div class="edit-label">Probabilité (%)</div>
         <input class="edit-input" type="number" id="eo-prob" min="0" max="100" placeholder="50">
       </div>
@@ -395,9 +443,29 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
         <div class="edit-label">Date estimée de closing</div>
         <input class="edit-input" type="date" id="eo-date">
       </div>
+      <div class="edit-field">
+        <div class="edit-label">Contact principal</div>
+        <select class="edit-select" id="eo-contact-principal" style="height:34px;"></select>
+      </div>
       <div class="edit-field" style="grid-column:1/-1">
-        <div class="edit-label">Notes</div>
-        <textarea class="fta" id="eo-notes" rows="3" style="width:100%;resize:vertical;"></textarea>
+        <div class="edit-label">Dernière action</div>
+        <input class="edit-input" id="eo-last-action" style="width:100%" placeholder="Ex : Email envoyé à la DRH le 28/06">
+      </div>
+      <div class="edit-field">
+        <div class="edit-label">Date dernière action</div>
+        <input class="edit-input" type="date" id="eo-last-action-date">
+      </div>
+      <div class="edit-field">
+        <div class="edit-label">Prochaine action</div>
+        <input class="edit-input" id="eo-next-action" placeholder="Ex : Relancer le DG">
+      </div>
+      <div class="edit-field">
+        <div class="edit-label">Date prochaine action</div>
+        <input class="edit-input" type="date" id="eo-next-action-date">
+      </div>
+      <div class="edit-field" style="grid-column:1/-1">
+        <div class="edit-label">Commentaires</div>
+        <textarea class="fta" id="eo-commentaires" rows="3" style="width:100%;resize:vertical;" placeholder="Contexte, enjeux, points de blocage…"></textarea>
       </div>
     </div>
     <div class="modal-actions">
@@ -428,16 +496,6 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
       </div>
       <div class="edit-field">
         <div class="edit-label">Responsable</div><input class="edit-input" id="ec-responsable" placeholder="Calvine TONGA">
-      </div>
-      <div class="edit-field">
-        <div class="edit-label">KESTIO Entreprise</div>
-        <select class="edit-select" id="ec-kestio">
-          <option value="">– Non défini</option>
-          <option value="N1 — Inconscience">N1 — Inconscience</option>
-          <option value="N2 — Prise de conscience">N2 — Prise de conscience</option>
-          <option value="N3 — Appropriation">N3 — Appropriation</option>
-          <option value="N4 — Recherche de solution">N4 — Recherche de solution</option>
-        </select>
       </div>
       <div class="edit-field">
         <div class="edit-label">Statut</div>
@@ -1079,7 +1137,7 @@ function cardHTML(comp,idx,cc){
   }).join('');
 
   return `<div class="ccard ${hasAct?'open':''}" id="cc${idx}">
-  <div class="ccard-hdr" onclick="tog(${idx});prepareNextAction('${comp._recordId||''}','${name.replace(/'/g,"\\'")}')">
+  <div class="ccard-hdr" onclick="Views.openCockpit('${comp._recordId||''}');NavSeq.setActive('${comp._recordId||''}')">
     <div class="cav ${avc(idx)}">${ini(name)}</div>
     <div class="cm"><div class="cname">${name}</div><div class="cmeta">${secteur?`<span>${secteur}</span>`:''} ${taille?`<span>· ${taille}</span>`:''} <span>· ${cc.length} contact${cc.length>1?'s':''}</span></div></div>
     <div class="cr2">${mb(mat)}${hasAct?`<span style="font-size:10px;color:var(--pc-terra-dark);font-family:'Exo 2',sans-serif;font-weight:700;">⚡ Action aujourd'hui</span>`:''}</div>
@@ -1118,8 +1176,16 @@ function cardHTML(comp,idx,cc){
 }
 
 function tog(i){document.getElementById('cc'+i).classList.toggle('open');}
-function sw(t,el){currentTab=t;document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));el.classList.add('on');
+function sw(t,el){
+  NavContext.saveTab(t);
+  NavSeq.clearActive();
+  currentTab=t;
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  el.classList.add('on');
   if(t==='prospect'){PE.renderScreen();return;}
+  if(t==='contacts'){Views.renderContacts();return;}
+  if(t==='opportunites'){Views.renderOpportunites();return;}
+  if(t==='clients'){Views.renderClients();return;}
   render();
 }
 
@@ -1128,19 +1194,11 @@ function render(){
   const cl=companies.map(c=>({comp:c,cc:getCC(c)})).filter(x=>x.cc.length>0);
   if(currentTab==='today'){
     const list=cl.filter(x=>compNA(x.cc)||x.cc.some(c=>!c['Statut réponse']||c['Statut réponse']==='Pas encore envoyé')).sort((a,b)=>urg(b.cc,b.comp)-urg(a.cc,a.comp)).slice(0,12);
-    el.innerHTML=list.length===0?`<div class="empty"><i class="ti ti-check" style="font-size:28px;display:block;margin:0 auto 10px;color:var(--pc-teal);"></i>Aucune action urgente.<br>Consultez "Toutes les entreprises" pour planifier.</div>`:`<div class="sec-lbl">Entreprises à activer aujourd'hui · ${list.length}</div><div class="cards">${list.map(({comp,cc},i)=>cardHTML(comp,i,cc)).join('')}</div>`;
-  } else if(currentTab==='all'){
+    el.innerHTML=list.length===0?`<div class="empty"><i class="ti ti-check" style="font-size:28px;display:block;margin:0 auto 10px;color:var(--pc-teal);"></i>Aucune action urgente.<br>Consultez "Entreprises" pour planifier.</div>`:`<div class="sec-lbl">Entreprises à activer aujourd'hui · ${list.length}</div><div class="cards">${list.map(({comp,cc},i)=>cardHTML(comp,i,cc)).join('')}</div>`;
+  } else {
+    // Vue Entreprises (anciennement 'all')
     const list=cl.sort((a,b)=>urg(b.cc,b.comp)-urg(a.cc,a.comp));
     el.innerHTML=`<div class="sec-lbl">Toutes les entreprises · ${list.length}</div><div class="cards">${list.map(({comp,cc},i)=>cardHTML(comp,i,cc)).join('')}</div>`;
-  } else {
-    let html='';
-    [4,3,2,1].forEach(lv=>{
-      const items=cl.filter(x=>cMat(x.cc,x.comp)===lv);
-      if(!items.length)return;
-      const m=MC[lv];
-      html+=`<div style="margin-bottom:1.5rem;"><div class="sec-lbl" style="display:flex;align-items:center;gap:8px;">${mb(lv)}<span>${items.length} entreprise${items.length>1?'s':''}</span></div><div style="font-size:11px;color:var(--tm);margin-bottom:8px;padding:8px 12px;background:#fff;border-radius:8px;border:0.5px solid var(--bd);">${m.act}</div><div class="cards">${items.map(({comp,cc},i)=>cardHTML(comp,lv*100+i,cc)).join('')}</div></div>`;
-    });
-    el.innerHTML=html||`<div class="empty">Aucune entreprise dans le pipeline.</div>`;
   }
 }
 
@@ -1325,7 +1383,356 @@ async function fetchAll(table){
   return recs;
 }
 
-// ─── SPRINT 2.2 — CRM OPÉRATIONNEL ──────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// SPRINT 7 — VUES CONTACTS / OPPORTUNITÉS / CLIENTS / COCKPIT ENTREPRISE
+// Règle d'or : toute donnée affichée est modifiable depuis le Morning Briefing.
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Helpers stade
+function stadeCls(s){
+  const v=(typeof s==='object'?s?.name:s)||'';
+  if(v==='Gagné')return'stade-gagne';
+  if(v==='Perdu')return'stade-perdu';
+  if(v==='Négociation')return'stade-negociation';
+  if(v==='Proposition envoyée')return'stade-proposition';
+  if(v.includes('change'))return'stade-echange';
+  if(v.includes('contact')||v.includes('Contact'))return'stade-contact';
+  return'stade-identification';
+}
+function stadeLabel(s){return typeof s==='object'?(s?.name||'–'):(s||'–');}
+
+const Views = {
+
+  // ─── VUE CONTACTS ────────────────────────────────────────────────────────
+  renderContacts(filter=''){
+    const el=document.getElementById('content');
+    const nq=s=>(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    const fq=nq(filter);
+    const list=contacts.filter(c=>
+      !fq||nq(c['Nom du contact']||'').includes(fq)||
+      nq(c['Rôle / Fonction']||'').includes(fq)||
+      nq(c['Email']||'').includes(fq)
+    ).sort((a,b)=>(a['Nom du contact']||'').localeCompare(b['Nom du contact']||''));
+
+    const rows=list.map(c=>{
+      const comp=companies.find(x=>(c['Entreprise liée']||[]).includes(x._recordId));
+      const kc=c['KESTIO Contact'];
+      const kv=typeof kc==='object'?(kc?.name||''):(kc||'');
+      const kn=kv?parseInt(kv[1])||0:0;
+      return `<tr onclick="openEditCont('${c._recordId||''}')">
+        <td class="td-primary">${c['Nom du contact']||'–'}</td>
+        <td>${c['Rôle / Fonction']||c['Rôle']||'–'}</td>
+        <td>${comp?comp['Nom de l\'entreprise']||'–':'–'}</td>
+        <td>${c['Email']?`<a href="mailto:${c['Email']}" onclick="event.stopPropagation()">${c['Email']}</a>`:'–'}</td>
+        <td>${kn?mb(kn):'<span style="font-size:10px;color:var(--tm);">–</span>'}</td>
+        <td><div class="sd ${sdot(c['Statut réponse']||'')}" title="${c['Statut réponse']||'Non contacté'}"></div></td>
+        <td class="td-actions" onclick="event.stopPropagation()">
+          ${c['Email']?`<a href="mailto:${c['Email']}" class="qa-btn" style="text-decoration:none;"><i class="ti ti-mail"></i></a>`:''}
+          ${c['LinkedIn']?`<a href="${c['LinkedIn']}" target="_blank" class="qa-btn" style="text-decoration:none;"><i class="ti ti-brand-linkedin"></i></a>`:''}
+          <button class="qa-btn" onclick="openInter('${c._recordId||''}')"><i class="ti ti-message-circle"></i></button>
+          <button class="qa-btn" onclick="openEditCont('${c._recordId||''}')"><i class="ti ti-pencil"></i></button>
+        </td>
+      </tr>`;
+    }).join('');
+
+    el.innerHTML=`
+      <div class="view-header">
+        <div><span class="view-title">Contacts</span><span class="view-count">${list.length} contact${list.length>1?'s':''}</span></div>
+        <button class="btn btn-teal" onclick="openAddContact()"><i class="ti ti-user-plus"></i> Nouveau contact</button>
+      </div>
+      <div class="view-filters">
+        <input class="view-filter-input" placeholder="🔍 Rechercher un contact…" oninput="Views.renderContacts(this.value)" value="${filter}">
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead><tr>
+            <th>Nom</th><th>Fonction</th><th>Entreprise</th>
+            <th>Email</th><th>KESTIO</th><th>Statut</th><th>Actions</th>
+          </tr></thead>
+          <tbody>${rows||'<tr><td colspan="7" style="text-align:center;color:var(--tm);padding:24px;">Aucun contact trouvé</td></tr>'}</tbody>
+        </table>
+      </div>`;
+  },
+
+  // ─── VUE OPPORTUNITÉS ────────────────────────────────────────────────────
+  renderOpportunites(filterStade='', filterSearch=''){
+    const el=document.getElementById('content');
+    const opps=window._opps||[];
+    const nq=s=>(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+
+    const list=opps.filter(o=>{
+      const stade=stadeLabel(o['Stade']);
+      if(stade==='Gagné'||stade==='Perdu') return false; // Exclure gagnés/perdus (→ Clients)
+      if(filterStade&&stade!==filterStade) return false;
+      if(filterSearch){
+        const fq=nq(filterSearch);
+        return nq(o['Nom de l\'opportunité']||'').includes(fq)||
+          nq(stade).includes(fq);
+      }
+      return true;
+    }).sort((a,b)=>new Date(b['Date prochaine action']||0)-new Date(a['Date prochaine action']||0));
+
+    const rows=list.map(o=>{
+      const comp=companies.find(x=>(o['Entreprise liée']||[]).includes(x._recordId));
+      const stade=stadeLabel(o['Stade']);
+      const na=o['Prochaine action']||'';
+      const nd=o['Date prochaine action'];
+      const du=nd?Math.floor((new Date(nd)-NOW)/86400000):null;
+      let urgCls='';
+      if(du!==null){if(du<0)urgCls='color:var(--pc-terra-dark);font-weight:600;';else if(du===0)urgCls='color:var(--pc-terra-dark);font-weight:600;';}
+      return `<tr onclick="openEditOpp('${o._recordId||''}')">
+        <td class="td-primary">${o['Nom de l\'opportunité']||'–'}</td>
+        <td>${comp?comp['Nom de l\'entreprise']||'–':'–'}</td>
+        <td><span class="stade-badge ${stadeCls(o['Stade'])}">${stade}</span></td>
+        <td>${o['Valeur (EUR)']?Number(o['Valeur (EUR)']).toLocaleString('fr-FR')+'€':'–'}</td>
+        <td><div style="font-size:11px;${urgCls}">${na||'–'}${nd?`<br><span style="font-size:10px;color:var(--tm);">${new Date(nd).toLocaleDateString('fr-FR')}</span>`:''}</div></td>
+        <td class="td-actions" onclick="event.stopPropagation()">
+          <button class="qa-btn" onclick="openEditOpp('${o._recordId||''}')"><i class="ti ti-pencil"></i> Modifier</button>
+        </td>
+      </tr>`;
+    }).join('');
+
+    const stades=['Premier contact','Échange en cours','Proposition envoyée','Négociation'];
+    const stadeOptions=stades.map(s=>`<option value="${s}"${filterStade===s?' selected':''}>${s}</option>`).join('');
+
+    el.innerHTML=`
+      <div class="view-header">
+        <div><span class="view-title">Opportunités</span><span class="view-count">${list.length} active${list.length>1?'s':''}</span></div>
+        <button class="btn btn-teal" onclick="openModal('modal-opp')"><i class="ti ti-target"></i> Nouvelle opportunité</button>
+      </div>
+      <div class="view-filters">
+        <input class="view-filter-input" placeholder="🔍 Rechercher…" oninput="Views.renderOpportunites(document.getElementById('opp-filter-stade').value,this.value)" value="${filterSearch}">
+        <select class="view-filter-select" id="opp-filter-stade" onchange="Views.renderOpportunites(this.value,document.querySelector('.view-filter-input').value)">
+          <option value="">Tous les stades</option>
+          ${stadeOptions}
+        </select>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead><tr>
+            <th>Opportunité</th><th>Entreprise</th><th>Stade</th>
+            <th>Valeur</th><th>Prochaine action</th><th>Actions</th>
+          </tr></thead>
+          <tbody>${rows||'<tr><td colspan="6" style="text-align:center;color:var(--tm);padding:24px;">Aucune opportunité active</td></tr>'}</tbody>
+        </table>
+      </div>`;
+  },
+
+  // ─── VUE CLIENTS ─────────────────────────────────────────────────────────
+  renderClients(){
+    const el=document.getElementById('content');
+    const opps=window._opps||[];
+    const list=opps.filter(o=>stadeLabel(o['Stade'])==='Gagné');
+
+    const rows=list.map(o=>{
+      const comp=companies.find(x=>(o['Entreprise liée']||[]).includes(x._recordId));
+      const val=o['Valeur (EUR)'];
+      return `<tr onclick="openEditOpp('${o._recordId||''}')">
+        <td class="td-primary">${comp?comp['Nom de l\'entreprise']||'–':'–'}</td>
+        <td>${o['Nom de l\'opportunité']||'–'}</td>
+        <td>${val?Number(val).toLocaleString('fr-FR')+'€':'–'}</td>
+        <td>${o['Date de clôture prévue']?new Date(o['Date de clôture prévue']).toLocaleDateString('fr-FR'):'–'}</td>
+        <td><span class="stade-badge stade-gagne">✓ Gagné</span></td>
+        <td class="td-actions" onclick="event.stopPropagation()">
+          <button class="qa-btn" onclick="openEditOpp('${o._recordId||''}')"><i class="ti ti-pencil"></i> Voir</button>
+        </td>
+      </tr>`;
+    }).join('');
+
+    const totalVal=list.reduce((s,o)=>s+(parseFloat(o['Valeur (EUR)'])||0),0);
+
+    el.innerHTML=`
+      <div class="view-header">
+        <div><span class="view-title">Clients</span><span class="view-count">${list.length} client${list.length>1?'s':''} · ${totalVal?totalVal.toLocaleString('fr-FR')+'€ signés':''}</span></div>
+      </div>
+      <div style="background:var(--pc-teal-bg);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:12px;color:var(--pc-teal-dark);">
+        <i class="ti ti-info-circle"></i> Les clients sont les opportunités dont le stade est "Gagné". Aucune donnée n'est dupliquée.
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead><tr>
+            <th>Entreprise</th><th>Opportunité</th><th>Valeur</th><th>Date signature</th><th>Statut</th><th>Actions</th>
+          </tr></thead>
+          <tbody>${rows||'<tr><td colspan="6" style="text-align:center;color:var(--tm);padding:24px;">Aucun client pour le moment</td></tr>'}</tbody>
+        </table>
+      </div>`;
+  },
+
+  // ─── COCKPIT ENTREPRISE (remplace cardHTML pour vue détaillée) ─────────
+  async openCockpit(compId){
+    const comp=companies.find(c=>c._recordId===compId);
+    if(!comp)return;
+    const name=comp['Nom de l\'entreprise']||'Entreprise';
+    const cc=getCC(comp);
+    const opps=(window._opps||[]).filter(o=>(o['Entreprise liée']||[]).includes(compId));
+
+    // Interactions récentes
+    let recentInter=[];
+    try{
+      const allInter=await fetchAll(TI);
+      const contactIds=cc.map(c=>c._recordId);
+      recentInter=allInter
+        .filter(i=>(i['Contact lié']||[]).some(id=>contactIds.includes(id)))
+        .sort((a,b)=>new Date(b['Date d\'interaction']||0)-new Date(a['Date d\'interaction']||0))
+        .slice(0,5);
+    }catch{}
+
+    const sec=comp['Secteur'];
+    const secLabel=typeof sec==='object'?(sec?.name||''):(sec||'');
+    const taille=comp['Taille'];
+    const tailleLabel=typeof taille==='object'?(taille?.name||''):(taille||'');
+
+    const infoHtml=`
+      <div class="cockpit-info-grid">
+        <div class="cockpit-info-item"><div class="cockpit-info-label">Secteur</div><div class="cockpit-info-value">${secLabel||'–'}</div></div>
+        <div class="cockpit-info-item"><div class="cockpit-info-label">Taille</div><div class="cockpit-info-value">${tailleLabel||'–'}</div></div>
+        <div class="cockpit-info-item"><div class="cockpit-info-label">Site web</div><div class="cockpit-info-value">${comp['Site internet']?`<a href="${comp['Site internet']}" target="_blank">${comp['Site internet']}</a>`:'–'}</div></div>
+        <div class="cockpit-info-item"><div class="cockpit-info-label">Statut</div><div class="cockpit-info-value">${typeof comp['Statut']==='object'?(comp['Statut']?.name||'–'):(comp['Statut']||'–')}</div></div>
+        ${comp['Adresse']?`<div class="cockpit-info-item" style="grid-column:1/-1"><div class="cockpit-info-label">Adresse</div><div class="cockpit-info-value">${comp['Adresse']}</div></div>`:''}
+        ${comp['Besoins spécifiques']?`<div class="cockpit-info-item" style="grid-column:1/-1"><div class="cockpit-info-label">Notes</div><div class="cockpit-info-value">${comp['Besoins spécifiques']}</div></div>`:''}
+      </div>`;
+
+    const contactsHtml=cc.length>0?cc.map(c=>{
+      const kc=c['KESTIO Contact'];const kv=typeof kc==='object'?(kc?.name||''):(kc||'');const kn=kv?parseInt(kv[1])||0:0;
+      return `<div class="cockpit-contact-row">
+        <div class="cav-sm ${avcs(0)}">${ini(c['Nom du contact'])}</div>
+        <div style="flex:1;">
+          <div style="font-weight:600;font-size:13px;">${c['Nom du contact']||'–'}</div>
+          <div style="font-size:11px;color:var(--tm);">${c['Rôle / Fonction']||'–'} ${kn?'· '+mb(kn):''}</div>
+        </div>
+        <div class="td-actions">
+          ${c['Email']?`<a href="mailto:${c['Email']}" class="qa-btn" style="text-decoration:none;" onclick="event.stopPropagation()"><i class="ti ti-mail"></i></a>`:''}
+          <button class="qa-btn" onclick="openInter('${c._recordId||''}')"><i class="ti ti-message-circle"></i></button>
+          <button class="qa-btn" onclick="openEditCont('${c._recordId||''}')"><i class="ti ti-pencil"></i></button>
+        </div>
+      </div>`;
+    }).join(''):`<div class="cockpit-empty">Aucun contact lié.</div>`;
+
+    const oppsHtml=opps.length>0?opps.map(o=>{
+      const stade=stadeLabel(o['Stade']);
+      return `<div class="cockpit-opp-row">
+        <div style="flex:1;">
+          <div style="font-weight:600;font-size:13px;">${o['Nom de l\'opportunité']||'–'}</div>
+          <div style="font-size:11px;color:var(--tm);">${o['Prochaine action']||''}</div>
+        </div>
+        <span class="stade-badge ${stadeCls(o['Stade'])}">${stade}</span>
+        <button class="qa-btn" onclick="openEditOpp('${o._recordId||''}')"><i class="ti ti-pencil"></i></button>
+      </div>`;
+    }).join(''):`<div class="cockpit-empty">Aucune opportunité.</div>`;
+
+    const interHtml=recentInter.length>0?recentInter.map(i=>`
+      <div class="cockpit-inter-row">
+        <div class="cockpit-inter-date">${i['Date d\'interaction']?new Date(i['Date d\'interaction']).toLocaleDateString('fr-FR'):''} · ${i['Type d\'interaction']||'Interaction'}</div>
+        <div style="font-size:12px;color:var(--ts);">${(i['Notes']||'').slice(0,120)}${(i['Notes']||'').length>120?'…':''}</div>
+      </div>`).join(''):`<div class="cockpit-empty">Aucune interaction enregistrée.</div>`;
+
+    document.getElementById('content').innerHTML=`
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <button class="btn" onclick="render()"><i class="ti ti-arrow-left"></i> Retour</button>
+        <h2 style="font-family:'STIX Two Text',Georgia,serif;font-size:20px;font-weight:700;margin:0;">${name}</h2>
+      </div>
+      <div class="cockpit">
+        <div class="cockpit-section">
+          <div class="cockpit-section-hdr">
+            <div class="cockpit-section-title">Informations générales</div>
+            <button class="qa-btn" onclick="openEditCompany('${compId}')"><i class="ti ti-pencil"></i> Modifier</button>
+          </div>
+          <div class="cockpit-section-body">${infoHtml}</div>
+        </div>
+        <div class="cockpit-section">
+          <div class="cockpit-section-hdr">
+            <div class="cockpit-section-title">Contacts (${cc.length})</div>
+            <button class="qa-btn" onclick="openAddContactFromCompany('${compId}','${name.replace(/'/g,"\\'")}')"><i class="ti ti-user-plus"></i> Nouveau contact</button>
+          </div>
+          <div class="cockpit-section-body">${contactsHtml}</div>
+        </div>
+        <div class="cockpit-section">
+          <div class="cockpit-section-hdr">
+            <div class="cockpit-section-title">Opportunités (${opps.length})</div>
+            <button class="qa-btn" onclick="openAddOppFromCompany('${compId}','${name.replace(/'/g,"\\'")}')"><i class="ti ti-target"></i> Nouvelle opportunité</button>
+          </div>
+          <div class="cockpit-section-body">${oppsHtml}</div>
+        </div>
+        <div class="cockpit-section">
+          <div class="cockpit-section-hdr">
+            <div class="cockpit-section-title">Historique des interactions</div>
+            <button class="qa-btn" onclick="openInterForCompany('${compId}')"><i class="ti ti-plus"></i> Nouvelle interaction</button>
+          </div>
+          <div class="cockpit-section-body">${interHtml}</div>
+        </div>
+      </div>`;
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ─── openEditOpp / saveEditOpp enrichis Sprint 7 ─────────────────────────
+
+function openEditOpp(oppId){
+  const o=window._opps?.find(x=>x._recordId===oppId);
+  if(!o)return;
+
+  // Pré-remplir Contact principal
+  const cpSel=document.getElementById('eo-contact-principal');
+  if(cpSel){
+    const compIds=o['Entreprise liée']||[];
+    const relContacts=contacts.filter(c=>(c['Entreprise liée']||[]).some(id=>compIds.includes(id)));
+    cpSel.innerHTML='<option value="">– Choisir –</option>'+relContacts.map(c=>`<option value="${c._recordId}">${c['Nom du contact']||''}</option>`).join('');
+    const cp=o['Contact principal'];
+    cpSel.value=Array.isArray(cp)?cp[0]:'';
+  }
+
+  document.getElementById('eo-id').value=oppId;
+  document.getElementById('eo-nom').value=o['Nom de l\'opportunité']||'';
+  document.getElementById('eo-stade').value=stadeLabel(o['Stade']);
+  document.getElementById('eo-responsable').value=o['Responsable']||'';
+  document.getElementById('eo-prob').value=o['Probabilité (%)']||'';
+  document.getElementById('eo-val').value=o['Valeur (EUR)']||'';
+  document.getElementById('eo-date').value=o['Date de clôture prévue']||'';
+  document.getElementById('eo-last-action').value=o['Dernière action']||'';
+  document.getElementById('eo-last-action-date').value=o['Date dernière action']||'';
+  document.getElementById('eo-next-action').value=o['Prochaine action']||'';
+  document.getElementById('eo-next-action-date').value=o['Date prochaine action']||'';
+  document.getElementById('eo-commentaires').value=o['Commentaires']||'';
+
+  document.getElementById('modal-edit-opp').classList.add('show');
+}
+
+async function saveEditOpp(){
+  const id=document.getElementById('eo-id').value;
+  if(!id)return;
+  const f={};
+  const nom=document.getElementById('eo-nom').value.trim();
+  if(nom)f[OPP.NAME]=nom;
+  f[OPP.STAGE]=document.getElementById('eo-stade').value;
+  const resp=document.getElementById('eo-responsable').value.trim();
+  if(resp)f['Responsable']=resp;
+  const prob=parseFloat(document.getElementById('eo-prob').value);
+  if(!isNaN(prob))f[OPP.PROBABILITY||'Probabilité (%)']=prob;
+  const val=parseFloat(document.getElementById('eo-val').value);
+  if(!isNaN(val))f[OPP.VALUE]=val;
+  const date=document.getElementById('eo-date').value;
+  if(date)f['Date de clôture prévue']=date;
+  const cp=document.getElementById('eo-contact-principal').value;
+  if(cp)f['Contact principal']=[cp];
+  const la=document.getElementById('eo-last-action').value.trim();
+  if(la)f['Dernière action']=la;
+  const lad=document.getElementById('eo-last-action-date').value;
+  if(lad)f['Date dernière action']=lad;
+  const na=document.getElementById('eo-next-action').value.trim();
+  if(na)f['Prochaine action']=na;
+  const nad=document.getElementById('eo-next-action-date').value;
+  if(nad)f['Date prochaine action']=nad;
+  const com=document.getElementById('eo-commentaires').value.trim();
+  if(com)f['Commentaires']=com;
+
+  await at('PATCH',TO,{fields:f},id);
+  cm('modal-edit-opp');
+  showToast('Opportunité mise à jour ✓');
+  await boot();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 // ÉDITION OPPORTUNITÉ
 function openEditOpp(oppId){
@@ -1431,48 +1838,10 @@ function closeSearch(){
 }
 
 function focusCompany(compId, highlightContactId=null){
-  // Basculer sur "Toutes les entreprises"
-  const tabs=document.querySelectorAll('.tab');
-  tabs.forEach(t=>t.classList.remove('on'));
-  tabs[1]?.classList.add('on');
-  currentTab='all';
-  render();
-  setTimeout(()=>{
-    const cl=companies.map(c=>({comp:c,cc:getCC(c)})).filter(x=>x.cc.length>0);
-    const sorted=[...cl].sort((a,b)=>urg(b.cc)-urg(a.cc));
-    const idx=sorted.findIndex(({comp})=>comp._recordId===compId);
-    if(idx<0)return;
-    const card=document.getElementById(`cc${idx}`);
-    if(!card)return;
-
-    // Ouvrir la fiche
-    card.classList.add('open');
-
-    // Scroll fluide vers la fiche
-    card.scrollIntoView({behavior:'smooth',block:'center'});
-
-    // Highlight de la fiche
-    card.style.transition='box-shadow .3s, border-color .3s';
-    card.style.boxShadow='0 0 0 3px rgba(105,186,165,.5)';
-    card.style.borderColor='var(--pc-teal)';
-    setTimeout(()=>{
-      card.style.boxShadow='';
-      card.style.borderColor='';
-    }, 2000);
-
-    // Si on cherche un contact spécifique, le mettre en évidence
-    if(highlightContactId){
-      setTimeout(()=>{
-        const contactCard=card.querySelector(`[data-contact-id="${highlightContactId}"]`);
-        if(contactCard){
-          contactCard.style.transition='box-shadow .3s';
-          contactCard.style.boxShadow='0 0 0 2px var(--pc-violet)';
-          contactCard.scrollIntoView({behavior:'smooth',block:'center'});
-          setTimeout(()=>{contactCard.style.boxShadow='';},2000);
-        }
-      },400);
-    }
-  },120);
+  // Sprint 7 : ouvrir directement le cockpit entreprise
+  Views.openCockpit(compId);
+  NavSeq.setActive(compId);
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
 function focusContact(contId){
@@ -1480,7 +1849,8 @@ function focusContact(contId){
   if(!c)return;
   const linked=c['Entreprise liée'];
   const compId=Array.isArray(linked)?linked[0]:null;
-  if(compId)focusCompany(compId, contId);
+  if(compId)focusCompany(compId);
+  else openEditCont(contId);
 }
 
 // AUTOCOMPLÉTION ENTREPRISE dans modal contact
@@ -3371,7 +3741,7 @@ async function boot(){
     const cl=companies.map(c=>({comp:c,cc:getCC(c)})).filter(x=>x.cc.length>0);
     document.getElementById('k0').textContent=cl.length;
     document.getElementById('k1').textContent=cl.filter(x=>compNA(x.cc)).length;
-    document.getElementById('k2').textContent=cl.filter(x=>cMat(x.cc)>=3).length;
+    document.getElementById('k2').textContent=oppData.filter(o=>{const s=stadeLabel(o['Stade']);return s!=='Gagné'&&s!=='Perdu';}).length;
     document.getElementById('k3').textContent=contacts.length;
 
     // Vérification synchronisation CRM_CONFIG ↔ Airtable
