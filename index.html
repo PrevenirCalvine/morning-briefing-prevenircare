@@ -261,7 +261,34 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
 .lie-new{background:var(--pc-teal-bg);color:var(--pc-teal-dark);}
 .lie-exists{background:var(--s1);color:var(--tm);}
 
-/* ─── SPRINT 7 — NOUVELLES VUES ──────────────────────────────────────────── */
+/* ─── SPRINT 7.1 — UX ────────────────────────────────────────────────────── */
+/* Groupes d'actions du jour */
+.action-group{margin-bottom:20px;}
+.action-group-hdr{display:flex;align-items:center;gap:8px;font-family:'Exo 2',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--tm);padding:8px 0;border-bottom:1.5px solid var(--bd);margin-bottom:10px;}
+.action-group-hdr .group-emoji{font-size:16px;}
+.action-done-btn{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-family:'Exo 2',sans-serif;font-weight:700;padding:4px 10px;border-radius:99px;border:0.5px solid var(--pc-teal);background:var(--pc-teal-bg);color:var(--pc-teal-dark);cursor:pointer;transition:all .15s;}
+.action-done-btn:hover{background:var(--pc-teal);color:#fff;}
+.action-done-section{margin-top:20px;padding-top:16px;border-top:0.5px solid var(--bd);}
+.action-done-section .sec-lbl{color:var(--tm);font-size:10px;}
+
+/* Cockpit sections pliables */
+.cockpit-section-hdr{cursor:pointer;user-select:none;}
+.cockpit-section-hdr:hover{background:var(--pc-teal-bg);}
+.cockpit-chevron{font-size:14px;color:var(--tm);transition:transform .2s;margin-left:4px;}
+.cockpit-body-wrap{overflow:hidden;transition:max-height .25s ease;}
+.cockpit-body-wrap.collapsed{max-height:0!important;padding:0;}
+
+/* Sales Copilot menu actions */
+.copilot-action-menu{display:flex;flex-direction:column;gap:10px;margin-top:8px;}
+.copilot-action-btn{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:10px;border:0.5px solid var(--bd);background:#fff;cursor:pointer;transition:all .15s;text-align:left;width:100%;}
+.copilot-action-btn:hover{border-color:var(--pc-violet);background:var(--pc-violet-bg);}
+.copilot-action-btn i{font-size:20px;color:var(--pc-violet);flex-shrink:0;}
+.copilot-action-title{font-family:'Exo 2',sans-serif;font-size:13px;font-weight:700;color:var(--tp);}
+.copilot-action-sub{font-size:11px;color:var(--tm);margin-top:1px;}
+.copilot-draft-wrap{background:var(--s1);border-radius:10px;padding:16px;margin-top:12px;border:0.5px solid var(--bd);}
+.copilot-draft-text{font-size:12px;line-height:1.8;color:var(--tp);white-space:pre-wrap;max-height:320px;overflow-y:auto;}
+.copilot-draft-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+/* ─────────────────────────────────────────────────────────────────────────── */
 .view-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
 .view-title{font-family:'STIX Two Text',Georgia,serif;font-size:20px;font-weight:700;color:var(--pc-dark);}
 .view-count{font-family:'Exo 2',sans-serif;font-size:12px;color:var(--tm);font-weight:600;margin-left:8px;}
@@ -1197,14 +1224,62 @@ function sw(t,el){
 function render(){
   const el=document.getElementById('content');
   const cl=companies.map(c=>({comp:c,cc:getCC(c)})).filter(x=>x.cc.length>0);
+
   if(currentTab==='today'){
     const list=cl.filter(x=>compNA(x.cc)||x.cc.some(c=>!c['Statut réponse']||c['Statut réponse']==='Pas encore envoyé')).sort((a,b)=>urg(b.cc,b.comp)-urg(a.cc,a.comp)).slice(0,12);
-    el.innerHTML=list.length===0?`<div class="empty"><i class="ti ti-check" style="font-size:28px;display:block;margin:0 auto 10px;color:var(--pc-teal);"></i>Aucune action urgente.<br>Consultez "Entreprises" pour planifier.</div>`:`<div class="sec-lbl">Entreprises à activer aujourd'hui · ${list.length}</div><div class="cards">${list.map(({comp,cc},i)=>cardHTML(comp,i,cc)).join('')}</div>`;
-  } else {
-    // Vue Entreprises (anciennement 'all')
-    const list=cl.sort((a,b)=>urg(b.cc,b.comp)-urg(a.cc,a.comp));
-    el.innerHTML=`<div class="sec-lbl">Toutes les entreprises · ${list.length}</div><div class="cards">${list.map(({comp,cc},i)=>cardHTML(comp,i,cc)).join('')}</div>`;
+    if(!list.length){
+      el.innerHTML=`<div class="empty"><i class="ti ti-check" style="font-size:28px;display:block;margin:0 auto 10px;color:var(--pc-teal);"></i>Toutes les actions du jour sont traitées 🎉<br>Consultez "Entreprises" pour planifier la suite.</div>`;
+      return;
+    }
+
+    // Regrouper par nature d'action
+    const groupes={
+      relance:  {emoji:'📧', label:'Relances email',         items:[]},
+      appel:    {emoji:'📞', label:'Appels téléphoniques',    items:[]},
+      rdv:      {emoji:'🤝', label:'Rendez-vous & suivis',    items:[]},
+      prosp:    {emoji:'🔍', label:'Début de prospection',    items:[]},
+      autre:    {emoji:'💬', label:'Autres actions',           items:[]},
+    };
+
+    list.forEach(({comp,cc},i)=>{
+      const pri=cc.find(c=>needsAct(c))||cc[0];
+      const st=pri?.['Statut réponse']||'';
+      const na=pri?.['Prochaine action']||'';
+      let groupe='autre';
+      if(st==='Envoyé – en attente'||st==='Relance à faire'||na.toLowerCase().includes('mail')||na.toLowerCase().includes('email')) groupe='relance';
+      else if(na.toLowerCase().includes('appel')||na.toLowerCase().includes('téléphone')||na.toLowerCase().includes('appeler')) groupe='appel';
+      else if(st==='RDV obtenu'||na.toLowerCase().includes('rdv')||na.toLowerCase().includes('rendez')||na.toLowerCase().includes('suivi')) groupe='rdv';
+      else if(st==='Pas encore envoyé'||!st) groupe='prosp';
+      groupes[groupe].items.push({comp,cc,i,pri});
+    });
+
+    let html='';
+    Object.values(groupes).filter(g=>g.items.length>0).forEach(g=>{
+      html+=`<div class="action-group">
+        <div class="action-group-hdr"><span class="group-emoji">${g.emoji}</span>${g.label} <span style="font-weight:400;font-size:10px;color:var(--tm);">(${g.items.length})</span></div>
+        <div class="cards">`;
+      g.items.forEach(({comp,cc,i,pri})=>{
+        const cid=pri?._recordId||'';
+        html+=`<div class="ccard" id="cc${i}" style="position:relative;">
+          ${cardHTML(comp,i,cc)}
+          ${cid?`<button class="action-done-btn" style="position:absolute;top:12px;right:50px;z-index:10;" onclick="event.stopPropagation();markActionDone('${cid}','${comp._recordId||''}')">✓ Faite</button>`:''}
+        </div>`;
+      });
+      html+=`</div></div>`;
+    });
+
+    // Section "Terminées aujourd'hui" (session uniquement)
+    if(window._doneTodayList?.length){
+      html+=`<div class="action-done-section"><div class="sec-lbl">✓ Traitées aujourd'hui (${window._doneTodayList.length})</div><div style="font-size:12px;color:var(--tm);margin-top:6px;">${window._doneTodayList.map(n=>`<div style="padding:4px 0;border-bottom:0.5px solid var(--bd);">✓ ${n}</div>`).join('')}</div></div>`;
+    }
+
+    el.innerHTML=html;
+    return;
   }
+
+  // Vue Entreprises
+  const list=cl.sort((a,b)=>urg(b.cc,b.comp)-urg(a.cc,a.comp));
+  el.innerHTML=`<div class="sec-lbl">Toutes les entreprises · ${list.length}</div><div class="cards">${list.map(({comp,cc},i)=>cardHTML(comp,i,cc)).join('')}</div>`;
 }
 
 function so(el,g){
@@ -1673,6 +1748,19 @@ const Views = {
 
 // ─── openEditOpp / saveEditOpp enrichis Sprint 7 ─────────────────────────
 
+// Utilitaire — pré-remplit un champ uniquement s'il existe dans le DOM.
+// Évite tout crash "Cannot set properties of null" si un id est manquant.
+function setVal(id, value){
+  const el = document.getElementById(id);
+  if(!el){ console.warn(`setVal > élément #${id} introuvable dans le DOM`); return; }
+  el.value = value ?? '';
+}
+function getVal(id, fallback=''){
+  const el = document.getElementById(id);
+  if(!el){ console.warn(`getVal > élément #${id} introuvable dans le DOM`); return fallback; }
+  return el.value;
+}
+
 function openEditOpp(oppId){
   const o=window._opps?.find(x=>x._recordId===oppId);
   if(!o)return;
@@ -1687,48 +1775,48 @@ function openEditOpp(oppId){
     cpSel.value=Array.isArray(cp)?cp[0]:'';
   }
 
-  document.getElementById('eo-id').value=oppId;
-  document.getElementById('eo-nom').value=o['Nom de l\'opportunité']||'';
-  document.getElementById('eo-stade').value=stadeLabel(o['Stade']);
-  document.getElementById('eo-responsable').value=o['Responsable']||'';
-  document.getElementById('eo-prob').value=o['Probabilité (%)']||'';
-  document.getElementById('eo-val').value=o['Valeur (EUR)']||'';
-  document.getElementById('eo-date').value=o['Date de clôture prévue']||'';
-  document.getElementById('eo-last-action').value=o['Dernière action']||'';
-  document.getElementById('eo-last-action-date').value=o['Date dernière action']||'';
-  document.getElementById('eo-next-action').value=o['Prochaine action']||'';
-  document.getElementById('eo-next-action-date').value=o['Date prochaine action']||'';
-  document.getElementById('eo-commentaires').value=o['Commentaires']||'';
+  setVal('eo-id', oppId);
+  setVal('eo-nom', o['Nom de l\'opportunité']);
+  setVal('eo-stade', stadeLabel(o['Stade']));
+  setVal('eo-responsable', o['Responsable']);
+  setVal('eo-prob', o['Probabilité (%)']);
+  setVal('eo-val', o['Valeur (EUR)']);
+  setVal('eo-date', o['Date de clôture prévue']);
+  setVal('eo-last-action', o['Dernière action']);
+  setVal('eo-last-action-date', o['Date dernière action']);
+  setVal('eo-next-action', o['Prochaine action']);
+  setVal('eo-next-action-date', o['Date prochaine action']);
+  setVal('eo-commentaires', o['Commentaires']);
 
-  document.getElementById('modal-edit-opp').classList.add('show');
+  document.getElementById('modal-edit-opp')?.classList.add('show');
 }
 
 async function saveEditOpp(){
-  const id=document.getElementById('eo-id').value;
+  const id=getVal('eo-id');
   if(!id)return;
   const f={};
-  const nom=document.getElementById('eo-nom').value.trim();
+  const nom=getVal('eo-nom').trim();
   if(nom)f[OPP.NAME]=nom;
-  f[OPP.STAGE]=document.getElementById('eo-stade').value;
-  const resp=document.getElementById('eo-responsable').value.trim();
+  f[OPP.STAGE]=getVal('eo-stade');
+  const resp=getVal('eo-responsable').trim();
   if(resp)f['Responsable']=resp;
-  const prob=parseFloat(document.getElementById('eo-prob').value);
+  const prob=parseFloat(getVal('eo-prob'));
   if(!isNaN(prob))f[OPP.PROBABILITY||'Probabilité (%)']=prob;
-  const val=parseFloat(document.getElementById('eo-val').value);
+  const val=parseFloat(getVal('eo-val'));
   if(!isNaN(val))f[OPP.VALUE]=val;
-  const date=document.getElementById('eo-date').value;
+  const date=getVal('eo-date');
   if(date)f['Date de clôture prévue']=date;
-  const cp=document.getElementById('eo-contact-principal').value;
+  const cp=getVal('eo-contact-principal');
   if(cp)f['Contact principal']=[cp];
-  const la=document.getElementById('eo-last-action').value.trim();
+  const la=getVal('eo-last-action').trim();
   if(la)f['Dernière action']=la;
-  const lad=document.getElementById('eo-last-action-date').value;
+  const lad=getVal('eo-last-action-date');
   if(lad)f['Date dernière action']=lad;
-  const na=document.getElementById('eo-next-action').value.trim();
+  const na=getVal('eo-next-action').trim();
   if(na)f['Prochaine action']=na;
-  const nad=document.getElementById('eo-next-action-date').value;
+  const nad=getVal('eo-next-action-date');
   if(nad)f['Date prochaine action']=nad;
-  const com=document.getElementById('eo-commentaires').value.trim();
+  const com=getVal('eo-commentaires').trim();
   if(com)f['Commentaires']=com;
 
   await at('PATCH',TO,{fields:f},id);
@@ -1753,6 +1841,123 @@ function openAddOppFromCompany(compId, compName){
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ─── SPRINT 2.1 — MODULE CRM CENTRALISÉ ─────────────────────────────────────
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SPRINT 7.1 — UX
+// ═══════════════════════════════════════════════════════════════════════════
+
+window._doneTodayList = window._doneTodayList || [];
+
+async function markActionDone(contactId, companyId){
+  const c=contacts.find(x=>x._recordId===contactId);
+  const compName=companies.find(x=>x._recordId===companyId)?.['Nom de l\'entreprise']||'?';
+  if(!c)return;
+  const f={'Prochaine action':'','Date prochaine action':''};
+  if(c['Statut réponse']==='Relance à faire')f['Statut réponse']='Envoy\u00e9 \u2013 en attente';
+  await at('PATCH',TC,{fields:f},contactId);
+  window._doneTodayList.push(`${compName} \u2014 ${c['Nom du contact']||'Contact'}`);
+  showToast('\u2713 Action marquée comme faite');
+  [companies,contacts]=await Promise.all([fetchAll(TE),fetchAll(TC)]);
+  window._opps=await fetchAll(TO);
+  render();
+}
+
+const _cockpitState={};
+function toggleCockpitSection(id){
+  const body=document.getElementById(`cockpit-body-${id}`);
+  const chev=document.getElementById(`cockpit-chev-${id}`);
+  if(!body)return;
+  if(body.classList.contains('collapsed')){
+    body.classList.remove('collapsed');body.style.maxHeight=body.scrollHeight+'px';
+    if(chev)chev.style.transform='rotate(0deg)';_cockpitState[id]='open';
+  }else{
+    body.style.maxHeight=body.scrollHeight+'px';
+    requestAnimationFrame(()=>{body.style.maxHeight='0px';body.classList.add('collapsed');});
+    if(chev)chev.style.transform='rotate(-90deg)';_cockpitState[id]='closed';
+  }
+}
+
+function cockpitSection(id,title,action,bodyHtml,defaultOpen=true){
+  const isClosed=_cockpitState[id]==='closed'||(!defaultOpen&&_cockpitState[id]!=='open');
+  return `<div class="cockpit-section">
+    <div class="cockpit-section-hdr" onclick="toggleCockpitSection('${id}')">
+      <div class="cockpit-section-title">${title}</div>
+      <div style="display:flex;align-items:center;gap:8px;">${action}<i class="ti ti-chevron-down cockpit-chevron" id="cockpit-chev-${id}" style="${isClosed?'transform:rotate(-90deg)':''}"></i></div>
+    </div>
+    <div class="${isClosed?'cockpit-body-wrap collapsed':'cockpit-body-wrap'}" id="cockpit-body-${id}" style="${isClosed?'max-height:0px':''}">
+      <div class="cockpit-section-body">${bodyHtml}</div>
+    </div>
+  </div>`;
+}
+
+const COPILOT_ACTIONS=[
+  {id:'email',   icon:'ti-mail',           title:'G\u00e9n\u00e9rer un email',       sub:'Brouillon adapt\u00e9 au niveau KESTIO'},
+  {id:'linkedin',icon:'ti-brand-linkedin', title:'Message LinkedIn',        sub:'Message court pour InMail ou DM'},
+  {id:'appel',   icon:'ti-phone',          title:"Script d'appel",          sub:'Trame pour un appel de d\u00e9couverte'},
+  {id:'rdv',     icon:'ti-calendar',       title:'Pr\u00e9parer un rendez-vous', sub:'Objectifs, questions, \u00e9l\u00e9ments cl\u00e9s'},
+  {id:'suivi',   icon:'ti-arrow-forward',  title:'Pr\u00e9parer un suivi',      sub:'Message de suivi apr\u00e8s un \u00e9change'},
+];
+
+function renderCopilotMenu(context){
+  const btns=COPILOT_ACTIONS.map(a=>`
+    <button class="copilot-action-btn" onclick="generateCopilotContent('${a.id}',window.salesContext)">
+      <i class="ti ${a.icon}"></i>
+      <div><div class="copilot-action-title">${a.title}</div><div class="copilot-action-sub">${a.sub}</div></div>
+    </button>`).join('');
+  return `<div class="copilot-badge"><i class="ti ti-building"></i> ${context?.company?.name||'\u2013'}</div>
+    <div class="copilot-section" style="margin-top:12px;"><div class="copilot-sec-lbl">Contacts</div>
+    <div class="copilot-data">${(context?.contacts||[]).map(c=>{
+      const kn=c.kestioContact?parseInt(c.kestioContact[1])||0:0;
+      return `<div style="margin-bottom:6px;"><strong>${c.firstname} ${c.lastname}</strong> \u00b7 ${c.role||'\u2013'}${kn?` ${mb(kn)}`:''}</div>`;
+    }).join('')||'\u2013'}</div></div>
+    <div class="copilot-section"><div class="copilot-sec-lbl">Que souhaitez-vous g\u00e9n\u00e9rer ?</div>
+    <div class="copilot-action-menu">${btns}</div></div>`;
+}
+
+async function generateCopilotContent(actionId,context){
+  console.log('SalesCopilot > Generate:',actionId);
+  const bodyEl=document.getElementById('copilot-body');
+  if(!bodyEl)return;
+  const action=COPILOT_ACTIONS.find(a=>a.id===actionId);
+  bodyEl.innerHTML=`<div class="copilot-badge"><i class="ti ti-building"></i> ${context?.company?.name||'\u2013'}</div>
+    <div class="copilot-loading" style="min-height:120px;"><div class="copilot-spin"></div>
+    <div class="copilot-loading-txt">${action?.title||'G\u00e9n\u00e9ration'} en cours\u2026</div></div>`;
+  let aiResponse=null;
+  try{
+    const r=await fetch('https://hook.eu2.make.com/n0ua9td3mfub2gmtujbanv4qce58pnox',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({...context,requested_action:actionId})
+    });
+    if(r.ok){const raw=await r.text();try{aiResponse=JSON.parse(raw);}catch{aiResponse={email:raw};}}
+  }catch(e){console.warn('SalesCopilot > Make error:',e.message);}
+  const draft=aiResponse?.email||aiResponse?.message||aiResponse?.script||`[${action?.title} non re\u00e7u \u2014 v\u00e9rifiez Make]`;
+  bodyEl.innerHTML=`<div class="copilot-badge"><i class="ti ti-building"></i> ${context?.company?.name||'\u2013'}</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;margin-bottom:8px;">
+      <div class="copilot-sec-lbl">${action?.title}</div>
+      <button class="btn btn-sm" onclick="renderCopilotMenuView()"><i class="ti ti-arrow-left"></i> Retour</button>
+    </div>
+    <div class="copilot-draft-wrap"><div class="copilot-draft-text" id="copilot-draft-content">${draft}</div></div>
+    <div class="copilot-draft-actions">
+      <button class="btn btn-teal" onclick="copilotCopyDraft()" style="flex:1;justify-content:center;"><i class="ti ti-copy"></i> Copier</button>
+      <button class="btn" onclick="generateCopilotContent('${actionId}',window.salesContext)"><i class="ti ti-refresh"></i> R\u00e9g\u00e9n\u00e9rer</button>
+      <button class="btn" onclick="renderCopilotMenuView()"><i class="ti ti-x"></i> Fermer</button>
+    </div>
+    ${aiResponse?.resume?`<div class="copilot-section" style="margin-top:14px;"><div class="copilot-sec-lbl">Analyse</div><div class="copilot-data">${aiResponse.resume}</div></div>`:''}`;
+}
+
+function renderCopilotMenuView(){
+  const bodyEl=document.getElementById('copilot-body');
+  if(!bodyEl||!window.salesContext)return;
+  bodyEl.innerHTML=renderCopilotMenu(window.salesContext);
+}
+
+function copilotCopyDraft(){
+  const el=document.getElementById('copilot-draft-content');
+  if(!el){showToast('\u26a0\ufe0f Aucun brouillon \u00e0 copier');return;}
+  navigator.clipboard.writeText(el.innerText.trim()).then(()=>showToast('Brouillon copi\u00e9 \u2713')).catch(()=>showToast('\u26a0\ufe0f Copie impossible'));
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 
 // RECHERCHE GLOBALE
 function normalize(s){ return(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
@@ -2283,138 +2488,9 @@ async function prepareNextAction(companyId, companyName){
     // Stocker pour utilisation future par generateEmail
     window.salesContext = salesContext;
 
-    // Envoi du salesContext vers Make + réception réponse OpenAI
-    console.log('📤 Envoi du salesContext vers Make…');
-
-    // Afficher état d'analyse en attente
-    document.getElementById('copilot-body').innerHTML=`
-      <div class="copilot-badge"><i class="ti ti-building"></i> ${companyName}</div>
-      <div class="copilot-loading" style="min-height:120px;">
-        <div class="copilot-spin"></div>
-        <div class="copilot-loading-txt">Analyse IA en cours…</div>
-      </div>`;
-
-    let aiResponse = null;
-    try {
-      const makeRes = await fetch('https://hook.eu2.make.com/n0ua9td3mfub2gmtujbanv4qce58pnox', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(salesContext)
-      });
-      if(makeRes.ok){
-        const raw = await makeRes.text();
-        try { aiResponse = JSON.parse(raw); } catch { aiResponse = {email: raw}; }
-        console.log('✅ Réponse OpenAI reçue :', aiResponse);
-      } else {
-        console.warn('⚠️ Make a répondu avec statut :', makeRes.status);
-      }
-    } catch(e){
-      console.warn('⚠️ Erreur communication Make :', e.message);
-    }
-
-    // Affichage dans le panneau
-    const lastInter = salesContext.interactions[0];
-
-    document.getElementById('copilot-body').innerHTML=`
-      <div class="copilot-badge"><i class="ti ti-building"></i> ${companyName}</div>
-
-      <div class="copilot-section">
-        <div class="copilot-sec-lbl">Niveau Kestio</div>
-        <div class="copilot-data">${mb(mat)} <span style="margin-left:8px;font-size:12px;color:var(--ts);">${salesContext.crm.kestioObjectif}</span></div>
-      </div>
-
-      <div class="copilot-section">
-        <div class="copilot-sec-lbl">Contacts (${salesContext.contacts.length})</div>
-        <div class="copilot-data">${salesContext.contacts.map(c=>`<div style="margin-bottom:6px;"><strong>${c.firstname} ${c.lastname}</strong> · ${c.role||'–'}<br><span style="color:var(--tm);font-size:11px;">${c.email||''}${c.phone?' · '+c.phone:''}</span></div>`).join('') || '–'}</div>
-      </div>
-
-      ${lastInter?`<div class="copilot-section">
-        <div class="copilot-sec-lbl">Dernière interaction</div>
-        <div class="copilot-data">${lastInter.type} · ${lastInter.date?new Date(lastInter.date).toLocaleDateString('fr-FR'):''}<br><span style="color:var(--tm);font-size:11px;">${lastInter.notes||''}</span></div>
-      </div>`:''}
-
-      ${aiResponse ? `
-      <div style="border-top:1.5px solid var(--pc-violet);margin:16px 0 14px;padding-top:14px;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
-          <i class="ti ti-brain" style="color:var(--pc-violet);font-size:18px;"></i>
-          <span style="font-family:'Exo 2',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--pc-violet-dark);">Analyse Sales Copilot</span>
-        </div>
-
-        ${aiResponse.resume?`<div class="copilot-section">
-          <div class="copilot-sec-lbl">Résumé</div>
-          <div class="copilot-data">${aiResponse.resume}</div>
-        </div>`:''}
-
-        ${aiResponse.analyse?`<div class="copilot-section">
-          <div class="copilot-sec-lbl">Analyse</div>
-          <div class="copilot-data">${aiResponse.analyse}</div>
-        </div>`:''}
-
-        ${aiResponse.strategie?`<div class="copilot-section">
-          <div class="copilot-sec-lbl">Stratégie recommandée</div>
-          <div class="copilot-data" style="color:var(--pc-violet-dark);border-left:2px solid var(--pc-violet);">${aiResponse.strategie}</div>
-        </div>`:''}
-
-        ${aiResponse.prochaine_action?`<div class="copilot-section">
-          <div class="copilot-sec-lbl">Prochaine action</div>
-          <div class="copilot-data">${aiResponse.prochaine_action}</div>
-        </div>`:''}
-
-        ${aiResponse.objections&&aiResponse.objections.length>0?`<div class="copilot-section">
-          <div class="copilot-sec-lbl">Objections anticipées</div>
-          <div class="copilot-data">${aiResponse.objections.map(o=>`<div style="margin-bottom:4px;">• ${o}</div>`).join('')}</div>
-        </div>`:''}
-
-        ${aiResponse.score_confiance?`<div class="copilot-section">
-          <div class="copilot-sec-lbl">Score de confiance</div>
-          <div class="copilot-data">
-            <div style="display:flex;align-items:center;gap:10px;">
-              <div style="flex:1;height:6px;background:var(--bd);border-radius:99px;overflow:hidden;">
-                <div style="width:${Math.round(aiResponse.score_confiance*100)}%;height:100%;background:var(--pc-teal);border-radius:99px;"></div>
-              </div>
-              <span style="font-family:'Exo 2',sans-serif;font-weight:700;color:var(--pc-teal-dark);">${Math.round(aiResponse.score_confiance*100)}%</span>
-            </div>
-          </div>
-        </div>`:''}
-
-        ${aiResponse.email?`<div class="copilot-section">
-          <div class="copilot-sec-lbl" style="display:flex;align-items:center;justify-content:space-between;">
-            Email généré
-            <button class="btn btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('ai-email-text').innerText);showToast('Email copié ✓')">
-              <i class="ti ti-copy"></i> Copier
-            </button>
-          </div>
-          <div class="ew" id="ai-email-text" style="white-space:pre-wrap;font-size:12px;line-height:1.8;">${aiResponse.email}</div>
-          <div style="margin-top:10px;display:flex;gap:8px;">
-            <button class="btn btn-teal" onclick="copilotCopyEmail()" style="flex:1;justify-content:center;">
-              <i class="ti ti-copy"></i> Copier l'email
-            </button>
-            <button class="btn" onclick="copilotIgnoreEmail()" title="Effacer le brouillon">
-              <i class="ti ti-x"></i> Ignorer
-            </button>
-          </div>
-        </div>`:''}
-      </div>
-      ` : `
-      <div class="copilot-section">
-        <div class="copilot-sec-lbl">Action recommandée</div>
-        <div class="copilot-data" style="color:var(--pc-violet-dark);border-left:2px solid var(--pc-violet);">${salesContext.crm.kestioAction}</div>
-      </div>
-      <div style="margin-top:12px;padding:10px 12px;background:var(--s1);border-radius:8px;font-size:12px;color:var(--tm);">
-        <i class="ti ti-info-circle" style="margin-right:4px;"></i>
-        Analyse IA non disponible — vérifiez le scénario Make.
-      </div>
-      `}
-
-      <div style="margin-top:16px;padding-top:14px;border-top:0.5px solid var(--bd);">
-        <div class="copilot-sec-lbl" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-          Contexte JSON
-          <button class="btn btn-sm" onclick="copilotCopyJSON()">
-            <i class="ti ti-copy"></i> Copier
-          </button>
-        </div>
-        <pre style="background:var(--s1);border-radius:8px;padding:10px;font-size:9px;color:var(--tm);overflow-x:auto;max-height:150px;overflow-y:auto;line-height:1.5;">${JSON.stringify(salesContext, null, 2)}</pre>
-      </div>`;
+    // Sprint 7.1 : afficher le menu d'actions au lieu de générer automatiquement
+    document.getElementById('copilot-body').innerHTML = renderCopilotMenu(salesContext);
+    console.log('🧠 SalesCopilot > salesContext prêt :', JSON.stringify(salesContext, null, 2));
 
   } catch(e) {
     console.error('Copilot error:', e);
