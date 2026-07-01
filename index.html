@@ -1976,33 +1976,68 @@ function renderCopilotMenu(context){
 }
 
 async function generateCopilotContent(actionId,context){
-  console.log('SalesCopilot > Generate:',actionId);
+  console.group('SalesCopilot > Generate: ' + actionId);
+  console.log('1. salesContext:', JSON.stringify(context, null, 2));
+
   const bodyEl=document.getElementById('copilot-body');
-  if(!bodyEl)return;
+  if(!bodyEl){ console.groupEnd(); return; }
   const action=COPILOT_ACTIONS.find(a=>a.id===actionId);
+
   bodyEl.innerHTML=`<div class="copilot-badge"><i class="ti ti-building"></i> ${context?.company?.name||'\u2013'}</div>
     <div class="copilot-loading" style="min-height:120px;"><div class="copilot-spin"></div>
     <div class="copilot-loading-txt">${action?.title||'G\u00e9n\u00e9ration'} en cours\u2026</div></div>`;
-  let aiResponse=null;
+
+  let aiResponse=null, makeStatus=null, makeRaw=null;
   try{
+    console.log('2. Appel webhook Make...');
     const r=await fetch('https://hook.eu2.make.com/n0ua9td3mfub2gmtujbanv4qce58pnox',{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({...context,requested_action:actionId})
     });
-    if(r.ok){const raw=await r.text();try{aiResponse=JSON.parse(raw);}catch{aiResponse={email:raw};}}
-  }catch(e){console.warn('SalesCopilot > Make error:',e.message);}
-  const draft=aiResponse?.email||aiResponse?.message||aiResponse?.script||`[${action?.title} non re\u00e7u \u2014 v\u00e9rifiez Make]`;
+    makeStatus=r.status;
+    makeRaw=await r.text();
+    console.log('3. Statut Make:', makeStatus);
+    console.log('4. Réponse brute Make:', makeRaw);
+    if(r.ok && makeRaw){
+      try{ aiResponse=JSON.parse(makeRaw); console.log('5. Réponse parsée:', aiResponse); }
+      catch{ aiResponse={email:makeRaw}; console.log('5. Réponse texte brut utilisée comme email'); }
+    } else {
+      console.warn('5. Make status', makeStatus, '— réponse vide ou erreur');
+    }
+  }catch(e){
+    console.error('3. Erreur réseau Make:', e.message);
+    makeStatus='ERREUR RÉSEAU — ' + e.message;
+  }
+  console.groupEnd();
+
+  const draft=aiResponse?.email||aiResponse?.message||aiResponse?.script||aiResponse?.content||null;
+
+  const errorHtml=`<div style="background:var(--pc-terra-bg);border:0.5px solid var(--pc-terra);border-radius:10px;padding:16px;font-size:12px;color:var(--pc-terra-dark);line-height:1.8;">
+    <strong><i class="ti ti-alert-triangle"></i> Contenu non reçu</strong><br><br>
+    Statut Make : <code>${makeStatus||'–'}</code><br>
+    Réponse : <code>${makeRaw?makeRaw.slice(0,300):'vide'}</code><br><br>
+    <strong>Points à vérifier dans Make :</strong><br>
+    • Le scénario est-il actif (toggle ON) ?<br>
+    • Le module OpenAI s'exécute-t-il sans erreur ?<br>
+    • La réponse OpenAI est-elle mappée dans le JSON de sortie sous la clé <code>email</code> ?<br>
+    • Le webhook répond-il bien <code>{"email": "..."}</code> ?<br><br>
+    <em>Logs complets disponibles dans la console (F12).</em>
+  </div>`;
+
   bodyEl.innerHTML=`<div class="copilot-badge"><i class="ti ti-building"></i> ${context?.company?.name||'\u2013'}</div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;margin-bottom:8px;">
       <div class="copilot-sec-lbl">${action?.title}</div>
       <button class="btn btn-sm" onclick="renderCopilotMenuView()"><i class="ti ti-arrow-left"></i> Retour</button>
     </div>
-    <div class="copilot-draft-wrap"><div class="copilot-draft-text" id="copilot-draft-content">${draft}</div></div>
-    <div class="copilot-draft-actions">
-      <button class="btn btn-teal" onclick="copilotCopyDraft()" style="flex:1;justify-content:center;"><i class="ti ti-copy"></i> Copier</button>
-      <button class="btn" onclick="generateCopilotContent('${actionId}',window.salesContext)"><i class="ti ti-refresh"></i> R\u00e9g\u00e9n\u00e9rer</button>
-      <button class="btn" onclick="renderCopilotMenuView()"><i class="ti ti-x"></i> Fermer</button>
-    </div>
+    ${draft
+      ? `<div class="copilot-draft-wrap"><div class="copilot-draft-text" id="copilot-draft-content">${draft}</div></div>
+         <div class="copilot-draft-actions">
+           <button class="btn btn-teal" onclick="copilotCopyDraft()" style="flex:1;justify-content:center;"><i class="ti ti-copy"></i> Copier</button>
+           <button class="btn" onclick="generateCopilotContent('${actionId}',window.salesContext)"><i class="ti ti-refresh"></i> R\u00e9g\u00e9n\u00e9rer</button>
+           <button class="btn" onclick="renderCopilotMenuView()"><i class="ti ti-x"></i> Fermer</button>
+         </div>`
+      : errorHtml
+    }
     ${aiResponse?.resume?`<div class="copilot-section" style="margin-top:14px;"><div class="copilot-sec-lbl">Analyse</div><div class="copilot-data">${aiResponse.resume}</div></div>`:''}`;
 }
 
