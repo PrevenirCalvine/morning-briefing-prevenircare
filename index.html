@@ -605,6 +605,82 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
   </div>
 </div>
 
+<!-- MODAL ACTION RÉALISÉE — Règle métier : aucune action sans prochaine étape -->
+<div class="modal-overlay" id="modal-action-done">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-title">✓ Action réalisée</div>
+    <input type="hidden" id="ad-contact-id">
+    <input type="hidden" id="ad-company-id">
+    <input type="hidden" id="ad-company-name">
+
+    <div class="fg">
+      <div class="fl">Résultat de l'action *</div>
+      <select class="fi" id="ad-resultat" style="height:40px;" onchange="ActionDone.onResultatChange(this.value)">
+        <option value="">— Choisir le résultat —</option>
+        <optgroup label="Échanges">
+          <option value="Email envoyé">📧 Email envoyé</option>
+          <option value="Réponse reçue">📬 Réponse reçue</option>
+          <option value="Appel réalisé">📞 Appel réalisé</option>
+          <option value="LinkedIn">💼 Message LinkedIn</option>
+          <option value="Visioconférence">🖥 Visioconférence</option>
+          <option value="Réunion en présentiel">🤝 Réunion en présentiel</option>
+        </optgroup>
+        <optgroup label="Avancées commerciales">
+          <option value="RDV obtenu">📅 RDV obtenu</option>
+          <option value="RDV tenu">✅ RDV tenu</option>
+          <option value="Brochure envoyée">📄 Brochure envoyée</option>
+          <option value="Devis envoyé par email">📨 Devis envoyé</option>
+          <option value="Devis présenté en rendez-vous">📊 Devis présenté</option>
+          <option value="Proposition de valeur présentée">💡 Proposition présentée</option>
+        </optgroup>
+        <optgroup label="Clôture définitive">
+          <option value="Contrat signé">🎉 Vente gagnée — Contrat signé</option>
+          <option value="Refus commercial">❌ Vente perdue — Refus définitif</option>
+          <option value="Sans réponse">🔇 Prospect non qualifié — Sans réponse</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <!-- Section prochaine étape — masquée si clôture définitive -->
+    <div id="ad-suite-section">
+      <div style="background:var(--pc-teal-bg);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--pc-teal-dark);margin-bottom:14px;">
+        <i class="ti ti-info-circle"></i> Un dossier ne disparaît jamais sans prochaine étape planifiée.
+      </div>
+      <div class="fg">
+        <div class="fl">Prochaine étape *</div>
+        <input class="fi" id="ad-next-action" placeholder="Relancer, Envoyer un devis, Préparer le RDV…" oninput="ActionDone.validateForm()">
+      </div>
+      <div class="fg">
+        <div class="fl">Date de la prochaine étape *</div>
+        <input class="fi" type="date" id="ad-next-date" oninput="ActionDone.validateForm()">
+      </div>
+    </div>
+
+    <!-- Section clôture définitive — affichée uniquement si résultat terminal -->
+    <div id="ad-cloture-section" style="display:none;">
+      <div style="background:var(--pc-terra-bg);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--pc-terra-dark);margin-bottom:14px;">
+        <i class="ti ti-flag"></i> Ce dossier sera clos. Il ne reviendra plus dans les actions du jour.
+      </div>
+    </div>
+
+    <div class="fg">
+      <div class="fl">Commentaire <span style="font-weight:400;color:var(--tm);">(facultatif)</span></div>
+      <textarea class="fta" id="ad-comment" placeholder="Ce qui s'est dit, les points clés, les engagements pris…"></textarea>
+    </div>
+
+    <div id="ad-validation-msg" style="display:none;font-size:12px;color:var(--pc-terra-dark);padding:8px 12px;background:var(--pc-terra-bg);border-radius:8px;margin-bottom:10px;">
+      Merci de définir la prochaine étape avant de clôturer cette action.
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn" onclick="cm('modal-action-done')">Annuler</button>
+      <button class="btn btn-teal" id="ad-confirm-btn" onclick="ActionDone.confirm()" disabled>
+        <i class="ti ti-check"></i> Valider et planifier la suite
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL NOUVELLE ENTREPRISE -->
 <div class="modal-overlay" id="modal-ne">
   <div class="modal">
@@ -816,7 +892,7 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
 <div class="toast" id="toast"></div>
 
 <script>
-const TOKEN='YpatBp1ANs8hOCg17w.631999d14abbce548f125e6796e50e70ca374e74cbba915e6a5e847478009618';
+const TOKEN='patBp1ANs8hOCg17w.631999d14abbce548f125e6796e50e70ca374e74cbba915e6a5e847478009618';
 // ─── SCHÉMA CRM CENTRALISÉ ────────────────────────────────────────────────────
 // Source : crmSchema.js — ne jamais écrire de noms de champs en dur ailleurs
 // Toutes les constantes de tables et champs sont définies ici.
@@ -1875,53 +1951,154 @@ function openAddOppFromCompany(compId, compName){
 // SPRINT 7.1 — UX
 // ═══════════════════════════════════════════════════════════════════════════
 
-window._doneTodayList = window._doneTodayList || [];
+// ═══════════════════════════════════════════════════════════════════════════
+// RÈGLE MÉTIER : AUCUNE ACTION SANS PROCHAINE ÉTAPE
+// Un dossier ne peut être clos que dans deux situations :
+//   1. Une prochaine action + date sont planifiées
+//   2. Le résultat est une clôture définitive (Contrat signé, Refus, Sans réponse)
+// ═══════════════════════════════════════════════════════════════════════════
 
-async function markActionDone(contactId, companyId){
-  const c=contacts.find(x=>x._recordId===contactId);
-  const compName=companies.find(x=>x._recordId===companyId)?.['Nom de l\'entreprise']||'?';
-  if(!c){ console.error('markActionDone > contact introuvable:', contactId); return; }
+const RESULTATS_CLOTURE = ['Contrat signé', 'Refus commercial', 'Sans réponse'];
 
-  console.log('✓ markActionDone >', compName, '—', c['Nom du contact']);
+const ActionDone = {
 
-  // Bug 4 fix : ne jamais envoyer "" pour un champ date — utiliser null
-  const today = NOW.toISOString().split('T')[0];
-  const f = {
-    'Prochaine action': '',           // texte vide OK
-    'Date prochaine action': null,    // null pour vider une date (pas "")
-    'Date dernière action': today,    // enregistrer quand l'action a été faite (si champ existe)
-  };
+  // Ouvrir le modal — remplace l'ancien markActionDone direct
+  open(contactId, companyId){
+    const comp = companies.find(x=>x._recordId===companyId);
+    document.getElementById('ad-contact-id').value = contactId;
+    document.getElementById('ad-company-id').value = companyId;
+    document.getElementById('ad-company-name').value = comp?.['Nom de l\'entreprise']||'';
+    document.getElementById('ad-resultat').value = '';
+    document.getElementById('ad-next-action').value = '';
+    document.getElementById('ad-next-date').value = '';
+    document.getElementById('ad-comment').value = '';
+    document.getElementById('ad-suite-section').style.display = 'block';
+    document.getElementById('ad-cloture-section').style.display = 'none';
+    document.getElementById('ad-validation-msg').style.display = 'none';
+    document.getElementById('ad-confirm-btn').disabled = true;
+    document.getElementById('ad-confirm-btn').innerHTML = '<i class="ti ti-check"></i> Valider et planifier la suite';
+    document.getElementById('modal-action-done').classList.add('show');
+  },
 
-  // Note : "Date dernière action" n'existe que sur Opportunités, pas sur Contacts
-  // On l'enlève pour éviter un 422 sur la table Contacts
-  delete f['Date dernière action'];
+  // Réagir au changement de résultat
+  onResultatChange(val){
+    const isCloture = RESULTATS_CLOTURE.includes(val);
+    document.getElementById('ad-suite-section').style.display = isCloture ? 'none' : 'block';
+    document.getElementById('ad-cloture-section').style.display = isCloture ? 'block' : 'none';
+    if(isCloture){
+      document.getElementById('ad-confirm-btn').disabled = !val;
+      document.getElementById('ad-confirm-btn').innerHTML = '<i class="ti ti-flag"></i> Clôturer ce dossier';
+    } else {
+      this.validateForm();
+      document.getElementById('ad-confirm-btn').innerHTML = '<i class="ti ti-check"></i> Valider et planifier la suite';
+    }
+  },
 
-  if(c['Statut réponse']==='Relance à faire') f['Statut réponse']='Envoy\u00e9 \u2013 en attente';
+  // Valider le formulaire — prochaine action + date obligatoires (hors clôture)
+  validateForm(){
+    const resultat = document.getElementById('ad-resultat').value;
+    if(RESULTATS_CLOTURE.includes(resultat)) return; // géré par onResultatChange
+    const na = document.getElementById('ad-next-action').value.trim();
+    const nd = document.getElementById('ad-next-date').value;
+    const valid = !!(na && nd);
+    document.getElementById('ad-confirm-btn').disabled = !valid;
+    document.getElementById('ad-validation-msg').style.display = valid ? 'none' : (na||nd?'block':'none');
+  },
 
-  try {
-    await at('PATCH', TC, {fields:f}, contactId);
-    console.log('✅ Airtable PATCH OK — contactId:', contactId);
-  } catch(e) {
-    console.error('❌ Airtable PATCH failed:', e.message);
-    showToast('⚠️ Erreur Airtable : ' + e.message);
-    return;
+  // Confirmer et enregistrer
+  async confirm(){
+    const contactId  = document.getElementById('ad-contact-id').value;
+    const companyId  = document.getElementById('ad-company-id').value;
+    const compName   = document.getElementById('ad-company-name').value;
+    const resultat   = document.getElementById('ad-resultat').value;
+    const na         = document.getElementById('ad-next-action').value.trim();
+    const nd         = document.getElementById('ad-next-date').value;
+    const comment    = document.getElementById('ad-comment').value.trim();
+    const isCloture  = RESULTATS_CLOTURE.includes(resultat);
+
+    const c = contacts.find(x=>x._recordId===contactId);
+    if(!c){ showToast('⚠️ Contact introuvable'); return; }
+
+    // Validation finale
+    if(!isCloture && (!na || !nd)){
+      document.getElementById('ad-validation-msg').style.display = 'block';
+      return;
+    }
+
+    console.log('ActionDone > confirm', {contactId, resultat, na, nd, isCloture});
+
+    // Construire le PATCH contact
+    const f = {};
+
+    // Statut réponse selon résultat
+    const statutMap = {
+      'Email envoyé':      'Envoyé – en attente',
+      'Réponse reçue':     'Réponse reçue',
+      'Appel réalisé':     'Réponse reçue',
+      'RDV obtenu':        'RDV obtenu',
+      'RDV tenu':          'RDV obtenu',
+      'Contrat signé':     'Réponse reçue',
+      'Refus commercial':  'Sans suite',
+      'Sans réponse':      'Sans suite',
+    };
+    if(statutMap[resultat]) f['Statut réponse'] = statutMap[resultat];
+    if(resultat === 'Email envoyé') f['Date dernier email'] = new Date().toISOString().split('T')[0];
+
+    if(isCloture){
+      // Clôture définitive : vider la prochaine action
+      f['Prochaine action'] = '';
+      f['Date prochaine action'] = null;
+    } else {
+      // Suite planifiée
+      f['Prochaine action'] = na;
+      f['Date prochaine action'] = nd;
+    }
+
+    // Commentaire → notes sur le contact
+    if(comment) f['Notes sur le contact'] = (c['Notes sur le contact']?c['Notes sur le contact']+'\n\n':'') + `[${new Date().toLocaleDateString('fr-FR')}] ${comment}`;
+
+    try {
+      await at('PATCH', TC, {fields:f}, contactId);
+      console.log('✅ Contact mis à jour:', contactId);
+    } catch(e) {
+      console.error('❌ PATCH failed:', e.message);
+      showToast('⚠️ Erreur Airtable : ' + e.message);
+      return;
+    }
+
+    // Enregistrer l'interaction dans l'historique
+    try {
+      await at('POST', TI, {fields:{
+        'Type d\'interaction': resultat,
+        'Notes': comment || resultat,
+        'Contact lié': [contactId],
+        'Date d\'interaction': new Date().toISOString(),
+      }});
+      console.log('✅ Interaction enregistrée');
+    } catch(e) {
+      console.warn('Interaction non enregistrée:', e.message);
+    }
+
+    // Mémoriser pour la section "Terminées"
+    window._doneTodayList = window._doneTodayList || [];
+    window._doneTodayList.push(`${compName} — ${c['Nom du contact']||'Contact'}${isCloture?' (clôturé)':' → '+na}`);
+
+    cm('modal-action-done');
+    showToast(isCloture ? '🏁 Dossier clôturé' : '✓ Action validée · Prochaine étape planifiée');
+
+    // Recharger
+    [companies, contacts] = await Promise.all([fetchAll(TE), fetchAll(TC)]);
+    window._opps = await fetchAll(TO);
+    render();
   }
+};
 
-  // Mettre à jour le cache local immédiatement (avant rechargement)
-  const localContact = contacts.find(x=>x._recordId===contactId);
-  if(localContact){
-    localContact['Prochaine action'] = '';
-    localContact['Date prochaine action'] = null;
-  }
-
-  window._doneTodayList.push(`${compName} \u2014 ${c['Nom du contact']||'Contact'}`);
-  showToast('\u2713 Action marquée comme faite');
-
-  // Recharger les données depuis Airtable
-  [companies, contacts] = await Promise.all([fetchAll(TE), fetchAll(TC)]);
-  window._opps = await fetchAll(TO);
-  render();
+// Alias pour compatibilité avec les boutons existants
+function markActionDone(contactId, companyId){
+  ActionDone.open(contactId, companyId);
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
 
 const _cockpitState={};
 function toggleCockpitSection(id){
