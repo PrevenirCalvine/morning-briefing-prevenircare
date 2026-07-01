@@ -1082,7 +1082,18 @@ function cMatContact(c){
   if(val.startsWith('N1')) return 1;
   return null;
 }
-function needsAct(c){const nd=c['Date prochaine action'];return nd&&new Date(nd)<=NOW;}
+// needsAct — retourne true si la prochaine action est due aujourd'hui ou en retard.
+// Comparaison en date locale pure (sans heure) pour éviter les décalages UTC.
+function needsAct(c){
+  const nd=c['Date prochaine action'];
+  if(!nd) return false;
+  // Extraire YYYY-MM-DD depuis la string ISO Airtable (ex: "2026-07-06")
+  const parts = String(nd).slice(0,10).split('-');
+  if(parts.length!==3) return false;
+  const actionDate = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+  const today = new Date(NOW.getFullYear(), NOW.getMonth(), NOW.getDate()); // minuit local
+  return actionDate <= today;
+}
 function compNA(cc){return cc.some(c=>needsAct(c));}
 /**
  * urg — Score d'urgence d'une entreprise pour le tri des listes.
@@ -1197,7 +1208,13 @@ function cardHTML(comp,idx,cc){
       <button class="btn btn-sm" onclick="event.stopPropagation();openAddContactFromCompany('${comp._recordId||''}','${name.replace(/'/g,"\\'")}')"><i class="ti ti-user-plus"></i> Ajouter un contact</button>
     </div>
     <div class="contact-list">${ctHTML}</div>
-    ${pri?`<div class="dl2">Brouillon — ${pri['Nom du contact']||''}</div><div class="ew"><div class="esubj">Objet : <strong>${em.s}</strong></div><div class="ebody">${em.b}</div><div class="esig"><div class="sname">Calvine TONGA</div><div class="ssub">Fondatrice – Présidente · PrévenirCare · prevenir.care</div></div></div>`:''}
+    ${pri&&em.s?`<div class="dl2" style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;">
+      <div style="font-size:12px;color:var(--ts);"><span style="color:var(--tm);font-size:10px;font-family:'Exo 2',sans-serif;font-weight:700;text-transform:uppercase;">Brouillon</span> · Objet : <strong>${em.s}</strong></div>
+      <button class="btn btn-sm" onclick="event.stopPropagation();toggleDraft('draft-${idx}')"><i class="ti ti-eye"></i> Voir</button>
+    </div>
+    <div id="draft-${idx}" style="display:none;margin-top:8px;">
+      <div class="ew"><div class="esubj">Objet : <strong>${em.s}</strong></div><div class="ebody">${em.b}</div><div class="esig"><div class="sname">Calvine TONGA</div><div class="ssub">Fondatrice – Présidente · PrévenirCare · prevenir.care</div></div></div>
+    </div>`:''}
     <div style="margin-top:16px;padding-top:14px;border-top:0.5px solid var(--bd);">
       <button class="btn-copilot" onclick="event.stopPropagation();prepareNextAction('${comp._recordId||''}','${name.replace(/'/g,"\\'")}')">
         <i class="ti ti-brain"></i> Analyser
@@ -1226,7 +1243,8 @@ function render(){
   const cl=companies.map(c=>({comp:c,cc:getCC(c)})).filter(x=>x.cc.length>0);
 
   if(currentTab==='today'){
-    const list=cl.filter(x=>compNA(x.cc)||x.cc.some(c=>!c['Statut réponse']||c['Statut réponse']==='Pas encore envoyé')).sort((a,b)=>urg(b.cc,b.comp)-urg(a.cc,a.comp)).slice(0,12);
+    // Actions du jour = uniquement entreprises avec date d'action <= aujourd'hui
+    const list=cl.filter(x=>compNA(x.cc)).sort((a,b)=>urg(b.cc,b.comp)-urg(a.cc,a.comp)).slice(0,20);
     if(!list.length){
       el.innerHTML=`<div class="empty"><i class="ti ti-check" style="font-size:28px;display:block;margin:0 auto 10px;color:var(--pc-teal);"></i>Toutes les actions du jour sont traitées 🎉<br>Consultez "Entreprises" pour planifier la suite.</div>`;
       return;
@@ -1351,7 +1369,7 @@ async function saveInter(){
   if(canal==='Email envoyé') f['Date dernier email']=today;
   if(notes) f['Notes sur le contact']=notes;
   if(na)    f['Prochaine action']=na;
-  if(nd)    f['Date prochaine action']=nd;
+  if(nd)    f['Date prochaine action']=nd; else if(na) f['Date prochaine action']=null;
   // KESTIO Contact — uniquement si l'utilisateur a sélectionné un niveau
   if(mat && mat>=1 && mat<=4){
     const kestioVal=`N${mat} \u2014 ${['','Inconscience','Prise de conscience','Appropriation','Recherche de solution'][mat]}`;
@@ -1426,6 +1444,17 @@ async function qu(rid,statut){
 
 function cm(id){document.getElementById(id).classList.remove('show');}
 function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500);}
+
+// Afficher/masquer un brouillon email à la demande
+function toggleDraft(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  const isHidden=el.style.display==='none';
+  el.style.display=isHidden?'block':'none';
+  // Mettre à jour le texte du bouton
+  const btn=el.previousElementSibling?.querySelector('button');
+  if(btn) btn.innerHTML=isHidden?'<i class="ti ti-eye-off"></i> Masquer':'<i class="ti ti-eye"></i> Voir';
+}
 
 // Recharge le CRM et rouvre la fiche d'une entreprise spécifique
 async function bootAndFocus(compId){
@@ -1851,14 +1880,46 @@ window._doneTodayList = window._doneTodayList || [];
 async function markActionDone(contactId, companyId){
   const c=contacts.find(x=>x._recordId===contactId);
   const compName=companies.find(x=>x._recordId===companyId)?.['Nom de l\'entreprise']||'?';
-  if(!c)return;
-  const f={'Prochaine action':'','Date prochaine action':''};
-  if(c['Statut réponse']==='Relance à faire')f['Statut réponse']='Envoy\u00e9 \u2013 en attente';
-  await at('PATCH',TC,{fields:f},contactId);
+  if(!c){ console.error('markActionDone > contact introuvable:', contactId); return; }
+
+  console.log('✓ markActionDone >', compName, '—', c['Nom du contact']);
+
+  // Bug 4 fix : ne jamais envoyer "" pour un champ date — utiliser null
+  const today = NOW.toISOString().split('T')[0];
+  const f = {
+    'Prochaine action': '',           // texte vide OK
+    'Date prochaine action': null,    // null pour vider une date (pas "")
+    'Date dernière action': today,    // enregistrer quand l'action a été faite (si champ existe)
+  };
+
+  // Note : "Date dernière action" n'existe que sur Opportunités, pas sur Contacts
+  // On l'enlève pour éviter un 422 sur la table Contacts
+  delete f['Date dernière action'];
+
+  if(c['Statut réponse']==='Relance à faire') f['Statut réponse']='Envoy\u00e9 \u2013 en attente';
+
+  try {
+    await at('PATCH', TC, {fields:f}, contactId);
+    console.log('✅ Airtable PATCH OK — contactId:', contactId);
+  } catch(e) {
+    console.error('❌ Airtable PATCH failed:', e.message);
+    showToast('⚠️ Erreur Airtable : ' + e.message);
+    return;
+  }
+
+  // Mettre à jour le cache local immédiatement (avant rechargement)
+  const localContact = contacts.find(x=>x._recordId===contactId);
+  if(localContact){
+    localContact['Prochaine action'] = '';
+    localContact['Date prochaine action'] = null;
+  }
+
   window._doneTodayList.push(`${compName} \u2014 ${c['Nom du contact']||'Contact'}`);
   showToast('\u2713 Action marquée comme faite');
-  [companies,contacts]=await Promise.all([fetchAll(TE),fetchAll(TC)]);
-  window._opps=await fetchAll(TO);
+
+  // Recharger les données depuis Airtable
+  [companies, contacts] = await Promise.all([fetchAll(TE), fetchAll(TC)]);
+  window._opps = await fetchAll(TO);
   render();
 }
 
