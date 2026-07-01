@@ -816,7 +816,7 @@ body{font-family:'Poppins',sans-serif;font-size:14px;background:#F4F5F6;color:va
 <div class="toast" id="toast"></div>
 
 <script>
-const TOKEN='patBp1ANs8hOCg17w.631999d14abbce548f125e6796e50e70ca374e74cbba915e6a5e847478009618';
+const TOKEN='YpatBp1ANs8hOCg17w.631999d14abbce548f125e6796e50e70ca374e74cbba915e6a5e847478009618';
 // ─── SCHÉMA CRM CENTRALISÉ ────────────────────────────────────────────────────
 // Source : crmSchema.js — ne jamais écrire de noms de champs en dur ailleurs
 // Toutes les constantes de tables et champs sont définies ici.
@@ -1977,54 +1977,84 @@ function renderCopilotMenu(context){
 
 async function generateCopilotContent(actionId,context){
   console.group('SalesCopilot > Generate: ' + actionId);
-  console.log('1. salesContext:', JSON.stringify(context, null, 2));
 
   const bodyEl=document.getElementById('copilot-body');
   if(!bodyEl){ console.groupEnd(); return; }
   const action=COPILOT_ACTIONS.find(a=>a.id===actionId);
 
-  bodyEl.innerHTML=`<div class="copilot-badge"><i class="ti ti-building"></i> ${context?.company?.name||'\u2013'}</div>
+  bodyEl.innerHTML=`<div class="copilot-badge"><i class="ti ti-building"></i> ${context?.company?.name||'–'}</div>
     <div class="copilot-loading" style="min-height:120px;"><div class="copilot-spin"></div>
-    <div class="copilot-loading-txt">${action?.title||'G\u00e9n\u00e9ration'} en cours\u2026</div></div>`;
+    <div class="copilot-loading-txt">${action?.title||'Génération'} en cours…</div></div>`;
+
+  // ─── Construction du payload OpenAI côté JS ──────────────────────────────
+  // Make ne fabrique plus le prompt. Son rôle : recevoir → transmettre → renvoyer.
+  // JSON.stringify garantit que guillemets, retours à la ligne et Unicode
+  // ne cassent jamais le JSON, quelle que soit la valeur des champs.
+
+  const systemPrompt = buildSystemPrompt(actionId);
+  const userContent  = buildUserContent(context, actionId);
+
+  const openaiPayload = {
+    model: 'gpt-4o',
+    instructions: systemPrompt,
+    input: userContent,
+  };
+
+  const webhookBody = {
+    openai_payload: openaiPayload,   // Make transmet tel quel à POST /v1/responses
+    requested_action: actionId,       // Conservé pour traçabilité Make
+    company_name: context?.company?.name || '',
+  };
+
+  console.log('1. openai_payload construit :', JSON.stringify(openaiPayload, null, 2));
+  console.log('2. Appel webhook Make...');
 
   let aiResponse=null, makeStatus=null, makeRaw=null;
   try{
-    console.log('2. Appel webhook Make...');
-    const r=await fetch('https://hook.eu2.make.com/n0ua9td3mfub2gmtujbanv4qce58pnox',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({...context,requested_action:actionId})
+    const r = await fetch('https://hook.eu2.make.com/n0ua9td3mfub2gmtujbanv4qce58pnox', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(webhookBody),
     });
-    makeStatus=r.status;
-    makeRaw=await r.text();
-    console.log('3. Statut Make:', makeStatus);
-    console.log('4. Réponse brute Make:', makeRaw);
+    makeStatus = r.status;
+    makeRaw = await r.text();
+    console.log('3. Statut Make :', makeStatus);
+    console.log('4. Réponse brute Make :', makeRaw);
     if(r.ok && makeRaw){
-      try{ aiResponse=JSON.parse(makeRaw); console.log('5. Réponse parsée:', aiResponse); }
-      catch{ aiResponse={email:makeRaw}; console.log('5. Réponse texte brut utilisée comme email'); }
+      try{
+        aiResponse = JSON.parse(makeRaw);
+        console.log('5. Réponse parsée :', aiResponse);
+      } catch {
+        aiResponse = {email: makeRaw};
+        console.log('5. Texte brut utilisé comme email');
+      }
     } else {
       console.warn('5. Make status', makeStatus, '— réponse vide ou erreur');
     }
-  }catch(e){
-    console.error('3. Erreur réseau Make:', e.message);
-    makeStatus='ERREUR RÉSEAU — ' + e.message;
+  } catch(e) {
+    console.error('3. Erreur réseau Make :', e.message);
+    makeStatus = 'ERREUR RÉSEAU — ' + e.message;
   }
   console.groupEnd();
 
-  const draft=aiResponse?.email||aiResponse?.message||aiResponse?.script||aiResponse?.content||null;
+  const draft = aiResponse?.email || aiResponse?.message ||
+                aiResponse?.script || aiResponse?.content ||
+                aiResponse?.output || null;
 
-  const errorHtml=`<div style="background:var(--pc-terra-bg);border:0.5px solid var(--pc-terra);border-radius:10px;padding:16px;font-size:12px;color:var(--pc-terra-dark);line-height:1.8;">
+  const errorHtml = `<div style="background:var(--pc-terra-bg);border:0.5px solid var(--pc-terra);border-radius:10px;padding:16px;font-size:12px;color:var(--pc-terra-dark);line-height:1.8;">
     <strong><i class="ti ti-alert-triangle"></i> Contenu non reçu</strong><br><br>
     Statut Make : <code>${makeStatus||'–'}</code><br>
-    Réponse : <code>${makeRaw?makeRaw.slice(0,300):'vide'}</code><br><br>
-    <strong>Points à vérifier dans Make :</strong><br>
-    • Le scénario est-il actif (toggle ON) ?<br>
-    • Le module OpenAI s'exécute-t-il sans erreur ?<br>
-    • La réponse OpenAI est-elle mappée dans le JSON de sortie sous la clé <code>email</code> ?<br>
-    • Le webhook répond-il bien <code>{"email": "..."}</code> ?<br><br>
-    <em>Logs complets disponibles dans la console (F12).</em>
+    Réponse : <code>${makeRaw ? makeRaw.slice(0,300) : 'vide'}</code><br><br>
+    <strong>Configuration Make attendue :</strong><br>
+    1. Webhook reçoit <code>body.openai_payload</code><br>
+    2. Module HTTP POST → <code>https://api.openai.com/v1/responses</code><br>
+    &nbsp;&nbsp;&nbsp;Body = <code>{{body.openai_payload}}</code> (passé tel quel)<br>
+    3. Response module renvoie <code>{"email": "{{output[].content[].text}}"}</code><br><br>
+    <em>Logs complets dans la console (F12).</em>
   </div>`;
 
-  bodyEl.innerHTML=`<div class="copilot-badge"><i class="ti ti-building"></i> ${context?.company?.name||'\u2013'}</div>
+  bodyEl.innerHTML = `
+    <div class="copilot-badge"><i class="ti ti-building"></i> ${context?.company?.name||'–'}</div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;margin-bottom:8px;">
       <div class="copilot-sec-lbl">${action?.title}</div>
       <button class="btn btn-sm" onclick="renderCopilotMenuView()"><i class="ti ti-arrow-left"></i> Retour</button>
@@ -2033,13 +2063,90 @@ async function generateCopilotContent(actionId,context){
       ? `<div class="copilot-draft-wrap"><div class="copilot-draft-text" id="copilot-draft-content">${draft}</div></div>
          <div class="copilot-draft-actions">
            <button class="btn btn-teal" onclick="copilotCopyDraft()" style="flex:1;justify-content:center;"><i class="ti ti-copy"></i> Copier</button>
-           <button class="btn" onclick="generateCopilotContent('${actionId}',window.salesContext)"><i class="ti ti-refresh"></i> R\u00e9g\u00e9n\u00e9rer</button>
+           <button class="btn" onclick="generateCopilotContent('${actionId}',window.salesContext)"><i class="ti ti-refresh"></i> Régénérer</button>
            <button class="btn" onclick="renderCopilotMenuView()"><i class="ti ti-x"></i> Fermer</button>
          </div>`
       : errorHtml
     }
-    ${aiResponse?.resume?`<div class="copilot-section" style="margin-top:14px;"><div class="copilot-sec-lbl">Analyse</div><div class="copilot-data">${aiResponse.resume}</div></div>`:''}`;
+    ${aiResponse?.analyse ? `<div class="copilot-section" style="margin-top:14px;"><div class="copilot-sec-lbl">Analyse</div><div class="copilot-data">${aiResponse.analyse}</div></div>` : ''}
+    ${aiResponse?.resume  ? `<div class="copilot-section"><div class="copilot-sec-lbl">Résumé</div><div class="copilot-data">${aiResponse.resume}</div></div>` : ''}`;
 }
+
+// ─── Prompt système selon l'action demandée ───────────────────────────────────
+// Séparé des données pour être modifié sans toucher à la logique d'envoi.
+function buildSystemPrompt(actionId){
+  const base = `Tu es le Sales Copilot de PrévenirCare, une plateforme de prévention santé primaire.
+Tu assistes Calvine TONGA, Fondatrice-Présidente, dans sa prospection commerciale B2B.
+
+PHILOSOPHIE COMMERCIALE KESTIO :
+- N1 Inconscience : ne jamais parler de PrévenirCare. Ouvrir une réflexion.
+- N2 Prise de conscience : nourrir la réflexion avec des faits et mécanismes.
+- N3 Appropriation : faire verbaliser le problème. Écouter et reformuler.
+- N4 Recherche de solution : présenter PrévenirCare comme réponse naturelle.
+
+STYLE CALVINE TONGA :
+- Ton pair-à-pair, jamais commercial
+- 4 paragraphes : observation personnalisée → réflexion utile → lien PC → ouverture
+- Formulations interdites : "Je me permets", "Je vous relance", "Auriez-vous 30 minutes"
+- Test final : "Si j'étais le destinataire, aurais-je envie de répondre ?"
+
+RÉPONSE : retourne uniquement le texte demandé, sans commentaire ni explication.`;
+
+  const actions = {
+    email:    `\nGénère un email de prospection adapté au niveau KESTIO Contact du décideur principal.`,
+    linkedin: `\nGénère un message LinkedIn court (max 300 caractères) adapté au niveau KESTIO.`,
+    appel:    `\nGénère un script d'appel structuré : accroche (20s) → questions de découverte → conclusion.`,
+    rdv:      `\nPrépare une fiche de rendez-vous : objectif, 5 questions clés, points à valider, ce à éviter.`,
+    suivi:    `\nGénère un email de suivi post-échange synthétisant ce qui a été dit et la prochaine étape.`,
+  };
+  return base + (actions[actionId] || '');
+}
+
+// ─── Contenu utilisateur structuré en JSON propre ─────────────────────────────
+// JSON.stringify protège contre tout caractère spécial dans les données CRM.
+// Les collections vides restent [], jamais absentes ou null.
+function buildUserContent(context, actionId){
+  const safe = v => v || '';
+  const safeArr = v => Array.isArray(v) ? v : [];
+
+  const data = {
+    action_demandee: actionId,
+    entreprise: {
+      nom:     safe(context?.company?.name),
+      secteur: safe(context?.company?.industry),
+      site:    safe(context?.company?.website),
+      notes:   safe(context?.company?.notes),
+    },
+    contacts: safeArr(context?.contacts).map(c => ({
+      prenom:        safe(c.firstname),
+      nom:           safe(c.lastname),
+      fonction:      safe(c.role),
+      email:         safe(c.email),
+      kestio:        safe(c.kestioContact),
+    })),
+    interactions: safeArr(context?.interactions).map(i => ({
+      type:  safe(i.type),
+      date:  safe(i.date),
+      notes: safe(i.notes),
+    })),
+    opportunites: safeArr(context?.opportunities).map(o => ({
+      nom:            safe(o.name),
+      stade:          safe(o.stage),
+      prochaine_action: safe(o.nextAction),
+    })),
+    crm: {
+      kestio_niveau:   safe(context?.crm?.kestioLevel),
+      kestio_objectif: safe(context?.crm?.kestioObjectif),
+      kestio_action:   safe(context?.crm?.kestioAction),
+      prochaine_action: safe(context?.crm?.nextAction),
+    },
+  };
+
+  // Retourner une string JSON propre — Make la transmet sans modification
+  return `Voici le contexte CRM en JSON. Génère le contenu demandé.\n\n${JSON.stringify(data, null, 2)}`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 function renderCopilotMenuView(){
   const bodyEl=document.getElementById('copilot-body');
