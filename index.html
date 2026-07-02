@@ -1899,35 +1899,72 @@ function openEditOpp(oppId){
 async function saveEditOpp(){
   const id=getVal('eo-id');
   if(!id)return;
-  const f={};
-  const nom=getVal('eo-nom').trim();
-  if(nom)f[OPP.NAME]=nom;
-  f[OPP.STAGE]=getVal('eo-stade');
-  const resp=getVal('eo-responsable').trim();
-  if(resp)f['Responsable']=resp;
-  const prob=parseFloat(getVal('eo-prob'));
-  if(!isNaN(prob))f[OPP.PROBABILITY||'Probabilité (%)']=prob;
-  const val=parseFloat(getVal('eo-val'));
-  if(!isNaN(val))f[OPP.VALUE]=val;
-  const date=getVal('eo-date');
-  if(date)f['Date de clôture prévue']=date;
-  const cp=getVal('eo-contact-principal');
-  if(cp)f['Contact principal']=[cp];
-  const la=getVal('eo-last-action').trim();
-  if(la)f['Dernière action']=la;
-  const lad=getVal('eo-last-action-date');
-  if(lad)f['Date dernière action']=lad;
-  const na=getVal('eo-next-action').trim();
-  if(na)f['Prochaine action']=na;
-  const nad=getVal('eo-next-action-date');
-  if(nad)f['Date prochaine action']=nad;
-  const com=getVal('eo-commentaires').trim();
-  if(com)f['Commentaires']=com;
 
-  await at('PATCH',TO,{fields:f},id);
-  cm('modal-edit-opp');
-  showToast('Opportunité mise à jour ✓');
-  await boot();
+  const f={};
+
+  // Champs texte — inclus uniquement si non vides
+  const nom=getVal('eo-nom').trim();
+  if(nom) f[OPP.NAME]=nom;
+
+  // ⚠️ SINGLE SELECT — ne jamais envoyer "" → erreur 422 Airtable
+  // Inclure uniquement si une valeur est explicitement sélectionnée
+  const stade=getVal('eo-stade');
+  if(stade) f[OPP.STAGE]=stade;
+
+  const resp=getVal('eo-responsable').trim();
+  if(resp) f['Responsable']=resp;
+
+  // Champs numériques
+  const prob=parseFloat(getVal('eo-prob'));
+  if(!isNaN(prob) && getVal('eo-prob')) f['Probabilité (%)'] = prob;
+
+  const val=parseFloat(getVal('eo-val'));
+  if(!isNaN(val) && getVal('eo-val')) f[OPP.VALUE]=val;
+
+  // Champs date — null pour vider, jamais ""
+  const date=getVal('eo-date');
+  if(date) f['Date de clôture prévue']=date;
+
+  // Contact principal — linked record
+  const cp=getVal('eo-contact-principal');
+  if(cp) f['Contact principal']=[cp];
+
+  // Champs texte libres
+  const la=getVal('eo-last-action').trim();
+  if(la) f['Dernière action']=la;
+
+  const lad=getVal('eo-last-action-date');
+  if(lad) f['Date dernière action']=lad;
+
+  const na=getVal('eo-next-action').trim();
+  if(na) f['Prochaine action']=na;
+
+  const nad=getVal('eo-next-action-date');
+  if(nad) f['Date prochaine action']=nad;
+
+  const com=getVal('eo-commentaires').trim();
+  if(com) f['Commentaires']=com;
+
+  // Log du payload pour diagnostic
+  console.log('saveEditOpp > payload envoyé à Airtable :', JSON.stringify(f, null, 2));
+
+  if(Object.keys(f).length === 0){
+    showToast('Aucune modification à enregistrer');
+    cm('modal-edit-opp');
+    return;
+  }
+
+  try {
+    await at('PATCH', TO, {fields:f}, id);
+    cm('modal-edit-opp');
+    showToast('Opportunité mise à jour ✓');
+    await boot();
+  } catch(e) {
+    // En cas d'erreur 422, afficher le payload fautif
+    console.error('saveEditOpp > 422 — payload refusé :', JSON.stringify(f, null, 2));
+    console.error('saveEditOpp > erreur :', e.message);
+    showToast('⚠️ Erreur Airtable : ' + e.message);
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -2669,15 +2706,23 @@ async function saveOpp(){
   const f={'Nom de l\'opportunité':nom};
   const entId=document.getElementById('opp-ent').value;
   if(entId)f['Entreprise liée']=[entId];
-  f['Stade']=document.getElementById('opp-stade').value;
+  // ⚠️ SINGLE SELECT — ne jamais envoyer "" → 422
+  const stade=document.getElementById('opp-stade').value;
+  if(stade)f['Stade']=stade;
   const val=parseFloat(document.getElementById('opp-val').value);
   if(val)f['Valeur (EUR)']=val;
   if(document.getElementById('opp-notes').value)f['Commentaires']=document.getElementById('opp-notes').value;
-  await CRM.createOpportunity(f);
-  cm('modal-opp');
-  ['opp-nom','opp-val','opp-notes'].forEach(id=>document.getElementById(id).value='');
-  showToast(`Opportunité "${nom}" créée ✓`);
-  await boot();
+  console.log('saveOpp > payload :', JSON.stringify(f, null, 2));
+  try {
+    await CRM.createOpportunity(f);
+    cm('modal-opp');
+    ['opp-nom','opp-val','opp-notes'].forEach(id=>document.getElementById(id).value='');
+    showToast(`Opportunité "${nom}" créée ✓`);
+    await boot();
+  } catch(e) {
+    console.error('saveOpp > erreur :', e.message, JSON.stringify(f));
+    showToast('⚠️ Erreur : ' + e.message);
+  }
 }
 
 // Interaction globale
